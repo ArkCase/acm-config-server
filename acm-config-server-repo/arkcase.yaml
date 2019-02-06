@@ -1,0 +1,1457 @@
+################### Analytics Configuration (acm-analytics-config.properties) ####################
+# Demo server for testing purposes
+elk:
+  server:
+    url: "http://acm-arkcase/arkcase/acm-elastic"
+    port: 5601
+    internal.url: "http://acm-arkcase/arkcase/acm-elastic"
+    internal.port: 5601
+    user: 
+    password:
+  dashboard.url: "/app/kibana#/dashboard/693034a0-6ca5-11e7-8049-858c370356cc"
+slk.server:
+  internal.url: "https://acm-solr"
+  internal.port: 8983
+  external.url: "https://acm-arkcase/arkcase"
+  dashboard.url: "/solr/banana/src/index.html"
+  dashboardfile.url: "#/dashboard/file/"
+################### External Integration (acmExternalIntegration.properties) ####################
+external.integration:
+  enable: true
+  userId: "arkcase-administrator@armedia.com"
+################### Plain Forms Configuraion (acm-forms-plain.properties) ####################
+# Frevvo server informatoin
+frevvo:
+  service.baseUrl: "https://acm-arkcase/arkcase"
+  service.external.baseUrl: "https://acm-arkcase/arkcase"
+  browser.redirect.baseUrl: "https://acm-arkcase/arkcase"
+  protocol.internal: "https"
+  host.internal: "acm-arkcase"
+  port.internal: 443
+  protocol: "https"
+  host: "acm-arkcase"
+  port: "443"
+  uri: "/arkcase/frevvo/web/tn/{tenant}/user/{user}/app/{application}/formtype/{type}/{mode}?container=false&resize=true&_formTz={frevvo_timezone}&locale={frevvo_locale}&_data=(acm_ticket:'{acm_ticket}',
+  serviceBaseUrl:'{frevvo_service_baseUrl}',serviceExternalBaseUrl:'{frevvo_service_external_baseUrl}',redirectBaseUrl:'{frevvo_browser_redirect_baseUrl}')"
+  tenant: "armedia"
+  admin.user: "admin"
+  admin.password: "ENC(U2FsdGVkX1/xhPRpzw95iNfLBLwieucwbQ0eg9woLOk=)"
+  designer.user: "acm"
+  # Application ids where plain forms are present (comma separated, example: _IgbIMDnTEeSjTrBIsoKK0g,_ubJWgTBpEeWlqfoL7GxXoQ)
+  plain.form.application.ids: "_IgbIMDnTEeSjTrBIsoKK0g"
+  # The timezone that need for Date/Time fields in the forms
+  # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  timezone: "America/New_York"
+  # This is default locale 
+  # If "frevvo.locale.overwrite=false" then this locale value will take effect.
+  # If "frevvo.locale.overwrite=true" then the locale from the request (from the browser) will overwrite this value
+  # If request (browser) locale cannot be recognized, this locale value will take effect
+  # Locale samples: en_US, en_AU ....
+  locale: "en_US"
+  locale.overwrite: false
+# This is configuration which Case File form should be active, case_file, project (all these are Cases)
+active.case.form: "case_file"
+# This is configuration which Complaint form should be active: complaint, etc...
+active.complaint.form: "complaint"
+# This is configuration which Close Complaint form should be active: close_complaint, etc...
+active.close.complaint.form: "close_complaint"
+# This is configuration which change status form should be active, change_case_status, cpc_change_status
+active.change_status.form: "change_case_status"
+# FORMS INFORMATION
+# Complaint
+complaint.form:
+  name: "Complaint"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_JtTqMC7fEeS5l-bMPzqvwA"
+  mode: "popupform"
+  enable.frevvo.form.engine: true
+  owningGroupType: "owning group"
+  owning_group.privilege: "acm-complaint-approve"
+  assignee.privilege.type: "group-user"
+  follower.privilege.type: "user"
+# ROI
+roi:
+  name: "Report Of Investigation"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_9qNBwDpwEeS9Eebjp95TKw"
+  mode: "popupform"
+  enable.frevvo.form.engine: true
+# Close Complaint
+close_complaint:
+  name: "Close Complaint"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_HNpQgE-yEeSBQuFshND1XQ"
+  mode: "popupform"
+  enable.frevvo.form.engine: true
+  approve.privilege: "acm-complaint-approve"
+# Change Case Status
+change_case_status:
+  name: "Change Case Status"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_YqxA0EAeEeSSh-NlfQsR7g"
+  mode: "popupform"
+  enable.frevvo.form.engine: true
+# Case File
+case_file:
+ name: "Case File"
+ application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+ type: "_jTrYoLXwEeSNKN7wfymqgA"
+ mode: "popupform"
+ owningGroupType: "owning group"
+ owning_group.privilege: "acm-case-approve"
+ assignee.privilege.type: "group-user"
+ follower.privilege.type: "user"
+# Electronic Communication
+electronic_communication:
+  name: "Electronic Communication"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_pv_mcIqbEeSiT9zUihAFcQ"
+  mode: "popupform"
+  enable.frevvo.form.engine: true
+# Timesheet
+timesheet:
+  name: "Timesheet"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_K2MQkLxHEeSms-PrS7te7w"
+  mode: "popupform"
+  CASE_FILE.details: "title_parseable"
+  COMPLAINT.details: "title_parseable"
+# Costsheet
+costsheet:
+  name: "Expenses"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_YPmMQL2oEeSmjJjf63cgRw"
+  mode: "popupform"
+  CASE_FILE.details: "title_parseable"
+  COMPLAINT.details: "title_parseable"
+# Project
+project:
+  name: "Project"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_wrtuYPoYEeSwvupLu0BE2g"
+  mode: "embed"
+  owningGroupType: "owning group"
+  owning_group.privilege: "acm-case-approve"
+  assignee.privilege.type: "group-user"
+  follower.privilege.type: "user"
+# Plain Configuration
+plain_configuration:
+  name: "Plain Configuration"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_e5-gwAkvEeWTa_9lG6es1A"
+  required.url.parameters: "objectId,objectNumber,objectType"
+  CASE_FILE.properties: "id=id,caseNumber=caseNumber,caseType=caseType,title=title,status=status,details=details,incidentDate=incidentDate,created=created,creator=creator,modified=modified,
+  modifier=modifier,closed=closed,disposition=disposition,priority=priority,objectType=objectType"
+  COMPLAINT.properties: "complaintId=complaintId,complaintNumber=complaintNumber,complaintType=complaintType,priority=priority,complaintTitle=complaintTitle,details=details,
+  incidentDate=incidentDate,created=created,creator=creator,modified=modified,modifier=modifier,status=status"
+  mode: "popupform"
+################### Object Notifications Configuration (acmObjectsNotifications.properties) ####################
+# If an object event is for an object with one of these 
+# class names, object types, or parent object types, 
+# the event will be broadcast to the browser over WebSockets
+#comma separated object type names 
+acm.object.changed.notification.filter.include:
+  object_types: "CASE_FILE,COMPLAINT,FILE,TASK,DOC_REPO,PERSON,ORGANIZATION"
+  #comma separated full path class name, example com.armedia.acm.plugins.casefile.model.CaseFile 
+  classNames: "com.armedia.acm.plugins.casefile.model.CaseFile,com.armedia.acm.plugins.complaint.model.Complaint,com.armedia.acm.plugins.task.model.AcmTask,com.armedia.acm.plugins.ecm.model.EcmFile,
+  com.armedia.acm.plugins.casefile.model.ChangeCaseStatus,com.armedia.acm.plugins.complaint.model.CloseComplaintRequest,com.armedia.acm.services.costsheet.model.AcmCostsheet,
+  com.armedia.acm.services.timesheet.model.AcmTimesheet,com.armedia.acm.plugins.documentrepository.model.DocumentRepository,com.armedia.acm.plugins.person.model.Person,
+  com.armedia.acm.plugins.person.model.Organization"
+  #comma separated parent object type names... if an object has such a parent type, it will be sent over websockets
+  parent_object_types: "CASE_FILE,COMPLAINT,TASK,DOC_REPO"
+  #this property is not used in the application.
+  root_parent_object_types: "CASE_FILE,COMPLAINT,TASK,DOC_REPO"
+################### AcmReports Server Configuration (acm-reports-server-config.properties) ####################
+report:
+  plugin:
+    PENTAHO_SERVER_URL: "https://acm-arkcase"
+    PENTAHO_SERVER_PORT: 443
+    PENTAHO_SERVER_INTERNAL_URL: "https://acm-arkcase"
+    PENTAHO_SERVER_INTERNAL_PORT: 443
+    PENTAHO_SERVER_USER: "ann-acm"
+    PENTAHO_SERVER_PASSWORD: "ENC(U2FsdGVkX18opRRmCattSZiUNjfr598Qq7P3DgZSwGw=)"
+    PENTAHO_REPORTS_URL: "/pentaho/api/repo/files/:public:arkcase/children"
+    PENTAHO_REPORT_URL_TEMPLATE: "/arkcase/pentaho/api/repos/{path}/viewer"
+    PENTAHO_VIEW_REPORT_URL_PRPTI_TEMPLATE: "/arkcase/pentaho/api/repos/{path}/prpti.view"
+    PENTAHO_VIEW_DASHBOARD_REPORT_URL_TEMPLATE: "/arkcase/pentaho/api/repos/{path}/viewer?ts={timestamp}"
+    PENTAHO_VIEW_ANALYSIS_REPORT_URL_TEMPLATE: "/arkcase/pentaho/api/repos/{path}/viewer"
+    #Configuration for the Reports Scheduling tool in the admin module
+    PENTAHO_SCHEDULE_INPUT_FOLDER: "/public/arkcase"
+    PENTAHO_SCHEDULE_OUTPUT_FOLDER: "/public/generated-reports"
+    PENTAHO_DOWNLOAD_API: "/pentaho/api/repo/files/:public/generated-reports/{reportFileName}"
+    PENTAHO_FILE_PROPERTIES_API: "/pentaho/api/repo/files/:public/generated-reports/children"
+    PENTAHO_REMOVE_FILE_API: "/pentaho/api/repo/files/delete"
+    PENTAHO_SCHEDULE_API: "/pentaho/api/scheduler/job"
+    PENTAHO_RETRIEVE_SCHEDULES_API: "/pentaho/api/scheduler/jobs"
+    PENTAHO_DELETE_SCHEDULE_API: "/pentaho/api/scheduler/removeJob"
+    PENTAHO_REPORT_DOCUMENT_REPOSITORY_NAME: "Scheduled Reports"
+    REPORT_TYPES: "caseSummary.prpt-Case Summary,ComplaintReport.prpt-Complaint Report"
+    REPORT_RECURRENCE: "DAILY-Daily,WEEKLY-Weekly,MONTHLY-Monthly"
+    REPORT_OUTPUT_TYPES: "Excel/CSV-Excel/CSV"
+    # This must be a real user account in the content management system (this account creates folders and documents in a document repository)
+    CMIS_STORE_REPORT_USER: "admin"
+  config:  
+    reports: "{\"CASE_SUMMARY\" : \"/arkcase/pentaho/api/repos/:public:arkcase:caseSummary.prpt/viewer\",
+    \"COMPLAINT_DISPOSITION_COUNT\" : \"/arkcase/pentaho/api/repos/:public:arkcase:ComplaintDispositionCount.prpt/viewer\",
+    \"COMPLAINT_REPORT\" : \"/arkcase/pentaho/api/repos/:public:arkcase:ComplaintReport.prpt/viewer\"}"
+    ################### (reportToRolesMap.properties) ###################
+    reportsToRoles: "{\"CASE_SUMMARY\" : \"ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR\",
+    \"COMPLAINT_DISPOSITION_COUNT\" : \"ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR\",
+    \"COMPLAINT_REPORT\" : \"ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR\"}"  
+################### Activiti Configuration (activiti.properties) ####################
+activiti.job.executor.activate: true
+################### Alfresco Ldap Syncer Service Configuration (alfrescoLdapSyncerService.properties) ####################
+alfresco.admin:
+  baseurl: "https://acm-arkcase/alfresco/s/enterprise/admin/admin-sync"
+  username: "admin"
+  password: "ENC(U2FsdGVkX1/xhPRpzw95iNfLBLwieucwbQ0eg9woLOk=)"
+################### Alfresco RMA Plugin Configuration (alfrescoRmaPlugin.properties) ####################
+alfresco_host: "acm-alfresco"
+#alfresco_port: 8080
+alfresco_port: 7070
+alfresco_user: "admin"
+alfresco_password: "ENC(U2FsdGVkX1/xhPRpzw95iNfLBLwieucwbQ0eg9woLOk=)"
+alfresco_contextRoot: "alfresco"
+alfresco_protocol: "https"
+# this property must be the version number of the RMA module AMP files.
+# Alfresco 4.2 ships with RMA v2.1.
+# Alfresco 5.0.1 ships with RMA v2.3
+alfresco_rma_module_version: 2.3
+alfresco_rma_integration_enabled: true
+alfresco_rma_declare_records_on_case_close: true
+alfresco_rma_declare_records_on_complaint_close: true
+alfresco_rma_create_record_folder_on_complaint_create: true
+alfresco_rma_declare_record_folder_on_file_upload: false
+alfresco_rma_declare_record_folder_on_file_declare: true
+alfresco_rma_declare_record_folder_on_folder_declare: true
+alfresco_rma_declare_file_record_on_declare_request:
+alfresco_rma_declare_folder_record_on_declare_request:
+# default value for the RMA 'originator organization' field
+rma_default_originator_org: "Armedia LLC"
+# root folder in the RM site where records will be stored
+rma_root_folder: "ACM"
+rma_categoryFolder_COMPLAINT: "Complaints"
+rma_categoryFolder_CASE_FILE: "Case Files"
+rma_categoryFolder_TASK: "Tasks"
+alfresco_rma_case_closed_statuses: "CLOSED"
+################### Application Configuration (app-config.properties) ####################
+navigator:
+  task:
+    name: "Tasks"
+    resourceName: "common:navigation.label.tasks"
+    iconName: "i i-checkmark"
+    privilege: "acmTaskModulePrivilege"
+    privilegeName: "acm-task-module"
+  complaint:
+    name: "Complaints"
+    resourceName: "common:navigation.label.complaints"
+    iconName: "i i-notice"
+    privilege: "acmComplaintModulePrivilege"
+    privilegeName: "acm-complaint-module"
+  search:
+    name: "Search"
+    resourceName: "common:navigation.label.search"
+    iconName: "i i-search2"
+    privilege: "acmSearchModulePrivilege"
+    privilegeName: "acm-search-module"
+  case:
+    name: "Case Files"
+    resourceName: "common:navigation.label.case-files"
+    iconName: "i i-folder"
+    privilege: "acmCaseModulePrivilege"
+    privilegeName: "acm-case-module"
+  dashboard:
+    name: "Dashboard"
+    resourceName: "common:navigation.label.dashboard"
+    iconName: "i i-statistics"
+    privilege: "acmDashboardModulePrivilege"
+    privilegeName: "acm-dashboard-module"
+  admin:
+    name: "Administration"
+    resourceName: "common:navigation.label.administration"
+    iconName: "fa fa-wrench"
+    privilege: "acmAdminModulePrivilege"
+    privilegeName: "acm-admin-module"
+  audit:
+    name: "Audit"
+    resourceName: "common:navigation.label.audit"
+    iconName: "fa fa-bolt"
+    privilege: "acmAuditModulePrivilege"
+    privilegeName: "acm-audit-module"
+  report:
+    name: "Reports"
+    resourceName: "common:navigation.label.reports"
+    iconName: "i i-stats"
+    privilege: "acmReportModulePrivilege"
+    privilegeName: "acm-report-module"
+  subscription:
+    name: "Subscriptions"
+    resourceName: "common:navigation.label.subscriptions"
+    iconName: "fa fa-bullhorn"
+    privilege: "acmSubscriptionModulePrivilege"
+    privilegeName: "acm-subscription-module"
+  notification:
+    name: "Notifications"
+    resourceName: "common:navigation.label.notifications"
+    iconName: "fa fa-bell-o"
+    privilege: "acmNotificationModulePrivilege"
+    privilegeName: "acm-notification-module"
+  time:
+    name: "Time Tracking"
+    resourceName: "common:navigation.label.time-tracking"
+    iconName: "i i-alarm"
+    privilege: "acmTimeModulePrivilege"
+    privilegeName: "acm-time-module"
+  cost:
+    name: "Cost Tracking"
+    resourceName: "common:navigation.label.cost-tracking"
+    iconName: "fa fa-money"
+    privilege: "acmCostModulePrivilege"
+    privilegeName: "acm-cost-module"
+  tag:
+    name: "Tags"
+    resourceName: "common:navigation.label.tags"
+    iconName: "fa fa-tags"
+    privilege: "acmTagModulePrivilege"
+    privilegeName: "acm-tag-module"
+  person:
+    name: "People"
+    resourceName: "common:navigation.label.people"
+    iconName: "fa fa-people"
+    privilege: "acmPersonModulePrivilege"
+    privilegeName: "acm-person-module"
+  organization:
+    name: "Organizations"
+    resourceName: "common:navigation.label.organizations"
+    iconName: "fa fa-organizations"
+    privilege: "acmOrganizationModulePrivilege"
+    privilegeName: "acm-organization-module"
+  document-repository: 
+    name: "Document Repository"
+    resourceName: "common:navigation.label.document-repository"
+    iconName: "i i-folder"
+    privilege: "documentRepositoryModulePrivilege"
+    privilegeName: "acm-document-repository-module"
+  my-documents: 
+    name: "My Documents"
+    resourceName: "common:navigation.label.my-documents"
+    iconName: "i i-folder"
+    privilege: "documentRepositoryModulePrivilege"
+    privilegeName: "acm-document-repository-module"
+  analytics:
+    name: "Data Analytics"
+    resourceName: "commonnavigation.label.analytics"
+    iconName: "i i-stats"
+    privilege: "acmAnalyticsModulePrivilege"
+    privilegeName: "acm-analytics-module"
+  analytics-audit: 
+    name: "Log Analytics"
+    resourceName: "common:navigation.label.analytics-audit"
+    iconName: "i i-stats"
+    privilege: "acmAnalyticsAuditModulePrivilege"
+    privilegeName: "acm-analytics-audit-module"
+################### Application Privileges (applicationPrivileges.properties) ####################
+acmGlobalAllowPrivilege: "Global Allow Privilege"
+auditPrivilege: "Audit Privilege"
+auditReadEventsForObjectPrivilege: "Audit Read Events For Object Privilege"
+acmGenerateCorrespondencePrivilege: "Generate Correspondence Privilege"
+dashboardPrivilege: "Dashboard Privilege"
+filePrivilege: "File Privilege"
+participantPrivilege: "Participant Privilege"
+blogPrivilege: "Blog Privilege"
+helloWorldPrivilege: "Hello World Privilege"
+profilePrivilege: "Profile Privilege"
+reportPrivilege: "Report Privilege"
+costsheetCreatePrivilege: "Costsheet Create Privilege"
+costsheetApprovePrivilege: "Costsheet Approve Privilege"
+timesheetApprovePrivilege: "Timesheet Approve Privilege"
+acmComplaintListPrivilege: "Complaint List Privilege"
+acmComplaintSavePrivilege: "Complaint Save Privilege"
+acmComplaintCreatePrivilege: "Complaint Create Privilege"
+acmComplaintApprovePrivilege: "Complaint Approve Privilege"
+acmSearchPrivilege: "Search Privilege"
+searchPrivilege: "Search Privilege"
+acmCaseApprovePrivilege: "Case Approve Privilege"
+saveCasePrivilege: "Save Case Privilege"
+caseFileListPrivilege: "Case File List Privilege"
+caseFileCreatePrivilege: "Case File Create Privilege"
+acmPersonSavePrivilege: "Person Save Privilege"
+acmPersonDeletePrivilege: "Person Delete Privilege"
+acmOrganizationSavePrivilege: "Organization Save Privilege"
+acmOrganizationListPrivilege: "Organization List Privilege"
+acmOrganizationDeletePrivilege: "Organization Delete Privilege"
+acmOrganizationDetailsPrivilege: "Organization Details Privilege"
+acmOrganizationAssociationListPrivilege: "Organization Association List Privilege"
+acmOrganizationAssociationSavePrivilege: "Organization Association Save Privilege"
+acmOrganizationAssociationDeletePrivilege: "Organization Association Delete Privilege"
+acmPersonAssociationListPrivilege: "Person Association List Privilege"
+acmPersonAssociationDeletePrivilege: "Person Association Delete Privilege"
+acmPersonAssociationSavePrivilege: "Person Association Save Privilege"
+adminPrivilege: "Admin Privilege"
+acmDeleteNoteByIdPrivilege: "Delete Note By Id Privilege"
+acmListNotesPrivilege: "List Notes Privilege"
+costsheetPrivilege: "Costsheet Privilege"
+timesheetCreatePrivilege: "Timesheet Create Privilege"
+timesheetPrivilege: "Timesheet Privilege"
+tagPrivilege: "Tag Privilege"
+acmTaskListPrivilege: "Task List Privilege"
+acmTaskSavePrivilege: "Task Save Privilege"
+acmTaskCreatePrivilege: "Task Create Privilege"
+acmTaskCompletePrivilege: "Task Complete Privilege"
+acmTaskDeletePrivilege: "Task Delete Privilege"
+acmNotificationPrivilege: "Notification Privilege"
+subscribePrivilege: "Subscribe Privilege"
+listMilestonesGroupedByDate: "List Milestones Grouped By Date"
+acmSignatureConfirmPrivilege: "Signature Confirm Privilege"
+acmSignatureFindPrivilege: "Signature Find Privilege"
+acmPersonFindPrivilege: "Person Find Privilege"
+acmPersonListPrivilege: "Person List Privilege"
+acmPersonTypesPrivilege: "Person Types Privilege"
+acmSaveNotePrivilege: "Save Note Privilege"
+acmOutlookListObjectsPrivilege: "Outlook List Objects Privilege"
+splitCaseFilePrivilege: "Split Case File Privilege"
+objectLockPrivilege: "Object Lock Privilege"
+objectUnLockPrivilege: "Object Unlock Privilege"
+listLocksDetailsPrivilege: "List Lock Details Privilege"
+listLockedObjectsPrivilege: "List Locked Objects Privilege"
+analyticsPrivilege: "Data Analytics Privilege"
+analyticsAuditPrivilege: "Log Analytics Privilege"
+acmAdminModulePrivilege: "Admin Module Privilege"
+acmAuditModulePrivilege: "Audit Module Privilege"
+acmCaseModulePrivilege: "Case Module Privilege"
+acmComplaintModulePrivilege: "Complaint Module Privilege"
+acmCostModulePrivilege: "Cost Module Privilege"
+acmDashboardModulePrivilege: "Dashboard Module Privilege"
+acmNotificationModulePrivilege: "Notification Module Privilege"
+acmReportModulePrivilege: "Report Module Privilege"
+acmSearchModulePrivilege: "Search Module Privilege"
+acmSubscriptionModulePrivilege: "Subscription Module Privilege"
+acmTagModulePrivilege: "Tag Module Privilege"
+acmTaskModulePrivilege: "Task Module Privilege"
+acmTimeModulePrivilege: "Time Module Privilege"
+acmCategoryManagementPrivilege: "Category Management Privilege"
+acmCalendarAdminPrivilege: "Calendar Admin Privilege"
+acmCalendarReadShortenedConfigPrivilege: "Read Shortened Calendar Config Privilege"
+acmCalendarEventsListPrivilege: "Calendar List Events Privilege"
+acmCalendarEventsSavePrivilege: "Calendar Save Events Privilege"
+acmCalendarEventsCreatePrivilege: "Calendar Create Events Privilege"
+acmCalendarEventsDeletePrivilege: "Calendar Delete Events Privilege"
+acmPersonModulePrivilege: "Person Module Privilege"
+acmOrganizationModulePrivilege: "Organization Module Privilege"
+documentRepositoryManagerPrivilege: "Document Repository Manager Privilege"
+documentRepositoryModulePrivilege: "Document Repository Module Privilege"
+acmAnalyticsModulePrivilege: "Data Analytics Module Privilege"
+acmAnalyticsAuditModulePrivilege: "Log Analytics Module Privilege"
+acmEmailConfigurePrivilege: "Configure Email Privilege"
+getStateOfArkcasePrivilege: "Get State Of Arkcase Privilege"
+listStateOfArkcasePrivilege: "List State Of Arkcase Privilege"
+generateStateOfArkcasePrivilege: "Generate State Of Arkcase Privilege"
+################### (applicationRoles.properties) ###################
+application:
+  roles: "ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR,ROLE_CONSUMER,ROLE_EXTERNAL,ROLE_ENTITY_ADMINISTRATOR"
+################### Application Role To User Group (applicationRoleToUserGroup.properties) ####################
+  rolesToGroups: "{\"ROLE_ENTITY_ADMINISTRATOR\": \"ARKCASE_ENTITY_ADMINISTRATOR@ARMEDIA.COM\",
+  \"ROLE_CONSUMER\": \"ARKCASE_CONSUMER@ARMEDIA.COM\",
+  \"ROLE_SUPERVISOR\": \"ARKCASE_SUPERVISOR@ARMEDIA.COM,ARKCASE_ADMINISTRATOR@ARMEDIA.COM\",
+  \"ROLE_ADMINISTRATOR\": \"ARKCASE_ADMINISTRATOR@ARMEDIA.COM,ARKCASE_ENTITY_ADMINISTRATOR@ARMEDIA.COM\",
+  \"ROLE_EXTERNAL\": \"ARKCASE_EXTERNAL@ARMEDIA.COM\",
+  \"ROLE_CONTRIBUTOR\": \"ARKCASE_CONTRIBUTOR@ARMEDIA.COM\"}"
+################### (applicationRolesPrivileges.properties) ###################
+  rolesToPrivileges: "{\"ROLE_ENTITY_ADMINISTRATOR\": \"acmGlobalAllowPrivilege,acmPersonSavePrivilege,acmPersonDeletePrivilege,acmPersonAssociationDeletePrivilege,acmPersonAssociationSavePrivilege,acmPersonFindPrivilege,acmPersonListPrivilege,acmPersonTypesPrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationSavePrivilege,acmOrganizationListPrivilege,acmOrganizationDeletePrivilege,acmOrganizationDetailsPrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege]\",
+  \"ROLE_CONSUMER\": \"acmGlobalAllowPrivilege,dashboardPrivilege,acmPersonListPrivilege,acmReportModulePrivilege,acmNotificationModulePrivilege,acmSubscriptionModulePrivilege,blogPrivilege,acmListNotesPrivilege,tagPrivilege,acmSearchModulePrivilege,acmSignatureFindPrivilege,profilePrivilege,acmPersonFindPrivilege,acmTaskListPrivilege,acmAuditModulePrivilege,acmComplaintListPrivilege,participantPrivilege,listMilestonesGroupedByDate,reportPrivilege,auditPrivilege,timesheetPrivilege,helloWorldPrivilege,acmTimeModulePrivilege,acmTaskModulePrivilege,acmPersonTypesPrivilege,caseFileListPrivilege,acmComplaintModulePrivilege,filePrivilege,acmCostModulePrivilege,acmOutlookListObjectsPrivilege,searchPrivilege,auditReadEventsForObjectPrivilege,acmSearchPrivilege,acmNotificationPrivilege,acmDashboardModulePrivilege,costsheetPrivilege,acmTagModulePrivilege,acmCaseModulePrivilege,documentRepositoryModulePrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationListPrivilege,acmOrganizationDetailsPrivilege,acmCalendarEventsListPrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege\",
+  \"ROLE_SUPERVISOR\": \"acmGlobalAllowPrivilege,auditPrivilege,auditReadEventsForObjectPrivilege,acmGenerateCorrespondencePrivilege,dashboardPrivilege,filePrivilege,participantPrivilege,blogPrivilege,helloWorldPrivilege,profilePrivilege,reportPrivilege,costsheetCreatePrivilege,costsheetApprovePrivilege,timesheetApprovePrivilege,acmComplaintListPrivilege,acmComplaintSavePrivilege,acmComplaintCreatePrivilege,acmComplaintApprovePrivilege,acmSearchPrivilege,searchPrivilege,acmCaseApprovePrivilege,saveCasePrivilege,caseFileListPrivilege,caseFileCreatePrivilege,acmPersonSavePrivilege,acmPersonDeletePrivilege,acmPersonAssociationDeletePrivilege,acmPersonAssociationSavePrivilege,acmDeleteNoteByIdPrivilege,acmListNotesPrivilege,costsheetPrivilege,timesheetCreatePrivilege,timesheetPrivilege,tagPrivilege,acmTaskListPrivilege,acmTaskSavePrivilege,acmTaskCreatePrivilege,acmTaskCompletePrivilege,acmTaskDeletePrivilege,acmNotificationPrivilege,subscribePrivilege,listMilestonesGroupedByDate,acmSignatureConfirmPrivilege,acmSignatureFindPrivilege,acmPersonFindPrivilege,acmPersonListPrivilege,acmPersonTypesPrivilege,acmSaveNotePrivilege,acmOutlookListObjectsPrivilege,splitCaseFilePrivilege,acmTaskModulePrivilege,acmComplaintModulePrivilege,acmSearchModulePrivilege,acmDashboardModulePrivilege,acmAuditModulePrivilege,acmReportModulePrivilege,acmSubscriptionModulePrivilege,acmNotificationModulePrivilege,acmTimeModulePrivilege,acmCostModulePrivilege,acmTagModulePrivilege,acmTaskClaimPrivilege,acmCaseModulePrivilege,objectLockPrivilege,objectUnLockPrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationSavePrivilege,acmOrganizationListPrivilege,acmOrganizationDeletePrivilege,acmOrganizationDetailsPrivilege,documentRepositoryModulePrivilege,acmCalendarEventsListPrivilege,acmCalendarEventsSavePrivilege,acmCalendarEventsCreatePrivilege,acmCalendarEventsDeletePrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege\",
+  \"ROLE_ADMINISTRATOR\": \"acmAdminModulePrivilege,acmAnalyticsAuditModulePrivilege,acmAnalyticsModulePrivilege,acmAuditModulePrivilege,acmCalendarAdminPrivilege,acmCalendarEventsCreatePrivilege,acmCalendarEventsDeletePrivilege,acmCalendarEventsListPrivilege,acmCalendarEventsSavePrivilege,acmCaseApprovePrivilege,acmCaseModulePrivilege,acmCategoryManagementPrivilege,acmComplaintApprovePrivilege,acmComplaintCreatePrivilege,acmComplaintListPrivilege,acmComplaintModulePrivilege,acmComplaintSavePrivilege,acmCostModulePrivilege,acmDashboardModulePrivilege,acmDeleteNoteByIdPrivilege,acmEmailConfigurePrivilege,acmGenerateCorrespondencePrivilege,acmGlobalAllowPrivilege,acmListNotesPrivilege,acmNotificationModulePrivilege,acmNotificationPrivilege,acmOrganizationDeletePrivilege,acmOrganizationDetailsPrivilege,acmOrganizationListPrivilege,acmOrganizationModulePrivilege,acmOrganizationSavePrivilege,acmOutlookListObjectsPrivilege,acmPersonAssociationDeletePrivilege,acmPersonAssociationListPrivilege,acmPersonAssociationSavePrivilege,acmPersonDeletePrivilege,acmPersonFindPrivilege,acmPersonListPrivilege,acmPersonModulePrivilege,acmPersonSavePrivilege,acmPersonTypesPrivilege,acmReportModulePrivilege,acmSaveNotePrivilege,acmSearchModulePrivilege,acmSearchPrivilege,acmSignatureConfirmPrivilege,acmSignatureFindPrivilege,acmSubscriptionModulePrivilege,acmTagModulePrivilege,acmTaskClaimPrivilege,acmTaskCompletePrivilege,acmTaskCreatePrivilege,acmTaskDeletePrivilege,acmTaskListPrivilege,acmTaskModulePrivilege,acmTaskSavePrivilege,acmTimeModulePrivilege,adminPrivilege,auditPrivilege,auditReadEventsForObjectPrivilege,blogPrivilege,caseFileCreatePrivilege,caseFileListPrivilege,costsheetApprovePrivilege,costsheetCreatePrivilege,costsheetPrivilege,dashboardPrivilege,documentRepositoryManagerPrivilege,documentRepositoryModulePrivilege,filePrivilege,generateStateOfArkcasePrivilege,getStateOfArkcasePrivilege,helloWorldPrivilege,listLockedObjectsPrivilege,listLocksDetailsPrivilege,listMilestonesGroupedByDate,listStateOfArkcasePrivilege,objectLockPrivilege,objectUnLockPrivilege,participantPrivilege,profilePrivilege,reportPrivilege,saveCasePrivilege,searchPrivilege,splitCaseFilePrivilege,subscribePrivilege,tagPrivilege,timesheetApprovePrivilege,timesheetCreatePrivilege,timesheetPrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege\",
+  \"ROLE_EXTERNAL\": \"acmGlobalAllowPrivilege,dashboardPrivilege,acmReportModulePrivilege,acmNotificationModulePrivilege,acmSubscriptionModulePrivilege,tagPrivilege,acmSearchModulePrivilege,profilePrivilege,acmAuditModulePrivilege,participantPrivilege,reportPrivilege,auditPrivilege,timesheetPrivilege,helloWorldPrivilege,acmTimeModulePrivilege,acmTaskModulePrivilege,acmPersonTypesPrivilege,acmComplaintModulePrivilege,filePrivilege,acmCostModulePrivilege,acmSearchPrivilege,acmNotificationPrivilege,acmDashboardModulePrivilege,acmTagModulePrivilege,acmCaseModulePrivilege,documentRepositoryModulePrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationDetailsPrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege\",
+  \"ROLE_CONTRIBUTOR\": \"dashboardPrivilege,acmPersonListPrivilege,subscribePrivilege,acmReportModulePrivilege,acmNotificationModulePrivilege,acmSubscriptionModulePrivilege,blogPrivilege,acmListNotesPrivilege,tagPrivilege,acmSearchModulePrivilege,acmPersonDeletePrivilege,timesheetCreatePrivilege,acmSignatureFindPrivilege,acmTaskDeletePrivilege,profilePrivilege,acmTaskCreatePrivilege,acmPersonFindPrivilege,acmTaskListPrivilege,acmAuditModulePrivilege,acmComplaintListPrivilege,participantPrivilege,acmPersonAssociationDeletePrivilege,acmPersonAssociationSavePrivilege,listMilestonesGroupedByDate,reportPrivilege,auditPrivilege,timesheetPrivilege,helloWorldPrivilege,costsheetCreatePrivilege,acmTimeModulePrivilege,acmTaskModulePrivilege,acmGlobalAllowPrivilege,acmTaskSavePrivilege,acmPersonTypesPrivilege,splitCaseFilePrivilege,acmGenerateCorrespondencePrivilege,caseFileListPrivilege,acmComplaintSavePrivilege,acmSaveNotePrivilege,acmTaskCompletePrivilege,acmComplaintModulePrivilege,filePrivilege,acmCostModulePrivilege,acmPersonSavePrivilege,acmOutlookListObjectsPrivilege,searchPrivilege,auditReadEventsForObjectPrivilege,acmSearchPrivilege,acmDeleteNoteByIdPrivilege,acmNotificationPrivilege,acmSignatureConfirmPrivilege,acmDashboardModulePrivilege,costsheetPrivilege,acmTagModulePrivilege,acmTaskClaimPrivilege,acmCaseModulePrivilege,saveCasePrivilege,objectLockPrivilege,objectUnLockPrivilege,documentRepositoryModulePrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationSavePrivilege,acmOrganizationListPrivilege,acmOrganizationDeletePrivilege,acmOrganizationDetailsPrivilege,acmCalendarEventsListPrivilege,acmCalendarEventsSavePrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege\"}"
+################### Arkcase ActiveMq Configuration (arkcase-activemq.properties) ####################
+# Comma-separated list of package names.  Objects of classes from these
+# packages (and sub-packages under these packages) can be sent to an
+# ActiveMQ destination.  When you see "This class is not trusted to be
+# serialized as ObjectMessage payload" in your ArkCase log file, add
+# the relevant package to this property.
+ark.activemq:
+  trustedPackages: "com.armedia"
+  #URL of the ActiveMQ broker.
+  transportConnectorURI: "ssl://acm-arkcase:61616"
+  #Maximum number of connections to ActiveMQ.
+  maxConnections: 10
+  #username to connect to the ActiveMQ instance
+  username: "guest"
+  #encrypted password for the ActiveMQ user identified by ark.activemq.username
+  password: "ENC(U2FsdGVkX1+SMOIdK/h2Cy5ONteYLksBQnHZllFZcKs=)"
+################### Arkcase Instance Identity Configuration (arkcase-instance-identity.properties) ####################
+
+################### Audit Plugin Configuration (auditPlugin.properties) ####################
+audit.plugin:
+  database.enabled: true
+  systemlog:
+    enabled: false
+    # ------------ windows event log configuration - used only when server is running on windows ----------------------
+    # To create the app source in event log open terminal as Administrator and run:
+    # eventcreate /l APPLICATION /so "applicationName defined in app-config.xml" /t Information /id 1 /d "Creating app source"
+    # EventID must be in the range of 1 - 1000.
+    windows.eventlog.eventId: 110
+    # ------------- syslog configuration - used only when server is running on *nux -------------------------------
+    # Add the following lines to rsyslog.conf file to enable UDP protocol:
+    # $ModLoad imudp
+    # $UDPServerRun 514
+    syslog.protocol: "UDP"
+    syslog.host: "localhost"
+    syslog.port: 514
+  #database log configuration
+  batch.run: true
+  purge.days: 30
+  batch.frequency: 3600000
+  #requests logging configuration
+  requests.logging:
+    enabled: false
+    headers.enabled: false
+    cookies.enabled: false
+    body.enabled: false
+  #database changes logging configuration
+  database.changes.logging:
+    enabled: false
+    fieldvalues.enabled: false
+  #activiti events logging configuration
+  activiti.logging:
+    enabled: false
+    entity.events.enabled: false
+    entity.events.object.enabled: false
+  #mule flows logging configuration
+  mule.flows.logging:
+    enabled: false
+    message.enabled: false
+    message.properties.enabled: false
+  #comma separated list of contentTypes that will be logged
+  contentTypesToLog: "application/json,application/atom+xml,text/plain,text/csv,text/html"
+################### (eventDescription.properties) ###################
+ # store key-value pairs used for automatic audit event description generation
+# key - fully qualified event name
+#       eg. com.armedia.acm.ecm.file.added
+# value - SpEL expression evaluated against the AcmEvent
+#       eg. if AcmEvent has EcmFile as event source, we can use expressions like 'Document ' + source.fileName
+audit.eventDescription: "{\"com.armedia.acm.ecm.file.added\": \"'File ' + source.fileName + source.fileActiveVersionNameExtension + ' added.'\",
+\"com.armedia.acm.ecm.file.downloaded\": \"'File ' + source.fileName + source.fileActiveVersionNameExtension + ' downloaded.'\",
+\"com.armedia.acm.ecm.file.updated\": \"'File ' + source.fileName + source.fileActiveVersionNameExtension + ' updated'\"}"
+AUDIT_REPORT: "/arkcase/pentaho/api/repos/:public:arkcase-audit:AuditReportWithUrl.prpt/viewer"
+AUDIT_CRITERIA: "[{\"name\":\"Audit\",\"inputs\":[{\"name\":\"objectType\", \"type\":\"select\", \"desc\":\"Object to audit\",\"options\":[{\"value\":\"\", \"text\":\"ALL\"}
+,{\"value\":\"CASE\", \"text\":\"Case Files\"},{\"value\":\"COMPLAINT\", \"text\":\"Complaints\"}
+,{\"value\":\"TASK\", \"text\":\"Tasks\"},{\"value\":\"FILE\", \"text\":\"Files\"}]},{\"name\":\"objectId\",\"type\":\"text\",\"value\":\"\", \"desc\":\"#\"}
+,{\"name\":\"dateRange\",\"nameStartDate\":\"startDate\",\"nameEndDate\":\"endDate\", \"type\":\"dateRange\", \"desc\":\"Date Range\"}]}]"
+CASE_FILE.history.event.types: "com.armedia.acm.app.task.create, com.armedia.acm.casefile.createdFromComplaint, com.armedia.acm.casefile.updatedFromComplaint, com.armedia.acm.casefile.created, com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced, 
+com.armedia.acm.file.version.set, com.armedia.acm.file.deleted, com.armedia.acm.casefile.status.changed, com.armedia.acm.casefile.priority.changed, com.armedia.acm.casefile.details.changed,
+com.armedia.acm.app.note.added, com.armedia.acm.app.note.updated, com.armedia.acm.app.note.deleted, com.armedia.acm.outlook.calendar.event.added, com.armedia.acm.correspondence.file.added,
+com.armedia.acm.casefile.participant.added, com.armedia.acm.casefile.participant.deleted, com.armedia.acm.activiti.task.create, com.armedia.acm.associatedtag.created,
+com.armedia.acm.personAssociation.created, com.armedia.acm.personAssociation.deleted, com.armedia.acm.objectassociation.reference.added,
+com.armedia.acm.objectassociation.reference.deleted, com.armedia.acm.objectassociation.reference.updated, com.armedia.acm.file.renamed,
+com.armedia.acm.smtp.event.sent, com.armedia.acm.smtp.event.received, com.armedia.acm.person.contactMethod.added, com.armedia.acm.person.contactMethod.deleted, com.armedia.acm.person.contactMethod.updated,
+com.armedia.acm.person.organization.added, com.armedia.acm.person.organization.deleted, com.armedia.acm.person.organization.updated, com.armedia.acm.person.created,
+com.armedia.acm.person.updated, com.armedia.acm.person.personAlias.added, com.armedia.acm.person.personAlias.deleted, com.armedia.acm.person.personAlias.updated,
+com.armedia.acm.personAssociation.updated, com.armedia.acm.person.postalAddress.added, com.armedia.acm.person.postalAddress.deleted,
+com.armedia.acm.person.postalAddress.updated, com.armedia.acm.casefile.title.changed, com.armedia.acm.object.assignee.change, com.armedia.acm.casefile.participant.changed,
+com.armedia.acm.casefile.costsheet.associated, com.armedia.acm.casefile.timesheet.associated, com.armedia.acm.transcribe.created, com.armedia.acm.transcribe.updated,
+com.armedia.acm.transcribe.queued, com.armedia.acm.transcribe.processing, com.armedia.acm.transcribe.completed, com.armedia.acm.transcribe.failed, com.armedia.acm.transcribe.cancelled,
+com.armedia.acm.transcribe.compiled, com.armedia.acm.transcribe.rollback, com.armedia.acm.file.co_edit.document.saved, com.armedia.acm.file.co_edit.user.leave, com.armedia.acm.file.co_edit.user.joined"
+COMPLAINT.history.event.types: "com.armedia.acm.complaint.created, com.armedia.acm.complaint.updated, com.armedia.acm.app.task.create, com.armedia.acm.complaint.created, com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced, 
+com.armedia.acm.file.version.set, com.armedia.acm.file.deleted, com.armedia.acm.app.note.added, com.armedia.acm.app.note.updated, com.armedia.acm.app.note.deleted,
+com.armedia.acm.complaint.status.changed, com.armedia.acm.complaint.details.changed, com.armedia.acm.complaint.priority.changed, com.armedia.acm.outlook.calendar.event.added,
+com.armedia.acm.correspondence.file.added, com.armedia.acm.complaint.participant.added, com.armedia.acm.complaint.participant.updated, com.armedia.acm.complaint.participant.deleted, com.armedia.acm.complaint.costsheet.associated,
+com.armedia.acm.complaint.timesheet.associated, com.armedia.acm.complaint.timesheet.associated, com.armedia.acm.activiti.task.create,
+com.armedia.acm.associatedtag.created, com.armedia.acm.personAssociation.created, com.armedia.acm.personAssociation.deleted, com.armed.acm.complaint.location.updated,
+com.armedia.acm.objectassociation.reference.added, com.armedia.acm.file.renamed, com.armedia.acm.smtp.event.sent, com.armedia.acm.smtp.event.received, com.armedia.acm.person.contactMethod.added,
+com.armedia.acm.person.contactMethod.deleted, com.armedia.acm.person.contactMethod.updated, com.armedia.acm.person.organization.added, com.armedia.acm.person.organization.deleted,
+com.armedia.acm.person.organization.updated, com.armedia.acm.person.created, com.armedia.acm.person.updated, com.armedia.acm.person.personAlias.updated, com.armedia.acm.person.personAlias.added, com.armedia.acm.person.personAlias.deleted,
+com.armedia.acm.person.personAlias.updated, com.armedia.acm.personAssociation.updated, com.armedia.acm.person.postalAddress.added, com.armedia.acm.person.postalAddress.deleted,
+com.armedia.acm.person.postalAddress.updated, com.armedia.acm.transcribe.created, com.armedia.acm.transcribe.updated,
+com.armedia.acm.transcribe.queued, com.armedia.acm.transcribe.processing, com.armedia.acm.transcribe.completed, com.armedia.acm.transcribe.failed, com.armedia.acm.transcribe.cancelled,
+com.armedia.acm.transcribe.compiled, com.armedia.acm.transcribe.rollback, com.armedia.acm.file.co_edit.document.saved, com.armedia.acm.file.co_edit.user.leave, com.armedia.acm.file.co_edit.user.joined"
+TASK.history.event.types: "com.armedia.acm.app.task.create, com.armedia.acm.task.added, com.armedia.acm.activiti.task.create, com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced,
+com.armedia.acm.file.version.set, com.armedia.acm.file.deleted, com.armedia.acm.app.note.added, com.armedia.acm.app.note.updated, com.armedia.acm.app.note.deleted,
+com.armedia.acm.app.task.details.changed, com.armedia.acm.app.task.priority.changed, com.armedia.acm.associatedtag.created, com.armedia.acm.app.task.status.changed,
+com.armedia.acm.app.note.rejectcomment.added, com.armedia.acm.file.renamed, com.armedia.acm.app.task.reworkdetails.changed, com.armedia.acm.smtp.event.sent, com.armedia.acm.app.signature.signed.task,
+com.armedia.acm.file.co_edit.document.saved, com.armedia.acm.file.co_edit.user.leave, com.armedia.acm.file.co_edit.user.joined"
+DOC_REPO.history.event.types: "com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced, com.armedia.acm.file.version.set, com.armedia.acm.file.deleted,
+com.armedia.acm.app.note.added, com.armedia.acm.app.note.updated, com.armedia.acm.app.note.deleted, com.armedia.acm.associatedtag.created,
+com.armedia.acm.app.note.rejectcomment.added, com.armedia.acm.file.renamed, com.armedia.acm.smtp.event.sent, com.armedia.acm.objectassociation.reference.added,
+com.armedia.acm.smtp.event.received, com.armedia.acm.documentrepository.created, com.armedia.acm.documentrepository.updated,
+com.armedia.acm.documentrepository.viewed, com.armedia.acm.ecm.file.downloaded, com.armedia.acm.folder.created, com.armedia.acm.folder.renamed,
+com.armedia.acm.documentrepository.participant.deleted, com.armedia.acm.documentrepository.participant.added, com.armedia.acm.documentrepository.name.updated,
+com.armedia.acm.documentrepository.participant.updated, com.armedia.acm.transcribe.created, com.armedia.acm.transcribe.updated,
+com.armedia.acm.transcribe.queued, com.armedia.acm.transcribe.processing, com.armedia.acm.transcribe.completed, com.armedia.acm.transcribe.failed, com.armedia.acm.transcribe.cancelled,
+com.armedia.acm.transcribe.compiled, com.armedia.acm.transcribe.rollback, com.armedia.acm.file.co_edit.document.saved, com.armedia.acm.file.co_edit.user.leave, com.armedia.acm.file.co_edit.user.joined"
+PERSON.history.event.types: "com.armedia.acm.person.created, com.armedia.acm.person.updated, com.armedia.acm.person.image.uploaded"
+ORGANIZATION.history.event.types: "com.armedia.acm.organization.created, com.armedia.acm.organization.updated"
+################### Calendar Configured Object Types (calendarConfiguredObjectTypes.properties) ####################
+calendar.configured_object_types: "CASE_FILE,COMPLAINT"
+################### Capture Configuration (capture.properties) ####################
+capture:
+  #file extensions that are allowed to be captured
+  fileExtensions: "xml"
+  #capture root folder to watch for files added
+  rootFolderToWatch: "${user.home}/.arkcase/capture"
+  working.folder: "${user.home}/.arkcase/working"
+  completed.folder: "${user.home}/.arkcase/completed"
+  #folder where files which are not able to be processed are saved here
+  error.folder: "${user.home}/.arkcase/error"
+  #list all object types which are supported
+  attachments.supported-object-types: "case_file,complaint"
+  #Shared folder where files to be converted to PDF will be copied
+  sendForPdfConversionFolder: "${user.home}/.arkcase/sendForPdfConversion"
+  #files which are processed by ephesoft and ready to be uploaded back to arkcase
+  convertedPdfsFolder: "${user.home}/.arkcase/processed"
+  #Ecm File types and file formats which will be sent for external conversion to PDF
+  fileTypesToBeConvertedToPDF: "authorization,abstract"
+  fileFormatsToBeConvertedToPDF: "TIF, TIFF, BMP, JPEG, JPG, PNG, HTML, HTM, XLS, XLSX, PPT, PPTX, DOC, DOCX, TXT"
+  #Ecm File types and file formats which can be merged with existing documents of the same type in a container
+  fileTypesToMerge: "authorization,abstract"
+  fileFormatsToMerge: "pdf"
+  #the folder where OXM file is located. Specify the path relative to $HOME/.arkcase/acm
+  oxm.file.path: "/ephesoft/oxm/ephesoft_complaint_oxm.xml"
+################### Case Plugin Configuration (caseFilePlugin.properties) ###################
+casefile.plugin:
+  #case file email folder
+  email.folder.relative.path: "emails-received"
+  #case file email regex to match case number
+  email.regex.case_number: "[\\d]{4}[\\d]{2}[\\d]{2}_[\\d]*"
+  #case file email regex for type
+  email.regex.object_type: "Case"
+  #case file email handler is enabled
+  email.handler.enabled: true
+  #types available for copy are: history, people, participants, tasks
+  split.typesToCopy: "history,people,participants"
+  merge.exclude_document_types: "case_file_xml,case_file"
+  search.tree.filter: "[{\"desc\":\"All Open Cases\", \"name\":\"all-open-cases\", \"value\":\"fq=-status_s:COMPLETE AND -status_s:DELETE AND -status_s:CLOSED\", \"default\":\"true\"}
+  ,{\"desc\": \"All I've Created\", \"name\":\"my-created-cases\", \"value\":\"fq=author_s:$[user]\"}
+  ,{\"desc\": \"All I'm Assigned\", \"name\":\"my-assigned-cases\", \"value\":\"fq=assignee_s:$[user]\"}
+  ,{\"desc\": \"All I'm Following\", \"name\":\"my-following-cases\", \"value\":\"fq={!join from=parent_object_id_s to=object_id_s}(owner_s:$[user] AND object_type_s:SUBSCRIPTION)\"}
+  ,{\"desc\": \"All Closed\", \"name\":\"all-closed-cases\", \"value\":\"fq=status_s:CLOSED\"}
+  ,{\"desc\": \"(No Filter)\", \"name\": \"\", \"value\": \"\"}]"
+  search.tree.sort: "[{\"desc\":\"Sort Date Asc\", \"name\":\"sort-date-asc\", \"value\":\"create_tdt ASC\"}
+  ,{\"desc\":\"Sort Date Desc\", \"name\":\"sort-date-desc\", \"value\":\"create_tdt DESC\"}
+  ,{\"desc\":\"Sort Case ID Asc\", \"name\":\"sort-case-id-asc\", \"value\":\"object_id_s ASC\"}
+  ,{\"desc\":\"Sort Case ID Dece\", \"name\":\"sort-case-id-desc\", \"value\":\"object_id_s DESC\"}
+  ,{\"desc\":\"Sort By Case Name\", \"name\":\"sort-by-name-asc\", \"value\":\"title_parseable_lcs ASC\"}
+  ,{\"desc\":\"(No Sort)\", \"name\": \"\", \"value\":\"\", \"default\":\"true\"}]"
+  #The properties where the search query should be executed (comma separated, for example: title_parseable,description_no_html_tags_parseable ... etc)
+  search.tree.searchQuery: "title_parseable"
+  fileTypes: "[{\"type\":\"other\", \"label\":\"Other\"}]"
+  status.closed: "CLOSED"
+  #Outlook integration
+  #this properties should be enabled if outlook integration is desired
+  auto_create_calendar_folder: true
+  delete_calendar_folder_after_case_closed: true
+  ##Dashboard SOLR queries
+  #Get all case_file by user that are not closed, deleted or completed
+  solr.all.not.closed.by.user: "object_type_s:CASE_FILE&fq=creator_lcs=?&fq=-status_s:COMPLETE&fq=-status_s:DELETE&fq=-status_s:CLOSED"
+  #Get all case_files grouped by status
+  solr.all.group.by.status: "object_type_s:CASE_FILE&group=true&group.field=status_lcs&group.limit=0"
+  ##Case File tree root name format. If this property not exist or it's empty, the default value will be taken: Acm.goodValue(objSolr.title_parseable) + ' (' + Acm.goodValue(objSolr.name) + ')'
+  tree.root.name.expression: "Acm.goodValue(objSolr.title_parseable)"
+  #The subject for creating calendar event for next court hearing date
+  next.court.hearing.date.calendar.subject: "Court Hearing Date"
+  ##Initial folder structure while creating case file (just leave blank or remove it if the folder structure should not be created)
+  #"attachment" indicates under which folder should be saved attachments. ONLY ONE should have value "true", all other should have "false"
+  #If multiple folders will have "attachment": true, then the last one will take effect (the attachments will go to the last one with "attachment": true)
+  folder.structure:
+################### Complaint Plugin Configuration (complaintPlugin.properties) ###################
+complaint.plugin:
+  email:
+    #complaint email folder
+    folder.relative.path: "emails-received"
+    #complaint email regex to match case number
+    regex.complaint_number: "[\\d]{4}[\\d]{2}[\\d]{2}_[\\d]*"
+    #complaint email regex for type
+    regex.object_type: "Complaint"
+    #complaint email handler is enabled
+    handler.enabled: true
+  workflow:
+    enabled: false
+    trigger.eventName: "com.armedia.acm.complaint.submittedForReview"
+    activiti:
+      name: "cmComplaintWorkflow"
+      inApproval.stateName: "IN APPROVAL"
+      approved.stateName: "ACTIVE"
+  # Number of seconds that listener will wait to load all documents for given XML batch. If all documents are loaded before these seconds, the process will continue immediately and
+  # waiting state will be terminated. Checking is made every second.
+  ephesoft.load.documents.seconds: 10
+  search.tree:
+    filter: "[{\"desc\": \"All Open Complaints\", \"name\":\"all-open-complaints\", \"value\":\"fq=-status_s:COMPLETE AND -status_s:DELETE AND -status_s:CLOSED\", \"default\":true}
+    ,{\"desc\": \"All I've Created\", \"name\":\"my-complaints-created\", \"value\":\"fq=author_s:$[user]\"}
+    ,{\"desc\": \"All I'm Assigned\", \"name\":\"my-complaints-assigned\", \"value\":\"fq=assignee_s:$[user]\"}
+    ,{\"desc\": \"All I'm Following\", \"name\":\"my-complaints-following\", \"value\":\"fq={!join from=parent_object_id_s to=object_id_s}(owner_s:$[user] AND object_type_s:SUBSCRIPTION)\"}
+    ,{\"desc\": \"All Closed No Further Action\", \"name\":\"all-closed-no-action\", \"value\":\"fq={!join from=id to=disposition_id_s}disposition_type_s:no_action\"}
+    ,{\"desc\": \"All Closed Refer External\", \"name\":\"all-closed-external\", \"value\":\"fq={!join from=id to=disposition_id_s}disposition_type_s:refer_external\"}
+    ,{\"desc\": \"All Closed Open Investigation\", \"name\":\"all-closed-investigation\", \"value\":\"fq={!join from=id to=disposition_id_s}disposition_type_s:open_investigation\"}
+    ,{\"desc\": \"(No Filter)\", \"name\":\"\", \"value\":\"\"}]"
+    sort: "[{\"desc\": \"Sort Incident Date Asc\", \"name\":\"sort-incident-date-asc\", \"value\":\"due_tdt ASC\"}
+    ,{\"desc\": \"Sort Incident Date Desc\", \"name\":\"sort-incident-date-asc\", \"value\":\"due_tdt ASC\"}
+    ,{\"desc\": \"Sort Created Date Asc\", \"name\":\"sort-created-date-asc\", \"value\":\"create_tdt ASC\"}
+    ,{\"desc\": \"Sort Created Date Desc\", \"name\":\"sort-created-date-desc\", \"value\":\"create_tdt DESC\", \"default\":true}
+    ,{\"desc\": \"Sort By Name\", \"name\":\"sort-by-name-asc\", \"value\":\"title_parseable_lcs ASC\"}
+    ,{\"desc\": \"(No Sort)\", \"name\":\"\", \"value\":\"\"}]"
+    #The properties where the search query should be executed (comma separated, for example: title_parseable,description_no_html_tags_parseable ... etc)
+    searchQuery: "title_parseable"
+  fileTypes: "[{\"type\":\"mr\", \"label\":\"Medical Release\"}
+  ,{\"type\":\"gr\", \"label\":\"General Release\"}
+  ,{\"type\":\"ev\", \"label\":\"eDelivery\"}
+  ,{\"type\":\"sig\", \"label\":\"SF86 Signature\"}
+  ,{\"type\":\"noi\", \"label\":\"Notice of Investigation\"}
+  ,{\"type\":\"wir\", \"label\":\"Witness Interview Request\"}
+  ,{\"type\":\"other\", \"label\":\"Other\"}]"
+  status.closed: "CLOSED"
+  #Outlook integration
+  #this properties should be enabled if outlook integration is desired
+  auto_create_calendar_folder: true
+  delete_calendar_folder_after_complaint_closed: true
+################### Compressor Configuration (compressor.properties) ###################
+compressor.fileNameFormat: "%1$sacm-%2$d-%3$s.zip"
+################### Costsheet Plugin Configuration (costsheetProperties.properties) ###################
+################### (cost.properties) ###################
+cost.plugin:
+  root.folder: "/Sites/acm/documentLibrary/Expenses"
+  search.tree.sort: "[{\"desc\":\"Sort Date Ascending\", \"name\":\"create_tdt ASC\"}
+  ,{\"desc\":\"Sort Date Decending\", \"name\":\"create_tdt DESC\"}
+  ,{\"desc\":\"Sort Costsheet ID Ascending\", \"name\":\"id ASC\"}
+  ,{\"desc\":\"Sort Costsheet ID Decending\", \"name\":\"id DESC\"}
+  ,{\"desc\":\"Sort By Costsheet Name\", \"name\":\"name DESC\"}]" 
+################### Dashbord Plugin Configuration (dashboardPlugin.properties) ###################
+## Default dashboard JSON String.
+dashboard.plugin:
+  defaultDashboard: "{\"title\":\"dashboard.title\",\"structure\":\"6-6\",\"rows\":[{\"columns\": [{\"styleClass\":\"col-md-12\"}]}],\"titleTemplateUrl\":\"modules/dashboard/templates/dashboard-title.html\"}"
+  moduleDefaultDashboard: "{\"title\":\"\",\"structure\":\"12\",\"rows\":[{\"columns\":[{\"styleClass\":\"col-md-12\",\"widgets\":\"[]\"}]}],\"titleTemplateUrl\":\"modules/dashboard/templates/module_dashboard-title.html\"}"
+  ## If you want to introduce new widgets to ACM3 set acm.add.widget = true
+  ## and set acm.new.widgets = newWidgetOne,newWidgetTwo etc. after you delete old values from previous update.
+  add.widget: true
+  ##New widgets
+  new.widgets: "casesByQueue,myCases,casesByStatus,news,myComplaints,myTasks,teamWorkload,newComplaints,details,calendar,cost,docsUnderReview,documents,expenses,history,hoursSummary,
+  locations,notes,participants,people,person,references,reworkDetails,signature,tasks,time,workflow,newCases,workflowReport,approvalRouting,tags,organizations,parentDocs,phones,faxes,
+  emails,urls,dbas,ids,relOrganizations,complaints,cases,pictures,aliases,related,approvers,userWebsites"
+  role.widgets: "[{\"role\":\"ROLE_CONTRIBUTOR\", \"widgetList\":\"news,teamWorkload,myTasks,myComplaints,newComplaints,casesByQueue,userWebsites\"}
+  ,{\"role\":\"ROLE_ADMINISTRATOR\", \"widgetList\":\"news,teamWorkload,myTasks,myComplaints,newComplaints,casesByQueue,userWebsites\"}
+  ,{\"role\":\"ROLE_CONSUMER\", \"widgetList\":\"news,myTasks,casesByQueue,userWebsites\"}
+  ,{\"role\":\"ROLE_EXTERNAL\", \"widgetList\":\"news,userWebsites\"}
+  ,{\"role\":\"ROLE_ENTITY_ADMINISTRATOR\", \"widgetList\":\"news,teamWorkload,myTasks,myComplaints,newComplaints,casesByQueue,userWebsites\"}
+  ,{\"role\":\"ROLE_SUPERVISOR\", \"widgetList\":\"news,teamWorkload,myTasks,myComplaints,newComplaints,casesByQueue,userWebsites\"}]"
+  ##modules where Dashboard will be used
+  modules: "DASHBOARD,CASE,TIME,COST,TASK,COMPLAINT,DOC_REPO,PERSON,ORGANIZATION,MY_DOC_REPO"
+  modules.dashboard.widgets: "casesByQueue,casesByStatus,myCases,myComplaints,myTasks,newComplaints,teamWorkload,news,newCases,workflowReport,userWebsites"
+################### DAC Configuration (dataAccessControl.properties) ###################
+dac: 
+  batchUpdateBasedOnLastModifiedEnabled: true
+  batchUpdateFrequencyInMilliseconds: 3600000
+  batchUpdateBatchSize: 50
+  enableDocumentACL: true
+  fallbackExpression: 
+    getObject: "get|list|read|download|view|subscribe"
+    editObject: "save|insert|remove|add|edit|change|lock|complete|unlock|merge|restrict|declare|rename|write"
+    insertObject: "create"
+    deleteObject: "delete"
+  includeDenyAccessFilter: true
+################### Datasource Properties (datasource.properties) ###################
+## whether to update the database schema.  Currently when running
+## under jrebel, the automatic update causes an error since jrebel
+## changes the classpath lookups somehow.  So if you want to run under
+## jrebel, first set schema.autoUpdate=true, then start normally
+## (no jrebel) in order to get the updates, then set schema.autoUpdate = false,
+## then start under jrebel.
+schema.autoUpdate: false
+## jpa configuration
+# database.platform must be an EclipseLink database platform.
+database:
+  platform: "org.eclipse.persistence.platform.database.MySQLPlatform"
+  #platform: "org.eclipse.persistence.platform.database.PostgreSQLPlatform"
+  platform.showSql: true
+  ##properties for other databases to follow.
+  ##encryption properties
+  encryption_properties: "compress-algo=1, cipher-algo=aes256"
+  encryption_function: "pgp_sym_encrypt"
+  encryption_enabled: true
+  encryption_passphrase: "text"
+  #set this property to true if database platform is PostgreSQL
+  encryption_supported: false
+  #encryption_supported: true 
+eclipselink.logging:
+  level: "FINEST"
+  logger: "org.eclipse.persistence.logging.slf4j.Slf4jSessionLogger"
+##comma separated list of packages to scan for JPA entity classes.
+##NOTE: Cannot start with a wild card.  The leading package name must
+##be specified.
+##NOTE: Use '**' to recurse into sub-packages.
+jpa.model.packages: "com.armedia.**"
+##postgresql
+acm:
+  driverClassName: "com.mysql.jdbc.Driver"
+  #driverClassName: "org.postgresql.Driver"
+  url: "jdbc:mysql://acm-mysql:3306/arkcase?verifyServerCertificate=true&requireSSL=true&useSSL=true&trustCertificateKeyStoreUrl=file:${user.home}/.arkcase/acm/private/truststore&trustCertificateKeyStorePassword=AcMd3v$"
+  #url: "jdbc:postgresql://acm-postgres:5432/arkcase?ssl=true"
+  schema: "arkcase"
+  username: "arkcase"
+  password: "ENC(U2FsdGVkX1/Byxn9VvOcopumBXAHXig+63j4n4SAJ3w=)"
+  initialSize: 10
+  maxActive: 20
+  minIdle: 5
+  maxWait: 10000
+  testOnBorrow: true
+  testOnReturn: false
+  idleConnectionTestPeriodInSeconds: 30
+  validationQuery: "select 1"
+  acquireRetryAttempts: 30
+  acquireRetryDelay: 1000
+  abandonedTimeoutInSeconds: 600
+  autoCommit: false
+##activiti engine database properties
+activiti.db.type: mysql
+#activiti.db.type: postgres
+################### Document Repository Plugin Configuration (documentRepositoryPlugin.properties) ###################
+doc.plugin:   
+  search.tree:
+    filter: "[{\"desc\": \"All I've Created\", \"name\":\"my-created-document-repositories\", \"value\":\"fq=author_s:$[user] AND repository_type_s:GENERAL\"}
+    ,{\"desc\": \"All I'm Following\", \"name\":\"my-following-document-repositories\", \"value\":\"fq={!join from=parent_object_id_s to=object_id_s}(owner_s:$[user] AND object_type_s:SUBSCRIPTION)\"}
+    ,{\"desc\": \"(No Filter)\", \"name\":\"default-filter\", \"value\":\"fq=repository_type_s:GENERAL\"}
+    ,{\"desc\": \"(No Filter)\", \"name\":\"my-personal-document-repositories\", \"value\":\"fq=assignee_s:$[user] AND repository_type_s:PERSONAL\"}]"
+    sort: "[{\"desc\": \"Sort Date Asc\", \"name\":\"sort-date-asc\", \"value\":\"create_tdt ASC\"}
+    ,{\"desc\": \"Sort Date Desc\", \"name\":\"sort-date-desc\", \"value\":\"create_tdt DESC\"}
+    ,{\"desc\": \"Sort Repository ID Asc\", \"name\":\"sort-document-repository-id-asc\", \"value\":\"object_id_s ASC\"}
+    ,{\"desc\": \"Sort Repository ID Desc\", \"name\":\"sort-document-repository-id-desc\", \"value\":\"object_id_s DESC\"}
+    ,{\"desc\": \"Sort By Repository Name\", \"name\":\"sort-by-document-repository-name-asc\", \"value\":\"title_parseable_lcs ASC\"}
+    ,{\"desc\": \"(No Sort)\", \"name\":\"\", \"value\":\"\", \"default\":\"true\"}]"
+    #The properties where the search query should be executed (comma separated, for example: title_parseable,description_no_html_tags_parseable ... etc)  
+    searchQuery: "title_parseable"  
+################### Due Task Configuration (dueTasksNotifier.properties) ###################  
+due.tasks.notification.enabled: true
+upcoming.tasks:
+  notification: 
+    subject: "Task soon to become overdue notification."
+    body.template: "The task %1$s with ID %2$s is due on %3$s."
+overdue.tasks.notification:
+  subject: "Task overdue notification"
+  body.template: "The task %1$s with ID %2$s was due on %3$s."
+################### Email Receiver Configuration (acmEmailReceiver.properties) ####################
+email:
+  should-delete-messages: false
+  should-mark-messages-as-read: false
+  max-messages-per-poll: 1
+  fixed-rate: 120000
+  #set some existing email here for testing 
+  CASE_FILE.user: "no-such-mailbox%40armedia.com"
+  CASE_FILE.password:
+  COMPLAINT.user: "no-such-mailbox%40armedia.com"
+  COMPLAINT.password:  
+  protocol: "imap"
+  fetch.folder: "inbox"
+  host: "outlook.office365.com"
+  port: 993
+  debug: true
+  userId: "mail-service"
+################### Email Sender Configuration (acmEmailSender.properties) ####################
+  sender:
+    type: smtp
+    encryption: off 
+    allowAttachments: true
+    allowDocuments: true
+    host: "internalmail.armedia.com"
+    allowHyperlinks: true
+    userFrom: "support@armedia.com"
+    port: 25
+    password: "AcMd3v$"
+#################### EcmFile Service Configuration (ecmFileService.properties) ####################
+ecm:
+  #participantTypes: "['Assignee','Co-owner','Supervisor','Owning Group','Approver','Collaborator','Follower','Reader','No Access']" 
+  documentsParticipantTypes.mappings:
+    group-write: "owning group"
+    group-read:
+    group-no-access:
+    write: "assignee,co-owner,supervisor,collaborator,owner"
+    read: "approver,follower,reader"
+    no-access: "No Access"
+    "*": "*"
+  defaultBasePath: "/Sites/acm/documentLibrary"
+  defaultPath:
+    COMPLAINT: "/Complaints"
+    TASK: "/Tasks"
+    CASE_FILE: "/Case Files"
+    DOC_REPO: "/Document Repositories"
+  #reference to cmis.id value of the default configuration in $HOME/.arkcase/acm/cmis/mule-config-*.cmis.properties
+  defaultCmisId: "alfresco"
+  viewer: "snowbound"
+  viewer.js: "$[context]/resources/vendors/ViewerJS/index.html?type=$[type]&title=$[title]#$[context]/api/latest/plugin/ecm/stream/$[fileId]"
+  viewer.snowbound: "https://acm-arkcase/arkcase/VirtualViewerJavaHTML5/index.html?documentId=ecmFileId=$[fileId]%26acm_ticket=$[ticket]%26userid=$[userid]"
+  viewer.snowbound.readonly:
+    url: "https://acm-arkcase/arkcase/VirtualViewerJavaHTML5/index-read-only.html?documentId=ecmFileId=$[fileId]%26acm_ticket=$[ticket]%26userid=$[userid]"
+    initialState: true
+  # Snowbound tab header values (fileName | fileType | fileTypeCapitalized)
+  # Leave as it is for Core, uncomment for extension
+  # FOIA
+  #viewer.snowbound.tabHeader: fileName
+  # HDS
+  #viewer.snowbound.tabHeader: fileTypeCapitalized
+  #Snowbound URL query string encryption key. Leave this property empty if you don't need encryption
+  viewer.snowbound.encryptionKey: "ENC(U2FsdGVkX1+/i7RReaawm2OyEcse1DBxZ0+oGE3ZsT5V1ahjvWhorhAZoUB97sHH)"
+  #viewer.pdfViewer: value "pdfjs" causes PDF.js to be used.  All other values have no effect.
+  viewer.pdfViewer: "default"
+#################### Event Types (eventType.properties) ####################
+#Audit business names on the event types:
+#Insert data:
+event.plugin:
+  eventName.insert: true
+  eventType.com.armedia.acm:
+    activiti.businessProcess:
+      end: "Activity Business Process Ended"
+      start: "Activity Business Process Started"
+      task:
+        assignment: "Activity Task Assignment"
+        complete: "Activity Task Complete"
+        create: "Activity Task Created"
+        delete: "Activity Task Delete"
+        added: "Task Added"
+  app:
+    task:
+      complete: "Task Complete"
+      create: "Task Created"
+      delete: "Task Deleted"
+      findById: "Find Task By Id"
+      save: "Save Task"
+      searchResult: "Task Search Give Results"
+      details.changed: "Task Details Changed"
+      reworkdetails.changed: "Task Rework Details Changed"
+      priority.changed: "Task Priority Changed"
+      status.changed: "Task Status Changed"
+    businessprocess.started: "Business Process Started"
+    note:
+      added: "Note Added"
+      rejectcomment.added: "Reject Comment Added"
+      updated: "Note Updated"
+      deleted: "Note Deleted"
+    signature.signed.task: "Task Signed"
+  task.added: "Task Added"  
+  casefile: "Case File Event"
+  casefile.ACTIVE: "Case File is Active"
+  casefile.DRAFT: "Case File is Draft"
+  casefile.search: "Case File Searched"
+  casefile.updated: "Case File Updated"
+  casefile.viewed: "Case Viewed"
+  casefile.file:
+    added: "Case File Added"
+    rejected: "Document Rejected from Brief"
+    lodged: "Document Lodged"
+  casefile.created: "Case File Created"
+  casefile.createdFromComplaint: "Case File Created From Complaint"
+  casefile.updatedFromComplaint: "Case File Updated From Complaint"
+  casefile.priority.changed: "Case File Priority Changed"
+  casefile.details.changed: "Case File Details Changed"
+  casefile.title.changed: "Case File Title Changed"
+  casefile.status.changed: "Case File Status Changed"
+  casefile.participant: 
+    added: "Participant Added"
+    deleted: "Participant Deleted"
+    changed: "Participant Changed"
+    created: "Participant Created"
+  casefile.costsheet.associated: "Costsheet Associated"
+  casefile.timesheet.associated: "Timesheet Associated"
+  ecm.file:
+    rejected: "Document Rejected from Brief"
+    file.lodged: "Document Lodged"
+    document.viewed: "Document Viewed"
+    added: "Document Uploaded"
+    downloaded: "Document Downloaded"
+    copied: "Document Copied"
+    replaced: "Document Replaced"
+    version.set: "Document Versioned"
+    deleted: "Document Deleted"
+    moved: "Document Moved"
+    renamed: "Document Renamed"
+    co_edit:
+      user:
+        joined: "User joined co-editing Document"
+        leave: "User left co-editing Document"
+      document.saved: "Document saved co-editing"
+  changeCaseStatus.created: "Change Case Status Created"
+  closeComplaintRequest.created: "Request for Closing Complaint Created"
+  complaint:
+    closed: "Complaint Closed"
+    created: "Complaint Created"
+    file.added: "New File Added to Complaint"
+    findById: "Find Complaint"
+    search.result: "Complaint Search Result"
+    submittedForReview: "Compliant Submited For Review"
+    updated: "Complaint Updated"
+    priority.changed: "Complaint Priority Changed"
+    details.changed: "Complaint Details Changed"
+    status.changed: "Complaint Status Changed"
+    location.updated: "Location Updated"
+    participant:
+      added: "Participant Added"
+      deleted: "Participant Deleted"
+    costsheet.associated: "Costsheet Associated"
+    timesheet.associated: "Timesheet Associated"
+  dashboard:
+    created: "Default Dashboard Created For the First Time"
+    getByUserId: "Dashboard Retrived "
+    updated: "Dashboard Configuration Updated"
+    widget: 
+      getByUserRoles: "Widget retrived by User Roles"
+      getRolesByWidgets: "Roles retrived by Widgets"
+      setAuthorizedRoles: "Dashboard Widget Access Updated"
+  functionalaccess.updated: "Access Updated"
+  login: "User Login"
+  logout: "User Logout"
+  object.participants.change: "Participant Changed"
+  objecthistory.created: "Object History Created"
+  personAssociation:
+    created: "Person Associated"
+    deleted: "Person Association Deleted"
+    updated: "Person Association Updated"
+  person:
+    postalAddress:
+      added: "Postal Address Added"
+      deleted: "Postal Address Deleted"
+      updated: "Postal Address Updated"
+    personAlias:
+      added: "Alias Added"
+      deleted: "Alias Deleted"
+      updated: "Alias Updated"
+    contactMethod:
+      added: "Contact Added"
+      deleted: "Contact Deleted"
+      updated: "Contact Updated"
+    organization:
+      added: "Organization Added"
+      deleted: "Organization Deleted"
+      updated: "Organization Updated"
+    created: "Person Created"
+    updated: "Person Updated"
+    viewed: "Person Viewed"
+    image.uploaded: "Person Updated Image Uploaded"
+  organization:
+    created: "Organization Created"
+    updated: "Organization Updated"
+    viewed: "Organization Viewed"
+  plugins:
+    search.result: "Plugins Search Result"
+    task:
+      adHocTaskCreated: "Ad Hoc Taks Created"
+      completed: "Task Completed"
+      findById: "Find Task"
+      search.result: "Search for a Task Result"
+  profile:
+    getByUserId: "Profile Retrived by User"
+    userorg:
+      created: "User association to Organization Created"
+      updated: "User association to Organization Updated"
+  subscription:
+    created: "Subscription Created"
+    deleted: "Subscription Deleted"
+  subscriptionevent.created: "Subscription Event Created"
+  widget: 
+    created: "New Widget Created"
+    update: "Widget Update"
+  widgetrole:
+    created: "Widget Role Created"
+    update: "Widget Role Update"
+  correspondence.file.added: "Correspondence Added"
+  outlook.calendar.event.added: "Calendar Event Added"
+  associatedtag.created: "Tag Added"
+  objectassociation:
+    created: "Reference Created"
+    reference:
+      added: "Reference Added"
+      updated: "Reference Updated"
+      deleted: "Reference Deleted"
+  objectlock:
+     checkout: "Checked Out"
+     checkin: "Checked In"
+     cancel: "Cancel Editing"
+  smtp.event:
+   sent: "Document Emailed"
+   received: "Email Received"
+  documentrepository:
+    created: "Document Repository Created"
+    updated: "Document Repository Updated"
+    viewed: "Document Repository Viewed"
+    name.updated: "Document Repository Title Changed"
+    participant:
+      deleted: "Participant Deleted"
+      added: "Participant Added"
+      updated: "Participant Changed"
+    folder:
+      created: "Folder Created"
+      renamed: "Folder Renamed"
+  ldapUser:
+    created: "LDAP User Created"
+    updated: "LDAP User Updated"
+    deleted: "LDAP User Deleted"
+  ldapGroup.deleted: "LDAP Group Deleted"
+  transcribe:
+    created: "Transcription Created"
+    updated: "Transcription Updated"
+    queued: "Transcription Queued"
+    processing: "Transcription Processing"
+    completed: "Transcription Completed"
+    failed: "Transcription Failed"
+    cancelled: "Transcription Cancelled"
+    compiled: "Transcription Compiled"
+    rollback: "Transcription Rollback"
+    provider.failed: "Transcription Provider Failed"
+#################### Fiscal Year Configuration (fiscalYear.properties) ####################
+fiscal.year.start:
+  day: 1
+  month: 10
+  year: 2015
+#################### Google Analytics Configuration (googleAnalytics.properties) ####################
+ga:
+  enabled: false
+  trackingId: "UA-92355326-2"
+  debug: false
+################### Login Configuration (login.properties) ####################  
+login.warning:
+  #sets if on login screen warning message should be enabled 
+  enabled: false
+  #sets the text which should be displayed if warning is enabled
+  message: 
+################### MsOutlook Integration Configuration (msOutlookIntegration.properties) #################### 
+outlook.exchange.integration:
+  enable.autodiscovery: false
+  enabled: false
+  system_user_email: "ann-acm@armedia.com"
+  system_user_email_password: "AcMd3v$"
+  client-access-server: "https://outlook.office365.com/EWS/Exchange.asmx"
+  system_user_id: "ann-acm@armedia.com"
+  server.version: "Exchange2010_SP2"
+################### MsOutlook Plugin Configuration (msOutlookPlugin.properties) ####################  
+  participants-types-as-outlook-permission: "approver, assignee, follower"
+  #Access Levels available : None, Owner, PublishingEditor, Editor, PublishingAuthor, Author, NoneditingAuthor, Reviewer, Contributor, FreeBusyTimeOnly, FreeBusyTimeAndSubjectAndLocation, Custom;
+  #Before changing default access level, visit: http://help.unc.edu/help/exchange-what-are-permission-levels-in-outlook/ for further information
+  default_access: "Reviewer"
+  approver_access: "PublishingEditor"
+  assignee_access: "Author"
+  follower_access: "Reviewer"
+  calendar.use.system.user: false
+################### Notification Plugin Configuration (notification.properties) ####################  
+notification:
+  arkcase.port: 
+  arkcase.url: "https://acm-arkcase"
+  arkcase.url.base: "https://acm-arkcase/arkcase"
+  CASE_FILE.label: "Case File"
+  COMPLAINT.label: "Complaint"
+  FILE.label: "File"
+  TASK.label: "Task"
+  NOTE.label: "Note"
+  PERSON-ASSOCIATION.label: "Person"
+  PARTICIPANT.label: "Participant"
+  purge.days: 30
+  #If variable is true message will be sent as system user, otherwise message will be send as logged-in user
+  send.from.system.user: true
+  user.batch: 
+    frequency: 300000
+    run: true
+    size: 50
+  #notification email template
+  email.template.path: "${user.home}/.arkcase/acm/templates/ArkCaseEmailTemplate.html"
+  search:
+    filters: "[{\"key\":\"Object Type\", \"values\":\"['NOTIFICATION']\"} ,{\"key\":\"Owner\", \"values\":\"['$user']\"}]"
+    name: "notification"
+################### OKTA MFA Properties (okta.properties) #################### 
+okta:
+  idpUrl:
+  token:
+  defaultLoginTargetUrl: "/mfa/auth"
+  enrollmentTargetUrl: "/mfa/enroll"
+  selectMethodTargetUrl: "/mfa/auth"
+  verifyMethodTargetUrl: "/mfa/verify" 
+################### Only Office Configuration (onlyOfficePlugin.properties) ####################    
+onlyoffice.plugin:
+  #url for document server
+  files.docservice.url.api: "https://onlyoffice.arkcase.com/ds-vpath/web-apps/apps/api/documents/api.js"
+  #base url used for sending to onlyoffice to be able to perform callbacks
+  arkcase.baseurl: "https://acm-arkcase/arkcase"
+  config: 
+    #view configuration
+    view:
+      type: "desktop"
+      height: "100%"
+      width: "100%"
+  jwt:
+    outbound: 
+      #is JWT signing outbound enabled
+      enabled: false
+      #algorith used for signing requests
+      algorithm: "HS256"
+      #key used for signing requests or key of the keystore, depends of the algorithm
+      key: "secret"
+      #absolute path to the keystore
+      keystore: 
+      #alias of the certificate  
+      certificate_alias: 
+    inbound: 
+      #is JWT verifying inbound enabled
+      enabled: false
+      #key used for verify the response token or key of the truststore, depends of the algorithm
+      key: "secret"
+      #path to the keystore
+      truststore:
+  #onlyoffice plugin enabled or not
+  enabled: true
+  history: 
+    #folder path relative to ${userhome}/.arkcase
+    folder_path: "/onlyoffice/changes"
+    #date format for displaying dates in document history
+    date_format: "yyyy-MM-dd hh:mm aa"     
+################### Person Plugin Configuration (personPlugin.properties) ###################
+person.plugin: 
+  types: "Defendant,Witness,WAS Officer,Victim,Defense Counsel,Forensic Scientist"
+  #Root folder for People(Person) module
+  folder.root: "/Sites/acm/documentLibrary/People/"
+  #Folder where pictures will be stored
+  #folder.pictures: Pictures
+  #Folder per each Person, where files/documents will be stored, written with spel expression
+  folder.own.spel: "givenName + '_' + (middleName == null ? '' : middleName + '_') + familyName + '_' + id"
+  search:
+    tree:
+      filter: "[{\"desc\": \"I've Created\", \"name\":\"my-created\", \"value\":\"fq=author_s:$[user]\"}
+      ,{\"desc\": \"I've Created - Active\", \"name\":\"my-created-active\", \"value\":\"fq=author_s:$[user] AND status_s:ACTIVE\"}
+      ,{\"desc\": \"Active\", \"name\":\"active\", \"value\":\"fq=status_s:ACTIVE\", \"default\":\"true\"}
+      ,{\"desc\": \"Inactive\", \"name\":\"in-active\", \"value\":\"fq=status_s:INACTIVE\"}
+      ,{\"desc\": \"(No Filter)\", \"name\":\"\", \"value\":\"\"}]"
+      sort: "[{\"desc\": \"Sort Date Created Ascending\", \"name\":\"sort-date-asc\", \"value\":\"create_tdt ASC\"}
+      ,{\"desc\": \"Sort Date Created Decending\", \"name\":\"sort-date-desc\", \"value\":\"create_tdt DESC\"}
+      ,{\"desc\": \"Sort By ID Ascending\", \"name\":\"sort-by-id-asc\", \"value\":\"id ASC\"}
+      ,{\"desc\": \"Sort By ID Decending\", \"name\":\"sort-by-id-desc\", \"value\":\"id DESC\"}
+      ,{\"desc\": \"Sort By Name A-Z\", \"name\":\"sort-by-name-asc\", \"value\":\"title_parseable_lcs ASC\", \"default\":\"true\"}
+      ,{\"desc\": \"Sort By Name Z-A\", \"name\":\"sort-by-name-desc\", \"value\":\"title_parseable_lcs DESC\"}
+      ,{\"desc\": \"(No Sort)\", \"name\":\"\", \"value\":\"\", \"default\":\"true\"}]" 
+      searchQuery: "title_parseable" 
+################### Profile Plugin Configuration (profilePlugin.properties) ###################
+profile.plugin: 
+  user.profile.root.folder: "/Sites/acm/documentLibrary/User Profile"
+################### Search Plugin Configuration (searchPlugin.properties) ################### 
+##All facets that will not be used should be commented
+search.plugin.facet:
+  assignee_full_name_facet: "Assignee Full Name"
+  date.create_date_tdt: "Create Date"
+  creator_full_name_facet: "Create User"
+  date.modified_date_tdt: "Modify Date"
+  modifier_full_name_facet: "Modify User"
+  parent_type_facet: "Parent Type"
+  type_facet: "Person,Organization Type"
+  object_type_facet: "Object Type"
+  location_city_facet: "City"
+  location_state_facet: "State"
+  location_postal_code_sdo: "Postal Code"
+  date.dueDate_tdt: "Due Date"
+  date.incident_date_tdt: "Incident Date"
+  priority_facet: Priority
+  incident_type_facet: "Incident Type"
+  status_facet: "Status"
+  parent_object_type_facet: "Parent Object Type"
+  owner_facet: "Owner"
+  groups_id_ss: "Group"
+  tag_token_facet: "Tag Token" 
+  tags_facet: "Tags"
+  document_repository_name_s: "Document Repository Name"
+  file_lang_s: "Document Language"
+  ## Time periods used by the faceted search
+  search:
+    time.period: "[{\"desc\":\"Previous Week\", \"value\":\"[NOW/DAY-7DAY TO *]\"} 
+    ,{\"desc\":\"Previous Month\", \"value\":\"[NOW/DAY-1MONTH TO *]\"}
+    ,{\"desc\":\"Previous Year\", \"value\":\"[NOW/DAY-1YEAR TO *]\"}]"
+    # Objects that will be excluded from facet search (comma separated, for example: NOTIFICATION,CASE_FILE,COMPLAINT)
+    # Exclude REFERENCE type for AFDP-5718
+    objects.to.exclude: "NOTIFICATION,SUBSCRIPTION_EVENT,TAG,REFERENCE"
+    ## Fields for generated reports
+    export.fields: "{\"description_parseable\":\"Description\", \"parent_number_lcs\":\"Object Number\", \"parent_type_s\":\"Object Type\"
+    ,\"modified_date_tdt\":\"Modified\", \"name\":\"Name\", \"object_type_s\":\"Type\", \"title_parseable\":\"Title\", \"assignee_full_name_lcs\":\"Assignee\"}"
+################### Session Control Configuration (.arkcase/acm/spring-security/sessionControl.properties) ###################
+sessionControl:
+  #number of concurrent session allowed
+  #set to -1 to allow unlimited sessions 
+  maximumSessions: 1
+  #determines whether the user should be prevented from opening more sessions than allowed
+  #If set to true, the user authenticating will be prevented from authenticating. 
+  #if set to false, the user that has already authenticated will be forcibly logged out.
+  exceptionIfMaximumExceeded: false     
+################### Solr Configuration (solr.properties) ###################
+solr:
+  host: "acm-solr"
+  port: 8983
+  contextRoot: "solr"
+  quicksearch.core: "acmQuickSearch"
+  advancedsearch.core: "acmAdvancedSearch"
+  updateHandler: "update"
+  contentFileHandler: "update/extract"
+  searchHandler: "select"
+  #whether to scan the database for changes based on the
+  #last modified date.  Set to true when database updates 
+  #are made outside the application, or if you need to catch up with the database.
+  enableBatchUpdateBasedOnLastModified: true
+  #if enableBatchUpdateBasedOnLastModified is true, this 
+  #property says how often to scan for updates.  Since most 
+  #updates should occur through the application (and thus be 
+  #indexed right away via events), the batch update should not run
+  #too often... unless you have active database feeds outside the 
+  #application.  3600000 ms = 1 hour...
+  batchUpdateFrequencyInMilliseconds: 3600000
+  #batchUpdateFrequencyInMilliseconds: 10000
+  #how many objects to extract at once during batch update.
+  batchUpdateBatchSize: 50
+  #whether to index file contents or just store document-related metadata
+  enableContentFileIndexing: true 
+################### State Of Arkcase Configuration (stateOfArkCase.properties) ###################
+state_of_arkcase.reports:
+  #specify in which folder reports will be generated and kept there
+  folder_path:
+  #specify for how many days logs will be kept
+  delete_older_than_days: 7
+################### Subscription Plugin Configuration (subsriptionPlugin.properties) ###################
+##Subscription module : API  return messages, messages included in the AcmObjectNotFoundException etc..
+subscription.plugin:
+  ##check for subscription events every three minutes.
+  batchUpdateFrequencyInMilliseconds: 180000
+  removed:
+    successful: "Subscription Removed Successfully"
+    failed: "Subscription Was not Removed Due To SQL exception"
+    event.types: "com.armedia.acm.plugins.search.result"
+  ##SOLR predefined queries for subscription module
+  get.object.byId: "id:?&fq=-status_s:COMPLETE&fq=-status_s:DELETE&fq=-status_s:CLOSED"
+  ##Used by UI ##
+  search:
+    name: "subscription"
+    filters: "[{\"key\": \"Object Type\", \"values\": \"['SUBSCRIPTION_EVENT']\"},{\"key\": \"Owner\", \"values\": \"[$user]\"}]"
+################### Tag Plugin Configuration (tagPlugin.properties) ###################
+tag.plugin:
+  search:
+    name: "tag"
+    filters: "[{\"key\":\"Object Type\", \"values\":\"['DOCUMENT']\"}]"
+    topFacets: "['Status']"
+  ##SOLR predefined queries for tag module
+  associated.by.object.id.and.type: "parent_type_s:$[parentType] AND parent_id_s:$[parentId] AND object_type_s:ASSOCIATED_TAG"
+  tags: "[{\"desc\":\"Tag number 1\", \"name\":\"tag_1\", \"value\":\"Text 1\"}
+  ,{\"desc\":\"Tag number 2\", \"name\":\"tag_2\", \"value\":\"Text 2\"}
+  ,{\"desc\":\"Tag number 3\", \"name\":\"tag_3\", \"value\":\"Text 3\"}
+  ,{\"desc\":\"Tag number 4\", \"name\":\"tag_4\", \"value\":\"Text 4\"}
+  ,{\"desc\":\"Tag number 5\", \"name\":\"tag_5\", \"value\":\"Text 5\"}
+  ,{\"desc\":\"Tag number 6\", \"name\":\"tag_6\", \"value\":\"Text 6\"}
+  ,{\"desc\":\"Tag number 7\", \"name\":\"tag_7\", \"value\":\"Text 7\"}
+  ,{\"desc\":\"Tag number 8\", \"name\":\"tag_8\", \"value\":\"Text 8\"}
+  ,{\"desc\":\"Tag number 9\", \"name\":\"tag_9\", \"value\":\"Text 9\"}
+  ,{\"desc\":\"Tag number 10\", \"name\":\"tag_10\", \"value\":\"Text 10\"}
+  ,{\"desc\":\"Tag number 11\", \"name\":\"tag_11\", \"value\":\"Text 11\"}
+  ,{\"desc\":\"Tag number 12\", \"name\":\"tag_12\", \"value\":\"Text 12\"}]"
+################### Task Plugin Configuration (taskPlugin.properties) ###################
+task.plugin:
+  search.tree:
+    ##!NOTE: "New Tasks For Me" and/OR "Old Tasks For Me" can be fetched by using filter bellow in combination with sorting ASC or DESC by Create Date...
+    ##For "New Tasks For Me", you should chose "Tasks for Me" --> fq=assigniee_s:$[user] together with "Sort Create Date Desc" --> create_tdt DESC ... and SOLR will retunr the newest Case Files.
+    filter: "[{\"desc\": \"Tasks for Me\", \"name\":\"my-tasks\", \"value\":\"fq=assignee_s:$[user] AND -status_s:COMPLETE AND -status_s:DELETE AND -status_s:CLOSED\", default:\"true\"}
+    ,{\"desc\":\"All Open Tasks\", \"name\":\"opened-tasks\", \"value\":\"fq=status_s:ACTIVE\"}
+    ,{\"desc\":\"All Completed Tasks\", \"name\":\"completed-tasks\", \"value\":\"fq=status_s:CLOSED\"}
+    ,{\"desc\":\"All Tasks Due Today\", \"name\":\"tasks-due-today\", \"value\":\"fq=due_tdt:[NOW/DAY TO NOW/DAY%2B1DAY] AND -status_s:COMPLETE AND -status_s:DELETE AND -status_s:CLOSED\"}
+    ,{\"desc\":\"All Tasks Due Today for Me\", \"name\":\"my-tasks-due-today\", \"value\":\"fq=due_tdt:[NOW/DAY TO NOW/DAY%2B1DAY] AND -status_s:COMPLETE AND -status_s:DELETE AND -status_s:CLOSED AND assignee_s:$[user]\"}
+    ,{\"desc\":\"All Tasks Overdue\", \"name\":\"tasks-overdue\", \"value\":\"fq=due_tdt:[* TO NOW/DAY] AND -status_s:COMPLETE AND -status_s:DELETE AND -status_s:CLOSED\"}
+    ,{\"desc\":\"All Tasks Overdue for Me\", \"name\":\"my-tasks-overdue\", \"value\":\"fq=due_tdt:[* TO NOW/DAY] AND -status_s:COMPLETE AND -status_s:DELETE AND -status_s:CLOSED AND assignee_s:$[user]\"}
+    ,{\"desc\":\"(No Filter)\", \"name\":\"\", \"value\":\"\"}]"
+    sort: "[{\"desc\":\"Sort Create Date Asc\", \"name\":\"sort-date-asc\", \"value\":\"create_tdt ASC\"}
+    ,{\"desc\":\"Sort Create Date Desc\", \"name\":\"sort-date-desc\", \"value\":\"create_tdt DESC\"}
+    ,{\"desc\":\"Sort Task Name Asc\", \"name\":\"sort-by-name-asc\", \"value\":\"title_parseable_lcs ASC\"}
+    ,{\"desc\":\"Sort Task Name Desc\", \"name\":\"sort-by-name-desc\", \"value\":\"title_parseable_lcs DESC\"}
+    ,{\"desc\":\"(No Sort)\", \"name\":\"\", \"value\":\"\", \"default\":\"true\"}]"
+    #The properties where the search query should be executed (comma separated, for example: title_parseable,description_no_html_tags_parseable ... etc)
+    searchQuery: "title_parseable,catch_all"
+  fileTypes: "[{\"type\":\"mr\", \"label\":\"Medical Release\"}
+  ,{\"type\":\"gr\", \"label\":\"General Release\"}
+  ,{\"type\":\"ev\", \"label\":\"eDelivery\"}
+  ,{\"type\":\"sig\", \"label\":\"SF86 Signature\"}
+  ,{\"type\":\"noi\", \"label\":\"Notice of Investigation\"}
+  ,{\"type\":\"wir\", \"label\":\"Witness Interview Request\"}
+  ,{\"type\":\"other\", \"label\":\"Other\"}]"
+## Dashboard SOLR queries
+solr.task:
+  #All tasks assigned to all users
+  all: "object_type_s:TASK"
+  #all past due tasks
+  pastdue: "object_type_s:TASK&fq=due_tdt:[* TO NOW]"
+  #All tasks assigned to all users that due date is until  one day from Today numberOfDaysFromToday
+  due.one.day.from.now: "object_type_s:TASK&fq=due_tdt:[NOW TO NOW + 1DAY/DAY]"
+  #All tasks assigned to all users that due date is until seven days from Today numberOfDaysFromToday
+  due.seven.days.from.now: "object_type_s:TASK&fq=due_tdt:[NOW TO NOW + 7DAY/DAY]"
+  #All tasks assigned to all users that due date is until one month from Today numberOfDaysFromToday
+  due.one.month.from.now: "object_type_s:TASK&fq=due_tdt:[NOW TO NOW+1MONTH/MONTH]"
+  #All taks assigned to a specific user
+  all.for.user: "object_type_s:TASK&fq=assignee_id_lcs:?"
+################### Time Properties (time.properties) ###################
+time.plugin:
+  root.folder: "/Sites/acm/documentLibrary/Timesheets"
+  search.tree.sort: "[{\"desc\":\"Sort Date Ascending\", \"name\":\"create_tdt ASC\"} 
+  ,{\"desc\":\"Sort Date Decending\", \"name\":\"create_tdt DESC\"}
+  ,{\"desc\":\"Sort Timesheet ID Ascending\", \"name\":\"id ASC\"}
+  ,{\"desc\":\"Sort Timesheet ID Decending\", \"name\":\"id DESC\"}
+  ,{\"desc\":\"Sort By Timesheet Name\", \"name\":\"name DESC\"}]"
+  useApprovalWorkflow: true
+################### Timesheet Properties (timesheetProperties.properties) ###################
+################### Transcribe Configuration (transcribe.properties) ####################
+transcribe:
+  enabled: false
+  automatic.enabled: false
+  new.transcribe.for.new.version: false
+  copy.transcribe.for.new.version: true
+  confidence: 80
+  cost: 0
+  number.of.files.for.processing: 10
+  word.count.per.item: 20
+  provider: "AWS"
+  providers: "AWS"
+  provider.purge.attempts: 5
+  allowed.media.duration.in.seconds: 7200
+  silent.between.words.in.seconds: 2
+#################### Username/password notifier properties (usernamePasswordNotifier.properties) ###################
+upcoming:
+  password.notification:
+    subject: "Reset password"
+    body.template: "Your username is %s and you can change your password by clicking this <a href='%s'>link</a> and following the on screen instructions."
+    template.path: "${user.home}/.arkcase/acm/templates/ArkCaseEmailTemplate.html"
+    resetPasswordLink: "%s/reset-password?token=%s"
+  forgotUsername.notification:
+    subject: "Forgot Username"
+    body.template: "Your email address has %d account(s): <b>%s</b>. Proceed to login <a href='%s/login'>%s/login</a>" 
+################### WEB Sockets Configuration (websockets.properties) ###################
+acm.websockets:
+  enabled: true
+  stomp_endpoint: "/stomp"
+  application_destination_prefix: "/app"
+  #Supported relay protocols are: tcp and ssl
+  stomp_broker_relay.relay_protocol: "ssl"
+  #Required values for ssl relay protocol only
+  #keystore type must be JKS
+  stomp_broker_relay.keystore: "${user.home}/.arkcase/acm/private/keystore.old"
+  stomp_broker_relay.keystore_pass: "password"
+  stomp_broker_relay.truststore: "${user.home}/.arkcase/acm/private/truststore"
+  stomp_broker_relay.truststore_pass: "AcMd3v$"
+  stomp_broker_relay.truststore_type: "JKS"
+  stomp_broker_relay.relay_host: "acm-activemq"
+  stomp_broker_relay.relay_port: 61613
+  stomp_broker_relay.heartbeat_send_interval: 20000
+  stomp_broker_relay.heartbeat_receive_interval: 20000
+  #STOMP (Browser to ActiveMQ) authentication
+  stomp_broker_relay.client_login: "guest"
+  stomp_broker_relay.client_passcode: "guest"
+  #STOMP (ArkCase to ActiveMQ) authentication
+  stomp_broker_relay.system_login: "guest"
+  stomp_broker_relay.system_passcode: "guest"
+  socksjs.enabled: true 
+################### WOPI Configuration (wopiPlguin.properties) ###################
+wopi.plugin:
+  host:
+    url: "https://wopi.arkcase.com/wopi/office/%1$d/edit?access_token=%2$s&protocol=%3$s&domain=%4$s&port=%5$d&context=%6$s&access_token_param_name=%7$s&file_id_param_name=%8$s"
+    validation:
+      url: "https://wopi.arkcase.com/wopi/office/%1$d/view?access_token=%2$s&protocol=%3$s&domain=%4$s&port=%5$d&context=%6$s&access_token_param_name=%7$s&file_id_param_name=%8$s&app_type=WopiTest"
+  tenant:
+    protocol: "https"
+    domain: "acm-arkcase"
+    port: 8843
+    context: "arkcase"
+    accessTokenParamName: "acm_email_ticket"
+    fileIdParamName: "ecmFileId"
+  lockDuration: 1800000
+  enabled: true
+################### (pdfConversionProperties.properties) ###################
+responseFolderConversion: false  
+                  
