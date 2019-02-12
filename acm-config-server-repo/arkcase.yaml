@@ -6,7 +6,7 @@ elk:
     port: 5601
     internal.url: "http://acm-arkcase/arkcase/acm-elastic"
     internal.port: 5601
-    user: 
+    user:
     password:
   dashboard.url: "/app/kibana#/dashboard/693034a0-6ca5-11e7-8049-858c370356cc"
 slk.server:
@@ -93,14 +93,14 @@ change_case_status:
   enable.frevvo.form.engine: true
 # Case File
 case_file:
- name: "Case File"
- application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
- type: "_jTrYoLXwEeSNKN7wfymqgA"
- mode: "popupform"
- owningGroupType: "owning group"
- owning_group.privilege: "acm-case-approve"
- assignee.privilege.type: "group-user"
- follower.privilege.type: "user"
+  name: "Case File"
+  application.id: "_IgbIMDnTEeSjTrBIsoKK0g"
+  type: "_jTrYoLXwEeSNKN7wfymqgA"
+  mode: "popupform"
+  owningGroupType: "owning group"
+  owning_group.privilege: "acm-case-approve"
+  assignee.privilege.type: "group-user"
+  follower.privilege.type: "user"
 # Electronic Communication
 electronic_communication:
   name: "Electronic Communication"
@@ -190,14 +190,14 @@ report:
     REPORT_OUTPUT_TYPES: "Excel/CSV-Excel/CSV"
     # This must be a real user account in the content management system (this account creates folders and documents in a document repository)
     CMIS_STORE_REPORT_USER: "admin"
-  config:  
+  config:
     reports: "{\"CASE_SUMMARY\" : \"/arkcase/pentaho/api/repos/:public:arkcase:caseSummary.prpt/viewer\",
     \"COMPLAINT_DISPOSITION_COUNT\" : \"/arkcase/pentaho/api/repos/:public:arkcase:ComplaintDispositionCount.prpt/viewer\",
     \"COMPLAINT_REPORT\" : \"/arkcase/pentaho/api/repos/:public:arkcase:ComplaintReport.prpt/viewer\"}"
     ################### (reportToRolesMap.properties) ###################
     reportsToRoles: "{\"CASE_SUMMARY\" : \"ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR\",
     \"COMPLAINT_DISPOSITION_COUNT\" : \"ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR\",
-    \"COMPLAINT_REPORT\" : \"ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR\"}"  
+    \"COMPLAINT_REPORT\" : \"ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR\"}"
 ################### Activiti Configuration (activiti.properties) ####################
 activiti.job.executor.activate: true
 ################### Alfresco Ldap Syncer Service Configuration (alfrescoLdapSyncerService.properties) ####################
@@ -326,13 +326,13 @@ navigator:
     iconName: "fa fa-organizations"
     privilege: "acmOrganizationModulePrivilege"
     privilegeName: "acm-organization-module"
-  document-repository: 
+  document-repository:
     name: "Document Repository"
     resourceName: "common:navigation.label.document-repository"
     iconName: "i i-folder"
     privilege: "documentRepositoryModulePrivilege"
     privilegeName: "acm-document-repository-module"
-  my-documents: 
+  my-documents:
     name: "My Documents"
     resourceName: "common:navigation.label.my-documents"
     iconName: "i i-folder"
@@ -344,119 +344,119 @@ navigator:
     iconName: "i i-stats"
     privilege: "acmAnalyticsModulePrivilege"
     privilegeName: "acm-analytics-module"
-  analytics-audit: 
+  analytics-audit:
     name: "Log Analytics"
     resourceName: "common:navigation.label.analytics-audit"
     iconName: "i i-stats"
     privilege: "acmAnalyticsAuditModulePrivilege"
     privilegeName: "acm-analytics-audit-module"
-################### Application Privileges (applicationPrivileges.properties) ####################
-acmGlobalAllowPrivilege: "Global Allow Privilege"
-auditPrivilege: "Audit Privilege"
-auditReadEventsForObjectPrivilege: "Audit Read Events For Object Privilege"
-acmGenerateCorrespondencePrivilege: "Generate Correspondence Privilege"
-dashboardPrivilege: "Dashboard Privilege"
-filePrivilege: "File Privilege"
-participantPrivilege: "Participant Privilege"
-blogPrivilege: "Blog Privilege"
-helloWorldPrivilege: "Hello World Privilege"
-profilePrivilege: "Profile Privilege"
-reportPrivilege: "Report Privilege"
-costsheetCreatePrivilege: "Costsheet Create Privilege"
-costsheetApprovePrivilege: "Costsheet Approve Privilege"
-timesheetApprovePrivilege: "Timesheet Approve Privilege"
-acmComplaintListPrivilege: "Complaint List Privilege"
-acmComplaintSavePrivilege: "Complaint Save Privilege"
-acmComplaintCreatePrivilege: "Complaint Create Privilege"
-acmComplaintApprovePrivilege: "Complaint Approve Privilege"
-acmSearchPrivilege: "Search Privilege"
-searchPrivilege: "Search Privilege"
-acmCaseApprovePrivilege: "Case Approve Privilege"
-saveCasePrivilege: "Save Case Privilege"
-caseFileListPrivilege: "Case File List Privilege"
-caseFileCreatePrivilege: "Case File Create Privilege"
-acmPersonSavePrivilege: "Person Save Privilege"
-acmPersonDeletePrivilege: "Person Delete Privilege"
-acmOrganizationSavePrivilege: "Organization Save Privilege"
-acmOrganizationListPrivilege: "Organization List Privilege"
-acmOrganizationDeletePrivilege: "Organization Delete Privilege"
-acmOrganizationDetailsPrivilege: "Organization Details Privilege"
-acmOrganizationAssociationListPrivilege: "Organization Association List Privilege"
-acmOrganizationAssociationSavePrivilege: "Organization Association Save Privilege"
-acmOrganizationAssociationDeletePrivilege: "Organization Association Delete Privilege"
-acmPersonAssociationListPrivilege: "Person Association List Privilege"
-acmPersonAssociationDeletePrivilege: "Person Association Delete Privilege"
-acmPersonAssociationSavePrivilege: "Person Association Save Privilege"
-adminPrivilege: "Admin Privilege"
-acmDeleteNoteByIdPrivilege: "Delete Note By Id Privilege"
-acmListNotesPrivilege: "List Notes Privilege"
-costsheetPrivilege: "Costsheet Privilege"
-timesheetCreatePrivilege: "Timesheet Create Privilege"
-timesheetPrivilege: "Timesheet Privilege"
-tagPrivilege: "Tag Privilege"
-acmTaskListPrivilege: "Task List Privilege"
-acmTaskSavePrivilege: "Task Save Privilege"
-acmTaskCreatePrivilege: "Task Create Privilege"
-acmTaskCompletePrivilege: "Task Complete Privilege"
-acmTaskDeletePrivilege: "Task Delete Privilege"
-acmNotificationPrivilege: "Notification Privilege"
-subscribePrivilege: "Subscribe Privilege"
-listMilestonesGroupedByDate: "List Milestones Grouped By Date"
-acmSignatureConfirmPrivilege: "Signature Confirm Privilege"
-acmSignatureFindPrivilege: "Signature Find Privilege"
-acmPersonFindPrivilege: "Person Find Privilege"
-acmPersonListPrivilege: "Person List Privilege"
-acmPersonTypesPrivilege: "Person Types Privilege"
-acmSaveNotePrivilege: "Save Note Privilege"
-acmOutlookListObjectsPrivilege: "Outlook List Objects Privilege"
-splitCaseFilePrivilege: "Split Case File Privilege"
-objectLockPrivilege: "Object Lock Privilege"
-objectUnLockPrivilege: "Object Unlock Privilege"
-listLocksDetailsPrivilege: "List Lock Details Privilege"
-listLockedObjectsPrivilege: "List Locked Objects Privilege"
-analyticsPrivilege: "Data Analytics Privilege"
-analyticsAuditPrivilege: "Log Analytics Privilege"
-acmAdminModulePrivilege: "Admin Module Privilege"
-acmAuditModulePrivilege: "Audit Module Privilege"
-acmCaseModulePrivilege: "Case Module Privilege"
-acmComplaintModulePrivilege: "Complaint Module Privilege"
-acmCostModulePrivilege: "Cost Module Privilege"
-acmDashboardModulePrivilege: "Dashboard Module Privilege"
-acmNotificationModulePrivilege: "Notification Module Privilege"
-acmReportModulePrivilege: "Report Module Privilege"
-acmSearchModulePrivilege: "Search Module Privilege"
-acmSubscriptionModulePrivilege: "Subscription Module Privilege"
-acmTagModulePrivilege: "Tag Module Privilege"
-acmTaskModulePrivilege: "Task Module Privilege"
-acmTimeModulePrivilege: "Time Module Privilege"
-acmCategoryManagementPrivilege: "Category Management Privilege"
-acmCalendarAdminPrivilege: "Calendar Admin Privilege"
-acmCalendarReadShortenedConfigPrivilege: "Read Shortened Calendar Config Privilege"
-acmCalendarEventsListPrivilege: "Calendar List Events Privilege"
-acmCalendarEventsSavePrivilege: "Calendar Save Events Privilege"
-acmCalendarEventsCreatePrivilege: "Calendar Create Events Privilege"
-acmCalendarEventsDeletePrivilege: "Calendar Delete Events Privilege"
-acmPersonModulePrivilege: "Person Module Privilege"
-acmOrganizationModulePrivilege: "Organization Module Privilege"
-documentRepositoryManagerPrivilege: "Document Repository Manager Privilege"
-documentRepositoryModulePrivilege: "Document Repository Module Privilege"
-acmAnalyticsModulePrivilege: "Data Analytics Module Privilege"
-acmAnalyticsAuditModulePrivilege: "Log Analytics Module Privilege"
-acmEmailConfigurePrivilege: "Configure Email Privilege"
-getStateOfArkcasePrivilege: "Get State Of Arkcase Privilege"
-listStateOfArkcasePrivilege: "List State Of Arkcase Privilege"
-generateStateOfArkcasePrivilege: "Generate State Of Arkcase Privilege"
 ################### (applicationRoles.properties) ###################
 application:
   roles: "ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR,ROLE_CONSUMER,ROLE_EXTERNAL,ROLE_ENTITY_ADMINISTRATOR"
-################### Application Role To User Group (applicationRoleToUserGroup.properties) ####################
+  ################### Application Privileges (applicationPrivileges.properties) ####################
+  privileges: "{\"acmGlobalAllowPrivilege\": \"Global Allow Privilege\",
+\"auditPrivilege\": \"Audit Privilege\",
+\"auditReadEventsForObjectPrivilege\": \"Audit Read Events For Object Privilege\",
+\"acmGenerateCorrespondencePrivilege\": \"Generate Correspondence Privilege\",
+\"dashboardPrivilege\": \"Dashboard Privilege\",
+\"filePrivilege\": \"File Privilege\",
+\"participantPrivilege\": \"Participant Privilege\",
+\"blogPrivilege\": \"Blog Privilege\",
+\"helloWorldPrivilege\": \"Hello World Privilege\",
+\"profilePrivilege\": \"Profile Privilege\",
+\"reportPrivilege\": \"Report Privilege\",
+\"costsheetCreatePrivilege\": \"Costsheet Create Privilege\",
+\"costsheetApprovePrivilege\": \"Costsheet Approve Privilege\",
+\"timesheetApprovePrivilege\": \"Timesheet Approve Privilege\",
+\"acmComplaintListPrivilege\": \"Complaint List Privilege\",
+\"acmComplaintSavePrivilege\": \"Complaint Save Privilege\",
+\"acmComplaintCreatePrivilege\": \"Complaint Create Privilege\",
+\"acmComplaintApprovePrivilege\": \"Complaint Approve Privilege\",
+\"acmSearchPrivilege\": \"Search Privilege\",
+\"searchPrivilege\": \"Search Privilege\",
+\"acmCaseApprovePrivilege\": \"Case Approve Privilege\",
+\"saveCasePrivilege\": \"Save Case Privilege\",
+\"caseFileListPrivilege\": \"Case File List Privilege\",
+\"caseFileCreatePrivilege\": \"Case File Create Privilege\",
+\"acmPersonSavePrivilege\": \"Person Save Privilege\",
+\"acmPersonDeletePrivilege\": \"Person Delete Privilege\",
+\"acmOrganizationSavePrivilege\": \"Organization Save Privilege\",
+\"acmOrganizationListPrivilege\": \"Organization List Privilege\",
+\"acmOrganizationDeletePrivilege\": \"Organization Delete Privilege\",
+\"acmOrganizationDetailsPrivilege\": \"Organization Details Privilege\",
+\"acmOrganizationAssociationListPrivilege\": \"Organization Association List Privilege\",
+\"acmOrganizationAssociationSavePrivilege\": \"Organization Association Save Privilege\",
+\"acmOrganizationAssociationDeletePrivilege\": \"Organization Association Delete Privilege\",
+\"acmPersonAssociationListPrivilege\": \"Person Association List Privilege\",
+\"acmPersonAssociationDeletePrivilege\": \"Person Association Delete Privilege\",
+\"acmPersonAssociationSavePrivilege\": \"Person Association Save Privilege\",
+\"adminPrivilege\": \"Admin Privilege\",
+\"acmDeleteNoteByIdPrivilege\": \"Delete Note By Id Privilege\",
+\"acmListNotesPrivilege\": \"List Notes Privilege\",
+\"costsheetPrivilege\": \"Costsheet Privilege\",
+\"timesheetCreatePrivilege\": \"Timesheet Create Privilege\",
+\"timesheetPrivilege\": \"Timesheet Privilege\",
+\"tagPrivilege\": \"Tag Privilege\",
+\"acmTaskListPrivilege\": \"Task List Privilege\",
+\"acmTaskSavePrivilege\": \"Task Save Privilege\",
+\"acmTaskCreatePrivilege\": \"Task Create Privilege\",
+\"acmTaskCompletePrivilege\": \"Task Complete Privilege\",
+\"acmTaskDeletePrivilege\": \"Task Delete Privilege\",
+\"acmNotificationPrivilege\": \"Notification Privilege\",
+\"subscribePrivilege\": \"Subscribe Privilege\",
+\"listMilestonesGroupedByDate\": \"List Milestones Grouped By Date\",
+\"acmSignatureConfirmPrivilege\": \"Signature Confirm Privilege\",
+\"acmSignatureFindPrivilege\": \"Signature Find Privilege\",
+\"acmPersonFindPrivilege\": \"Person Find Privilege\",
+\"acmPersonListPrivilege\": \"Person List Privilege\",
+\"acmPersonTypesPrivilege\": \"Person Types Privilege\",
+\"acmSaveNotePrivilege\": \"Save Note Privilege\",
+\"acmOutlookListObjectsPrivilege\": \"Outlook List Objects Privilege\",
+\"splitCaseFilePrivilege\": \"Split Case File Privilege\",
+\"objectLockPrivilege\": \"Object Lock Privilege\",
+\"objectUnLockPrivilege\": \"Object Unlock Privilege\",
+\"listLocksDetailsPrivilege\": \"List Lock Details Privilege\",
+\"listLockedObjectsPrivilege\": \"List Locked Objects Privilege\",
+\"analyticsPrivilege\": \"Data Analytics Privilege\",
+\"analyticsAuditPrivilege\": \"Log Analytics Privilege\",
+\"acmAdminModulePrivilege\": \"Admin Module Privilege\",
+\"acmAuditModulePrivilege\": \"Audit Module Privilege\",
+\"acmCaseModulePrivilege\": \"Case Module Privilege\",
+\"acmComplaintModulePrivilege\": \"Complaint Module Privilege\",
+\"acmCostModulePrivilege\": \"Cost Module Privilege\",
+\"acmDashboardModulePrivilege\": \"Dashboard Module Privilege\",
+\"acmNotificationModulePrivilege\": \"Notification Module Privilege\",
+\"acmReportModulePrivilege\": \"Report Module Privilege\",
+\"acmSearchModulePrivilege\": \"Search Module Privilege\",
+\"acmSubscriptionModulePrivilege\": \"Subscription Module Privilege\",
+\"acmTagModulePrivilege\": \"Tag Module Privilege\",
+\"acmTaskModulePrivilege\": \"Task Module Privilege\",
+\"acmTimeModulePrivilege\": \"Time Module Privilege\",
+\"acmCategoryManagementPrivilege\": \"Category Management Privilege\",
+\"acmCalendarAdminPrivilege\": \"Calendar Admin Privilege\",
+\"acmCalendarReadShortenedConfigPrivilege\": \"Read Shortened Calendar Config Privilege\",
+\"acmCalendarEventsListPrivilege\": \"Calendar List Events Privilege\",
+\"acmCalendarEventsSavePrivilege\": \"Calendar Save Events Privilege\",
+\"acmCalendarEventsCreatePrivilege\": \"Calendar Create Events Privilege\",
+\"acmCalendarEventsDeletePrivilege\": \"Calendar Delete Events Privilege\",
+\"acmPersonModulePrivilege\": \"Person Module Privilege\",
+\"acmOrganizationModulePrivilege\": \"Organization Module Privilege\",
+\"documentRepositoryManagerPrivilege\": \"Document Repository Manager Privilege\",
+\"documentRepositoryModulePrivilege\": \"Document Repository Module Privilege\",
+\"acmAnalyticsModulePrivilege\": \"Data Analytics Module Privilege\",
+\"acmAnalyticsAuditModulePrivilege\": \"Log Analytics Module Privilege\",
+\"acmEmailConfigurePrivilege\": \"Configure Email Privilege\",
+\"getStateOfArkcasePrivilege\": \"Get State Of Arkcase Privilege\",
+\"listStateOfArkcasePrivilege\": \"List State Of Arkcase Privilege\",
+\"generateStateOfArkcasePrivilege\": \"Generate State Of Arkcase Privilege\"}"
+  ################### Application Role To User Group (applicationRoleToUserGroup.properties) ####################
   rolesToGroups: "{\"ROLE_ENTITY_ADMINISTRATOR\": \"ARKCASE_ENTITY_ADMINISTRATOR@ARMEDIA.COM\",
   \"ROLE_CONSUMER\": \"ARKCASE_CONSUMER@ARMEDIA.COM\",
   \"ROLE_SUPERVISOR\": \"ARKCASE_SUPERVISOR@ARMEDIA.COM,ARKCASE_ADMINISTRATOR@ARMEDIA.COM\",
   \"ROLE_ADMINISTRATOR\": \"ARKCASE_ADMINISTRATOR@ARMEDIA.COM,ARKCASE_ENTITY_ADMINISTRATOR@ARMEDIA.COM\",
   \"ROLE_EXTERNAL\": \"ARKCASE_EXTERNAL@ARMEDIA.COM\",
   \"ROLE_CONTRIBUTOR\": \"ARKCASE_CONTRIBUTOR@ARMEDIA.COM\"}"
-################### (applicationRolesPrivileges.properties) ###################
+  ################### (applicationRolesPrivileges.properties) ###################
   rolesToPrivileges: "{\"ROLE_ENTITY_ADMINISTRATOR\": \"acmGlobalAllowPrivilege,acmPersonSavePrivilege,acmPersonDeletePrivilege,acmPersonAssociationDeletePrivilege,acmPersonAssociationSavePrivilege,acmPersonFindPrivilege,acmPersonListPrivilege,acmPersonTypesPrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationSavePrivilege,acmOrganizationListPrivilege,acmOrganizationDeletePrivilege,acmOrganizationDetailsPrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege]\",
   \"ROLE_CONSUMER\": \"acmGlobalAllowPrivilege,dashboardPrivilege,acmPersonListPrivilege,acmReportModulePrivilege,acmNotificationModulePrivilege,acmSubscriptionModulePrivilege,blogPrivilege,acmListNotesPrivilege,tagPrivilege,acmSearchModulePrivilege,acmSignatureFindPrivilege,profilePrivilege,acmPersonFindPrivilege,acmTaskListPrivilege,acmAuditModulePrivilege,acmComplaintListPrivilege,participantPrivilege,listMilestonesGroupedByDate,reportPrivilege,auditPrivilege,timesheetPrivilege,helloWorldPrivilege,acmTimeModulePrivilege,acmTaskModulePrivilege,acmPersonTypesPrivilege,caseFileListPrivilege,acmComplaintModulePrivilege,filePrivilege,acmCostModulePrivilege,acmOutlookListObjectsPrivilege,searchPrivilege,auditReadEventsForObjectPrivilege,acmSearchPrivilege,acmNotificationPrivilege,acmDashboardModulePrivilege,costsheetPrivilege,acmTagModulePrivilege,acmCaseModulePrivilege,documentRepositoryModulePrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationListPrivilege,acmOrganizationDetailsPrivilege,acmCalendarEventsListPrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege\",
   \"ROLE_SUPERVISOR\": \"acmGlobalAllowPrivilege,auditPrivilege,auditReadEventsForObjectPrivilege,acmGenerateCorrespondencePrivilege,dashboardPrivilege,filePrivilege,participantPrivilege,blogPrivilege,helloWorldPrivilege,profilePrivilege,reportPrivilege,costsheetCreatePrivilege,costsheetApprovePrivilege,timesheetApprovePrivilege,acmComplaintListPrivilege,acmComplaintSavePrivilege,acmComplaintCreatePrivilege,acmComplaintApprovePrivilege,acmSearchPrivilege,searchPrivilege,acmCaseApprovePrivilege,saveCasePrivilege,caseFileListPrivilege,caseFileCreatePrivilege,acmPersonSavePrivilege,acmPersonDeletePrivilege,acmPersonAssociationDeletePrivilege,acmPersonAssociationSavePrivilege,acmDeleteNoteByIdPrivilege,acmListNotesPrivilege,costsheetPrivilege,timesheetCreatePrivilege,timesheetPrivilege,tagPrivilege,acmTaskListPrivilege,acmTaskSavePrivilege,acmTaskCreatePrivilege,acmTaskCompletePrivilege,acmTaskDeletePrivilege,acmNotificationPrivilege,subscribePrivilege,listMilestonesGroupedByDate,acmSignatureConfirmPrivilege,acmSignatureFindPrivilege,acmPersonFindPrivilege,acmPersonListPrivilege,acmPersonTypesPrivilege,acmSaveNotePrivilege,acmOutlookListObjectsPrivilege,splitCaseFilePrivilege,acmTaskModulePrivilege,acmComplaintModulePrivilege,acmSearchModulePrivilege,acmDashboardModulePrivilege,acmAuditModulePrivilege,acmReportModulePrivilege,acmSubscriptionModulePrivilege,acmNotificationModulePrivilege,acmTimeModulePrivilege,acmCostModulePrivilege,acmTagModulePrivilege,acmTaskClaimPrivilege,acmCaseModulePrivilege,objectLockPrivilege,objectUnLockPrivilege,acmPersonModulePrivilege,acmOrganizationModulePrivilege,acmOrganizationSavePrivilege,acmOrganizationListPrivilege,acmOrganizationDeletePrivilege,acmOrganizationDetailsPrivilege,documentRepositoryModulePrivilege,acmCalendarEventsListPrivilege,acmCalendarEventsSavePrivilege,acmCalendarEventsCreatePrivilege,acmCalendarEventsDeletePrivilege,acmOrganizationAssociationListPrivilege,acmOrganizationAssociationSavePrivilege,acmOrganizationAssociationDeletePrivilege,acmCalendarReadShortenedConfigPrivilege\",
@@ -525,7 +525,7 @@ audit.plugin:
   #comma separated list of contentTypes that will be logged
   contentTypesToLog: "application/json,application/atom+xml,text/plain,text/csv,text/html"
 ################### (eventDescription.properties) ###################
- # store key-value pairs used for automatic audit event description generation
+# store key-value pairs used for automatic audit event description generation
 # key - fully qualified event name
 #       eg. com.armedia.acm.ecm.file.added
 # value - SpEL expression evaluated against the AcmEvent
@@ -713,7 +713,7 @@ cost.plugin:
   ,{\"desc\":\"Sort Date Decending\", \"name\":\"create_tdt DESC\"}
   ,{\"desc\":\"Sort Costsheet ID Ascending\", \"name\":\"id ASC\"}
   ,{\"desc\":\"Sort Costsheet ID Decending\", \"name\":\"id DESC\"}
-  ,{\"desc\":\"Sort By Costsheet Name\", \"name\":\"name DESC\"}]" 
+  ,{\"desc\":\"Sort By Costsheet Name\", \"name\":\"name DESC\"}]"
 ################### Dashbord Plugin Configuration (dashboardPlugin.properties) ###################
 ## Default dashboard JSON String.
 dashboard.plugin:
@@ -736,12 +736,12 @@ dashboard.plugin:
   modules: "DASHBOARD,CASE,TIME,COST,TASK,COMPLAINT,DOC_REPO,PERSON,ORGANIZATION,MY_DOC_REPO"
   modules.dashboard.widgets: "casesByQueue,casesByStatus,myCases,myComplaints,myTasks,newComplaints,teamWorkload,news,newCases,workflowReport,userWebsites"
 ################### DAC Configuration (dataAccessControl.properties) ###################
-dac: 
+dac:
   batchUpdateBasedOnLastModifiedEnabled: true
   batchUpdateFrequencyInMilliseconds: 3600000
   batchUpdateBatchSize: 50
   enableDocumentACL: true
-  fallbackExpression: 
+  fallbackExpression:
     getObject: "get|list|read|download|view|subscribe"
     editObject: "save|insert|remove|add|edit|change|lock|complete|unlock|merge|restrict|declare|rename|write"
     insertObject: "create"
@@ -803,7 +803,7 @@ acm:
 activiti.db.type: mysql
 #activiti.db.type: postgres
 ################### Document Repository Plugin Configuration (documentRepositoryPlugin.properties) ###################
-doc.plugin:   
+docRepo.plugin:
   search.tree:
     filter: "[{\"desc\": \"All I've Created\", \"name\":\"my-created-document-repositories\", \"value\":\"fq=author_s:$[user] AND repository_type_s:GENERAL\"}
     ,{\"desc\": \"All I'm Following\", \"name\":\"my-following-document-repositories\", \"value\":\"fq={!join from=parent_object_id_s to=object_id_s}(owner_s:$[user] AND object_type_s:SUBSCRIPTION)\"}
@@ -816,11 +816,11 @@ doc.plugin:
     ,{\"desc\": \"Sort By Repository Name\", \"name\":\"sort-by-document-repository-name-asc\", \"value\":\"title_parseable_lcs ASC\"}
     ,{\"desc\": \"(No Sort)\", \"name\":\"\", \"value\":\"\", \"default\":\"true\"}]"
     #The properties where the search query should be executed (comma separated, for example: title_parseable,description_no_html_tags_parseable ... etc)  
-    searchQuery: "title_parseable"  
+    searchQuery: "title_parseable"
 ################### Due Task Configuration (dueTasksNotifier.properties) ###################  
 due.tasks.notification.enabled: true
 upcoming.tasks:
-  notification: 
+  notification:
     subject: "Task soon to become overdue notification."
     body.template: "The task %1$s with ID %2$s is due on %3$s."
 overdue.tasks.notification:
@@ -836,17 +836,17 @@ email:
   CASE_FILE.user: "no-such-mailbox%40armedia.com"
   CASE_FILE.password:
   COMPLAINT.user: "no-such-mailbox%40armedia.com"
-  COMPLAINT.password:  
+  COMPLAINT.password:
   protocol: "imap"
   fetch.folder: "inbox"
   host: "outlook.office365.com"
   port: 993
   debug: true
   userId: "mail-service"
-################### Email Sender Configuration (acmEmailSender.properties) ####################
+  ################### Email Sender Configuration (acmEmailSender.properties) ####################
   sender:
     type: smtp
-    encryption: off 
+    encryption: off
     allowAttachments: true
     allowDocuments: true
     host: "internalmail.armedia.com"
@@ -923,7 +923,7 @@ event.plugin:
       updated: "Note Updated"
       deleted: "Note Deleted"
     signature.signed.task: "Task Signed"
-  task.added: "Task Added"  
+  task.added: "Task Added"
   casefile: "Case File Event"
   casefile.ACTIVE: "Case File is Active"
   casefile.DRAFT: "Case File is Draft"
@@ -941,7 +941,7 @@ event.plugin:
   casefile.details.changed: "Case File Details Changed"
   casefile.title.changed: "Case File Title Changed"
   casefile.status.changed: "Case File Status Changed"
-  casefile.participant: 
+  casefile.participant:
     added: "Participant Added"
     deleted: "Participant Deleted"
     changed: "Participant Changed"
@@ -988,7 +988,7 @@ event.plugin:
     created: "Default Dashboard Created For the First Time"
     getByUserId: "Dashboard Retrived "
     updated: "Dashboard Configuration Updated"
-    widget: 
+    widget:
       getByUserRoles: "Widget retrived by User Roles"
       getRolesByWidgets: "Roles retrived by Widgets"
       setAuthorizedRoles: "Dashboard Widget Access Updated"
@@ -1042,7 +1042,7 @@ event.plugin:
     created: "Subscription Created"
     deleted: "Subscription Deleted"
   subscriptionevent.created: "Subscription Event Created"
-  widget: 
+  widget:
     created: "New Widget Created"
     update: "Widget Update"
   widgetrole:
@@ -1058,12 +1058,12 @@ event.plugin:
       updated: "Reference Updated"
       deleted: "Reference Deleted"
   objectlock:
-     checkout: "Checked Out"
-     checkin: "Checked In"
-     cancel: "Cancel Editing"
+    checkout: "Checked Out"
+    checkin: "Checked In"
+    cancel: "Cancel Editing"
   smtp.event:
-   sent: "Document Emailed"
-   received: "Email Received"
+    sent: "Document Emailed"
+    received: "Email Received"
   documentrepository:
     created: "Document Repository Created"
     updated: "Document Repository Updated"
@@ -1092,6 +1092,168 @@ event.plugin:
     compiled: "Transcription Compiled"
     rollback: "Transcription Rollback"
     provider.failed: "Transcription Provider Failed"
+auditEvent:
+  eventName.insert: true
+  eventTypes: "{\"eventType.com.armedia.acm.activiti.businessProcess.end\": \"Activity Business Process Ended\"
+  ,\"eventType.com.armedia.acm.activiti.businessProcess.start\": \"Activity Business Process Started\"
+  ,\"eventType.com.armedia.acm.activiti.task.assignment\": \"Activity Task Assignment\"
+  ,\"eventType.com.armedia.acm.activiti.task.complete\": \"Activity Task Complete\"
+  ,\"eventType.com.armedia.acm.activiti.task.create\": \"Activity Task Created\"
+  ,\"eventType.com.armedia.acm.activiti.task.delete\": \"Activity Task Delete\"
+  ,\"eventType.com.armedia.acm.app.task.complete\": \"Task Complete\"
+  ,\"eventType.com.armedia.acm.app.task.create\": \"Task Created\"
+  ,\"eventType.com.armedia.acm.app.task.delete\": \"Task Deleted\"
+  ,\"eventType.com.armedia.acm.app.task.findById\": \"Find Task By Id\"
+  ,\"eventType.com.armedia.acm.app.task.save\": \"Save Task\"
+  ,\"eventType.com.armedia.acm.app.task.searchResult\": \"Task Search Give Results\"
+  ,\"eventType.com.armedia.acm.app.task.details.changed\": \"Task Details Changed\"
+  ,\"eventType.com.armedia.acm.app.task.reworkdetails.changed\": \"Task Rework Details Changed\"
+  ,\"eventType.com.armedia.acm.app.task.priority.changed\": \"Task Priority Changed\"
+  ,\"eventType.com.armedia.acm.app.task.status.changed\": \"Task Status Changed\"
+  ,\"eventType.com.armedia.acm.businessprocess.started\": \"Business Process Started\"
+  ,\"eventType.com.armedia.acm.casefile\": \"Case File Event\"
+  ,\"eventType.com.armedia.acm.casefile.ACTIVE\": \"Case File is Active\"
+  ,\"eventType.com.armedia.acm.casefile.DRAFT\": \"Case File is Draft\"
+  ,\"eventType.com.armedia.acm.casefile.search\": \"Case File Searched\"
+  ,\"eventType.com.armedia.acm.casefile.updated\": \"Case File Updated\"
+  ,\"eventType.com.armedia.acm.casefile.file.added\": \"Case File Added\"
+  ,\"eventType.com.armedia.acm.casefile.viewed\": \"Case Viewed\"
+  ,\"eventType.com.armedia.acm.casefile.file.rejected\": \"Document Rejected from Brief\"
+  ,\"eventType.com.armedia.acm.ecm.file.rejected\": \"Document Rejected from Brief\"
+  ,\"eventType.com.armedia.acm.casefile.file.lodged\": \"Document Lodged\"
+  ,\"eventType.com.armedia.acm.ecm.file.file.lodged\": \"Document Lodged\"
+  ,\"eventType.com.armedia.acm.changeCaseStatus.created\": \"Change Case Status Created\"
+  ,\"eventType.com.armedia.acm.closeComplaintRequest.created\": \"Request for Closing Complaint Created\"
+  ,\"eventType.com.armedia.acm.complaint.closed\": \"Complaint Closed\"
+  ,\"eventType.com.armedia.acm.complaint.created\": \"Complaint Created\"
+  ,\"eventType.com.armedia.acm.complaint.file.added\": \"New File Added to Complaint\"
+  ,\"eventType.com.armedia.acm.complaint.findById\": \"Find Complaint\"
+  ,\"eventType.com.armedia.acm.complaint.search.result\": \"Complaint Search Result\"
+  ,\"eventType.com.armedia.acm.complaint.submittedForReview\": \"Compliant Submited For Review\"
+  ,\"eventType.com.armedia.acm.complaint.updated\": \"Complaint Updated\"
+  ,\"eventType.com.armedia.acm.dashboard.created\": \"Default Dashboard Created For the First Time \"
+  ,\"eventType.com.armedia.acm.dashboard.getByUserId\": \"Dashboard Retrived \"
+  ,\"eventType.com.armedia.acm.dashboard.updated\": \"Dashboard Configuration Updated\"
+  ,\"eventType.com.armedia.acm.dashboard.widget.getByUserRoles\": \"Widget retrived by User Roles\"
+  ,\"eventType.com.armedia.acm.dashboard.widget.getRolesByWidgets\": \"Roles retrived by Widgets\"
+  ,\"eventType.com.armedia.acm.dashboard.widget.setAuthorizedRoles\": \"Dashboard Widget Access Updated\"
+  ,\"eventType.com.armedia.acm.ecm.file.document.viewed\": \"Document Viewed\"
+  ,\"eventType.com.armedia.acm.ecm.file.added\": \"Document Uploaded\"
+  ,\"eventType.com.armedia.acm.ecm.file.downloaded\": \"Document Downloaded\"
+  ,\"eventType.com.armedia.acm.ecm.file.copied\": \"Document Copied\"
+  ,\"eventType.com.armedia.acm.ecm.file.replaced\": \"Document Replaced\"
+  ,\"eventType.com.armedia.acm.file.version.set\": \"Document Versioned\"
+  ,\"eventType.com.armedia.acm.file.deleted\": \"Document Deleted\"
+  ,\"eventType.com.armedia.acm.ecm.file.moved\": \"Document Moved\"
+  ,\"eventType.com.armedia.acm.file.renamed\": \"Document Renamed\"
+  ,\"eventType.com.armedia.acm.file.co_edit.user.joined\": \"User joined co-editing Document\"
+  ,\"eventType.com.armedia.acm.file.co_edit.user.leave\": \"User left co-editing Document\"
+  ,\"eventType.com.armedia.acm.file.co_edit.document.saved\": \"Document saved co-editing\"
+  ,\"eventType.com.armedia.acm.functionalaccess.updated\": \"Access Updated\"
+  ,\"eventType.com.armedia.acm.login\": \"User Login\"
+  ,\"eventType.com.armedia.acm.logout\": \"User Logout\"
+  ,\"eventType.com.armedia.acm.object.assignee.change\": \"Asignee Changed\"
+  ,\"eventType.com.armedia.acm.object.participants.change\": \"Participant Changed\"
+  ,\"eventType.com.armedia.acm.objecthistory.created\": \"Object History Created\"
+  ,\"eventType.com.armedia.acm.personAssociation.created\": \"Person Associated\"
+  ,\"eventType.com.armedia.acm.personAssociation.deleted\": \"Person Association Deleted\"
+  ,\"eventType.com.armedia.acm.personAssociation.updated\": \"Person Association Updated\"
+  ,\"eventType.com.armedia.acm.person.postalAddress.added\": \"Postal Address Added\"
+  ,\"eventType.com.armedia.acm.person.postalAddress.deleted\": \"Postal Address Deleted\"
+  ,\"eventType.com.armedia.acm.person.postalAddress.updated\": \"Postal Address Updated\"
+  ,\"eventType.com.armedia.acm.person.personAlias.added\": \"Alias Added\"
+  ,\"eventType.com.armedia.acm.person.personAlias.deleted\": \"Alias Deleted\"
+  ,\"eventType.com.armedia.acm.person.personAlias.updated\": \"Alias Updated\"
+  ,\"eventType.com.armedia.acm.person.contactMethod.added\": \"Contact Added\"
+  ,\"eventType.com.armedia.acm.person.contactMethod.deleted\": \"Contact Deleted\"
+  ,\"eventType.com.armedia.acm.person.contactMethod.updated\": \"Contact Updated\"
+  ,\"eventType.com.armedia.acm.person.organization.added\": \"Organization Added\"
+  ,\"eventType.com.armedia.acm.person.organization.deleted\": \"Organization Deleted\"
+  ,\"eventType.com.armedia.acm.person.organization.updated\": \"Organization Updated\"
+  ,\"eventType.com.armedia.acm.person.created\": \"Person Created\"
+  ,\"eventType.com.armedia.acm.person.updated\": \"Person Updated\"
+  ,\"eventType.com.armedia.acm.person.viewed\": \"Person Viewed\"
+  ,\"eventType.com.armedia.acm.person.image.uploaded \": \" Person Updated Image Uploaded\"
+  ,\"eventType.com.armedia.acm.organization.created\": \"Organization Created\"
+  ,\"eventType.com.armedia.acm.organization.updated\": \"Organization Updated\"
+  ,\"eventType.com.armedia.acm.organization.viewed\": \"Organization Viewed\"
+  ,\"eventType.com.armedia.acm.plugins.search.result\": \"Plugins Search Result\"
+  ,\"eventType.com.armedia.acm.plugins.task.adHocTaskCreated\": \"Ad Hoc Taks Created\"
+  ,\"eventType.com.armedia.acm.plugins.task.completed\": \" Task Completed\"
+  ,\"eventType.com.armedia.acm.plugins.task.findById\": \"Find Task\"
+  ,\"eventType.com.armedia.acm.plugins.task.search.result\": \"Search for a Task Result\"
+  ,\"eventType.com.armedia.acm.profile.getByUserId\": \"Profile Retrived by User\"
+  ,\"eventType.com.armedia.acm.profile.userorg.created\": \"User association to Organization Created\"
+  ,\"eventType.com.armedia.acm.profile.userorg.updated\": \"User association to Organization Updated\"
+  ,\"eventType.com.armedia.acm.subscription.created\": \"Subscription Created\"
+  ,\"eventType.com.armedia.acm.subscription.deleted\": \"Subscription Deleted\"
+  ,\"eventType.com.armedia.acm.subscriptionevent.created\": \"Subscription Event Created\"
+  ,\"eventType.com.armedia.acm.task.added\": \"Task Added\"
+  ,\"eventType.com.armedia.acm.widget.created\": \"New Widget Created\"
+  ,\"eventType.com.armedia.acm.widgetrole.created\": \"Widget Role Created\"
+  ,\"eventType.com.armedia.acm.widgetrole.update\": \"Widget Role Update\"
+  ,\"eventType.com.armedia.acm.widget.update\": \"Widget Update\"
+  ,\"eventType.com.armedia.acm.complaint.priority.changed\": \"Complaint Priority Changed\"
+  ,\"eventType.com.armedia.acm.complaint.details.changed\": \"Complaint Details Changed\"
+  ,\"eventType.com.armedia.acm.complaint.status.changed\": \"Complaint Status Changed\"
+  ,\"eventType.com.armedia.acm.complaint.location.updated\": \"Location Updated\"
+  ,\"eventType.com.armedia.acm.complaint.participant.added\": \"Participant Added\"
+  ,\"eventType.com.armedia.acm.complaint.participant.deleted\": \"Participant Deleted\"
+  ,\"eventType.com.armedia.acm.complaint.costsheet.associated\": \"Costsheet Associated\"
+  ,\"eventType.com.armedia.acm.complaint.timesheet.associated\": \"Timesheet Associated\"
+  ,\"eventType.com.armedia.acm.casefile.created\": \"Case File Created\"
+  ,\"eventType.com.armedia.acm.casefile.createdFromComplaint\": \"Case File Created From Complaint\"
+  ,\"eventType.com.armedia.acm.casefile.updatedFromComplaint\": \"Case File Updated From Complaint\"
+  ,\"eventType.com.armedia.acm.casefile.priority.changed\": \"Case File Priority Changed\"
+  ,\"eventType.com.armedia.acm.casefile.details.changed\": \"Case File Details Changed\"
+  ,\"eventType.com.armedia.acm.casefile.title.changed\": \"Case File Title Changed\"
+  ,\"eventType.com.armedia.acm.casefile.status.changed\": \"Case File Status Changed\"
+  ,\"eventType.com.armedia.acm.casefile.participant.added\": \"Participant Added\"
+  ,\"eventType.com.armedia.acm.casefile.participant.deleted\": \"Participant Deleted\"
+  ,\"eventType.com.armedia.acm.casefile.participant.changed\": \"Participant Changed\"
+  ,\"eventType.com.armedia.acm.casefile.costsheet.associated\": \"Costsheet Associated\"
+  ,\"eventType.com.armedia.acm.casefile.timesheet.associated\": \"Timesheet Associated\"
+  ,\"eventType.com.armedia.acm.correspondence.file.added\": \"Correspondence Added \"
+  ,\"eventType.com.armedia.acm.app.note.added\": \"Note Added\"
+  ,\"eventType.com.armedia.acm.app.note.rejectcomment.added\": \"Reject Comment Added\"
+  ,\"eventType.com.armedia.acm.app.note.updated\": \"Note Updated\"
+  ,\"eventType.com.armedia.acm.app.note.deleted\": \"Note Deleted\"
+  ,\"eventType.com.armedia.acm.outlook.calendar.event.added\": \"Calendar Event Added\"
+  ,\"eventType.com.armedia.acm.associatedtag.created\": \"Tag Added\"
+  ,\"eventType.com.armedia.acm.participant.created \": \"Participant Created\"
+  ,\"eventType.com.armedia.acm.objectassociation.created\": \"Reference Created\"
+  ,\"eventType.com.armedia.acm.objectassociation.reference.added\": \"Reference Added\"
+  ,\"eventType.com.armedia.acm.objectassociation.reference.updated\": \"Reference Updated\"
+  ,\"eventType.com.armedia.acm.objectassociation.reference.deleted\": \"Reference Deleted\"
+  ,\"eventType.com.armedia.acm.objectlock.checkout\": \"Checked Out\"
+  ,\"eventType.com.armedia.acm.objectlock.checkin\": \"Checked In\"
+  ,\"eventType.com.armedia.acm.objectlock.cancel\": \"Cancel Editing\"
+  ,\"eventType.com.armedia.acm.smtp.event.sent\": \"Document Emailed\"
+  ,\"eventType.com.armedia.acm.smtp.event.received\": \"Email Received\"
+  ,\"eventType.com.armedia.acm.app.signature.signed.task\": \"Task Signed\"
+  ,\"eventType.com.armedia.acm.documentrepository.created\": \"Document Repository Created\"
+  ,\"eventType.com.armedia.acm.documentrepository.updated\": \"Document Repository Updated\"
+  ,\"eventType.com.armedia.acm.documentrepository.viewed\": \"Document Repository Viewed\"
+  ,\"eventType.com.armedia.acm.documentrepository.name.updated\": \"Document Repository Title Changed\"
+  ,\"eventType.com.armedia.acm.documentrepository.participant.deleted\": \"Participant Deleted\"
+  ,\"eventType.com.armedia.acm.documentrepository.participant.added\": \"Participant Added\"
+  ,\"eventType.com.armedia.acm.documentrepository.participant.updated\": \"Participant Changed\"
+  ,\"eventType.com.armedia.acm.folder.created\": \"Folder Created\"
+  ,\"eventType.com.armedia.acm.folder.renamed\": \"Folder Renamed\"
+  ,\"eventType.com.armedia.acm.ldapUser.created\": \"LDAP User Created\"
+  ,\"eventType.com.armedia.acm.ldapUser.updated\": \"LDAP User Updated\"
+  ,\"eventType.com.armedia.acm.ldapUser.deleted\": \"LDAP User Deleted\"
+  ,\"eventType.com.armedia.acm.ldapGroup.deleted\": \"LDAP Group Deleted\"
+  ,\"eventType.com.armedia.acm.transcribe.created\": \"Transcription Created\"
+  ,\"eventType.com.armedia.acm.transcribe.updated\": \"Transcription Updated\"
+  ,\"eventType.com.armedia.acm.transcribe.queued\": \"Transcription Queued\"
+  ,\"eventType.com.armedia.acm.transcribe.processing\": \"Transcription Processing\"
+  ,\"eventType.com.armedia.acm.transcribe.completed\": \"Transcription Completed\"
+  ,\"eventType.com.armedia.acm.transcribe.failed\": \"Transcription Failed\"
+  ,\"eventType.com.armedia.acm.transcribe.cancelled\": \"Transcription Cancelled\"
+  ,\"eventType.com.armedia.acm.transcribe.compiled\": \"Transcription Compiled\"
+  ,\"eventType.com.armedia.acm.transcribe.rollback\": \"Transcription Rollback\"
+  ,\"eventType.com.armedia.acm.transcribe.provider.failed\": \"Transcription Provider Failed\"}"
 #################### Fiscal Year Configuration (fiscalYear.properties) ####################
 fiscal.year.start:
   day: 1
@@ -1107,7 +1269,7 @@ login.warning:
   #sets if on login screen warning message should be enabled 
   enabled: false
   #sets the text which should be displayed if warning is enabled
-  message: 
+  message:
 ################### MsOutlook Integration Configuration (msOutlookIntegration.properties) #################### 
 outlook.exchange.integration:
   enable.autodiscovery: false
@@ -1117,7 +1279,7 @@ outlook.exchange.integration:
   client-access-server: "https://outlook.office365.com/EWS/Exchange.asmx"
   system_user_id: "ann-acm@armedia.com"
   server.version: "Exchange2010_SP2"
-################### MsOutlook Plugin Configuration (msOutlookPlugin.properties) ####################  
+################### MsOutlook Plugin Configuration (msOutlookPlugin.properties) ####################
   participants-types-as-outlook-permission: "approver, assignee, follower"
   #Access Levels available : None, Owner, PublishingEditor, Editor, PublishingAuthor, Author, NoneditingAuthor, Reviewer, Contributor, FreeBusyTimeOnly, FreeBusyTimeAndSubjectAndLocation, Custom;
   #Before changing default access level, visit: http://help.unc.edu/help/exchange-what-are-permission-levels-in-outlook/ for further information
@@ -1128,7 +1290,7 @@ outlook.exchange.integration:
   calendar.use.system.user: false
 ################### Notification Plugin Configuration (notification.properties) ####################  
 notification:
-  arkcase.port: 
+  arkcase.port:
   arkcase.url: "https://acm-arkcase"
   arkcase.url.base: "https://acm-arkcase/arkcase"
   CASE_FILE.label: "Case File"
@@ -1141,7 +1303,7 @@ notification:
   purge.days: 30
   #If variable is true message will be sent as system user, otherwise message will be send as logged-in user
   send.from.system.user: true
-  user.batch: 
+  user.batch:
     frequency: 300000
     run: true
     size: 50
@@ -1157,21 +1319,21 @@ okta:
   defaultLoginTargetUrl: "/mfa/auth"
   enrollmentTargetUrl: "/mfa/enroll"
   selectMethodTargetUrl: "/mfa/auth"
-  verifyMethodTargetUrl: "/mfa/verify" 
+  verifyMethodTargetUrl: "/mfa/verify"
 ################### Only Office Configuration (onlyOfficePlugin.properties) ####################    
 onlyoffice.plugin:
   #url for document server
   files.docservice.url.api: "https://onlyoffice.arkcase.com/ds-vpath/web-apps/apps/api/documents/api.js"
   #base url used for sending to onlyoffice to be able to perform callbacks
   arkcase.baseurl: "https://acm-arkcase/arkcase"
-  config: 
+  config:
     #view configuration
     view:
       type: "desktop"
       height: "100%"
       width: "100%"
   jwt:
-    outbound: 
+    outbound:
       #is JWT signing outbound enabled
       enabled: false
       #algorith used for signing requests
@@ -1179,10 +1341,10 @@ onlyoffice.plugin:
       #key used for signing requests or key of the keystore, depends of the algorithm
       key: "secret"
       #absolute path to the keystore
-      keystore: 
+      keystore:
       #alias of the certificate  
-      certificate_alias: 
-    inbound: 
+      certificate_alias:
+    inbound:
       #is JWT verifying inbound enabled
       enabled: false
       #key used for verify the response token or key of the truststore, depends of the algorithm
@@ -1191,13 +1353,13 @@ onlyoffice.plugin:
       truststore:
   #onlyoffice plugin enabled or not
   enabled: true
-  history: 
+  history:
     #folder path relative to ${userhome}/.arkcase
     folder_path: "/onlyoffice/changes"
     #date format for displaying dates in document history
-    date_format: "yyyy-MM-dd hh:mm aa"     
+    date_format: "yyyy-MM-dd hh:mm aa"
 ################### Person Plugin Configuration (personPlugin.properties) ###################
-person.plugin: 
+person.plugin:
   types: "Defendant,Witness,WAS Officer,Victim,Defense Counsel,Forensic Scientist"
   #Root folder for People(Person) module
   folder.root: "/Sites/acm/documentLibrary/People/"
@@ -1218,10 +1380,10 @@ person.plugin:
       ,{\"desc\": \"Sort By ID Decending\", \"name\":\"sort-by-id-desc\", \"value\":\"id DESC\"}
       ,{\"desc\": \"Sort By Name A-Z\", \"name\":\"sort-by-name-asc\", \"value\":\"title_parseable_lcs ASC\", \"default\":\"true\"}
       ,{\"desc\": \"Sort By Name Z-A\", \"name\":\"sort-by-name-desc\", \"value\":\"title_parseable_lcs DESC\"}
-      ,{\"desc\": \"(No Sort)\", \"name\":\"\", \"value\":\"\", \"default\":\"true\"}]" 
-      searchQuery: "title_parseable" 
+      ,{\"desc\": \"(No Sort)\", \"name\":\"\", \"value\":\"\", \"default\":\"true\"}]"
+      searchQuery: "title_parseable"
 ################### Profile Plugin Configuration (profilePlugin.properties) ###################
-profile.plugin: 
+profile.plugin:
   user.profile.root.folder: "/Sites/acm/documentLibrary/User Profile"
 ################### Search Plugin Configuration (searchPlugin.properties) ################### 
 ##All facets that will not be used should be commented
@@ -1245,7 +1407,7 @@ search.plugin.facet:
   parent_object_type_facet: "Parent Object Type"
   owner_facet: "Owner"
   groups_id_ss: "Group"
-  tag_token_facet: "Tag Token" 
+  tag_token_facet: "Tag Token"
   tags_facet: "Tags"
   document_repository_name_s: "Document Repository Name"
   file_lang_s: "Document Language"
@@ -1260,6 +1422,41 @@ search.plugin.facet:
     ## Fields for generated reports
     export.fields: "{\"description_parseable\":\"Description\", \"parent_number_lcs\":\"Object Number\", \"parent_type_s\":\"Object Type\"
     ,\"modified_date_tdt\":\"Modified\", \"name\":\"Name\", \"object_type_s\":\"Type\", \"title_parseable\":\"Title\", \"assignee_full_name_lcs\":\"Assignee\"}"
+search.plugin:
+  facet:
+    "{\"assignee_full_name_facet\": \"Assignee Full Name\",
+    \"date.create_date_tdt\": \"Create Date\",
+    \"creator_full_name_facet\": \"Create User\",
+    \"date.modified_date_tdt\": \"Modify Date\",
+    \"modifier_full_name_facet\": \"Modify User\",
+    \"parent_type_facet\": \"Parent Type\",
+    \"type_facet\": \"Person,Organization Type\",
+    \"object_type_facet\": \"Object Type\",
+    \"location_city_facet\": \"City\",
+    \"location_state_facet\": \"State\",
+    \"location_postal_code_sdo\": \"Postal Code\",
+    \"date.dueDate_tdt\": \"Due Date\",
+    \"date.incident_date_tdt\": \"Incident Date\",
+    \"priority_facet\": \"Priority\",
+    \"incident_type_facet\": \"Incident Type\",
+    \"status_facet\": \"Status\",
+    \"parent_object_type_facet\": \"Parent Object Type\",
+    \"owner_facet\": \"Owner\",
+    \"groups_id_ss\": \"Group\",
+    \"tag_token_facet\": \"Tag Token\", 
+    \"tags_facet\": \"Tags\",
+    \"document_repository_name_s\": \"Document Repository Name\",
+    \"file_lang_s\": \"Document Language\"}"
+  ## Time periods used by the faceted search
+  time.period: "[{\"desc\":\"Previous Week\", \"value\":\"[NOW/DAY-7DAY TO *]\"} 
+  ,{\"desc\":\"Previous Month\", \"value\":\"[NOW/DAY-1MONTH TO *]\"}
+  ,{\"desc\":\"Previous Year\", \"value\":\"[NOW/DAY-1YEAR TO *]\"}]"
+  # Objects that will be excluded from facet search (comma separated, for example: NOTIFICATION,CASE_FILE,COMPLAINT)
+  # Exclude REFERENCE type for AFDP-5718
+  objects.to.exclude: "NOTIFICATION,SUBSCRIPTION_EVENT,TAG,REFERENCE"
+  ## Fields for generated reports
+  export.fields: "{\"description_parseable\":\"Description\", \"parent_number_lcs\":\"Object Number\", \"parent_type_s\":\"Object Type\"
+  ,\"modified_date_tdt\":\"Modified\", \"name\":\"Name\", \"object_type_s\":\"Type\", \"title_parseable\":\"Title\", \"assignee_full_name_lcs\":\"Assignee\"}"
 ################### Session Control Configuration (.arkcase/acm/spring-security/sessionControl.properties) ###################
 sessionControl:
   #number of concurrent session allowed
@@ -1268,7 +1465,7 @@ sessionControl:
   #determines whether the user should be prevented from opening more sessions than allowed
   #If set to true, the user authenticating will be prevented from authenticating. 
   #if set to false, the user that has already authenticated will be forcibly logged out.
-  exceptionIfMaximumExceeded: false     
+  exceptionIfMaximumExceeded: false
 ################### Solr Configuration (solr.properties) ###################
 solr:
   host: "acm-solr"
@@ -1294,7 +1491,7 @@ solr:
   #how many objects to extract at once during batch update.
   batchUpdateBatchSize: 50
   #whether to index file contents or just store document-related metadata
-  enableContentFileIndexing: true 
+  enableContentFileIndexing: true
 ################### State Of Arkcase Configuration (stateOfArkCase.properties) ###################
 state_of_arkcase.reports:
   #specify in which folder reports will be generated and kept there
@@ -1411,7 +1608,7 @@ upcoming:
     resetPasswordLink: "%s/reset-password?token=%s"
   forgotUsername.notification:
     subject: "Forgot Username"
-    body.template: "Your email address has %d account(s): <b>%s</b>. Proceed to login <a href='%s/login'>%s/login</a>" 
+    body.template: "Your email address has %d account(s): <b>%s</b>. Proceed to login <a href='%s/login'>%s/login</a>"
 ################### WEB Sockets Configuration (websockets.properties) ###################
 acm.websockets:
   enabled: true
@@ -1436,7 +1633,7 @@ acm.websockets:
   #STOMP (ArkCase to ActiveMQ) authentication
   stomp_broker_relay.system_login: "guest"
   stomp_broker_relay.system_passcode: "guest"
-  socksjs.enabled: true 
+  socksjs.enabled: true
 ################### WOPI Configuration (wopiPlguin.properties) ###################
 wopi.plugin:
   host:
