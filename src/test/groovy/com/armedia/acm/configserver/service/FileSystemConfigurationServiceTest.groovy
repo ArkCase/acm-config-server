@@ -7,7 +7,7 @@ class FileSystemConfigurationServiceTest extends Specification {
     FileSystemConfigurationService service
 
     def setup() {
-        service = new FileSystemConfigurationService("acm-config-server-repo/runtime-test.yaml")
+        service = new FileSystemConfigurationService("acm-config-server-repo/arkcase-test.yaml")
     }
 
     def "should update properties"() {
@@ -20,5 +20,4 @@ class FileSystemConfigurationServiceTest extends Specification {
         then:
         true
     }
-
 }

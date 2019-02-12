@@ -12,6 +12,8 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,17 +36,28 @@ public class FileSystemConfigurationService implements ConfigurationService
         FileSystemResource yamlResource = new FileSystemResource(propertiesPath);
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
 
         Yaml yaml = new Yaml(options);
-        try
+        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8))
         {
-            Map<String, Object> configMap = yaml.load(yamlResource.getInputStream());
+            Map<String, Object> configMap = yaml.load(configStreamReader);
             if (configMap == null)
             {
                 configMap = new LinkedHashMap<>();
             }
             configMap.putAll(properties);
             yaml.dump(configMap, new FileWriter(yamlResource.getFile()));
+
+            for (Map.Entry<String, Object> entry : properties.entrySet())
+            {
+                configMap.put(entry.getKey(), entry.getValue());
+            }
+
+            try (FileWriter fw = new FileWriter(yamlResource.getFile()))
+            {
+                yaml.dump(configMap, fw);
+            }
         }
         catch (IOException e)
         {
