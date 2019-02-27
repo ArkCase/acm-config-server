@@ -538,7 +538,7 @@ AUDIT_CRITERIA: "[{\"name\":\"Audit\",\"inputs\":[{\"name\":\"objectType\", \"ty
 ,{\"value\":\"CASE\", \"text\":\"Case Files\"},{\"value\":\"COMPLAINT\", \"text\":\"Complaints\"}
 ,{\"value\":\"TASK\", \"text\":\"Tasks\"},{\"value\":\"FILE\", \"text\":\"Files\"}]},{\"name\":\"objectId\",\"type\":\"text\",\"value\":\"\", \"desc\":\"#\"}
 ,{\"name\":\"dateRange\",\"nameStartDate\":\"startDate\",\"nameEndDate\":\"endDate\", \"type\":\"dateRange\", \"desc\":\"Date Range\"}]}]"
-CASE_FILE.history.event.types: "com.armedia.acm.app.task.create, com.armedia.acm.casefile.createdFromComplaint, com.armedia.acm.casefile.updatedFromComplaint, com.armedia.acm.casefile.created, com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced, 
+CASE_FILE.history.event.types: "com.armedia.acm.app.task.create, com.armedia.acm.casefile.createdFromComplaint, com.armedia.acm.casefile.updatedFromComplaint, com.armedia.acm.casefile.created, com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced,
 com.armedia.acm.file.version.set, com.armedia.acm.file.deleted, com.armedia.acm.casefile.status.changed, com.armedia.acm.casefile.priority.changed, com.armedia.acm.casefile.details.changed,
 com.armedia.acm.app.note.added, com.armedia.acm.app.note.updated, com.armedia.acm.app.note.deleted, com.armedia.acm.outlook.calendar.event.added, com.armedia.acm.correspondence.file.added,
 com.armedia.acm.casefile.participant.added, com.armedia.acm.casefile.participant.deleted, com.armedia.acm.activiti.task.create, com.armedia.acm.associatedtag.created,
@@ -552,7 +552,7 @@ com.armedia.acm.person.postalAddress.updated, com.armedia.acm.casefile.title.cha
 com.armedia.acm.casefile.costsheet.associated, com.armedia.acm.casefile.timesheet.associated, com.armedia.acm.transcribe.created, com.armedia.acm.transcribe.updated,
 com.armedia.acm.transcribe.queued, com.armedia.acm.transcribe.processing, com.armedia.acm.transcribe.completed, com.armedia.acm.transcribe.failed, com.armedia.acm.transcribe.cancelled,
 com.armedia.acm.transcribe.compiled, com.armedia.acm.transcribe.rollback, com.armedia.acm.file.co_edit.document.saved, com.armedia.acm.file.co_edit.user.leave, com.armedia.acm.file.co_edit.user.joined"
-COMPLAINT.history.event.types: "com.armedia.acm.complaint.created, com.armedia.acm.complaint.updated, com.armedia.acm.app.task.create, com.armedia.acm.complaint.created, com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced, 
+COMPLAINT.history.event.types: "com.armedia.acm.complaint.created, com.armedia.acm.complaint.updated, com.armedia.acm.app.task.create, com.armedia.acm.complaint.created, com.armedia.acm.ecm.file.added, com.armedia.acm.ecm.file.replaced,
 com.armedia.acm.file.version.set, com.armedia.acm.file.deleted, com.armedia.acm.app.note.added, com.armedia.acm.app.note.updated, com.armedia.acm.app.note.deleted,
 com.armedia.acm.complaint.status.changed, com.armedia.acm.complaint.details.changed, com.armedia.acm.complaint.priority.changed, com.armedia.acm.outlook.calendar.event.added,
 com.armedia.acm.correspondence.file.added, com.armedia.acm.complaint.participant.added, com.armedia.acm.complaint.participant.updated, com.armedia.acm.complaint.participant.deleted, com.armedia.acm.complaint.costsheet.associated,
@@ -714,6 +714,7 @@ cost.plugin:
   ,{\"desc\":\"Sort Costsheet ID Ascending\", \"name\":\"id ASC\"}
   ,{\"desc\":\"Sort Costsheet ID Decending\", \"name\":\"id DESC\"}
   ,{\"desc\":\"Sort By Costsheet Name\", \"name\":\"name DESC\"}]"
+  useApprovalWorkflow: true
 ################### Dashbord Plugin Configuration (dashboardPlugin.properties) ###################
 ## Default dashboard JSON String.
 dashboard.plugin:
@@ -799,6 +800,12 @@ acm:
   acquireRetryDelay: 1000
   abandonedTimeoutInSeconds: 600
   autoCommit: false
+  ## JDBC interceptors
+  ## NOTE: Only works when using Tomcat JDBC Pool for datasource
+  ## See https://tomcat.apache.org/tomcat-9.0-doc/jdbc-pool.html for supported interceptors
+  ## and syntax
+  ## Threshold value for SlowQueryReport is in 'milliseconds'
+  jdbcInterceptors: "SlowQueryReport(threshold=5000)"
 ##activiti engine database properties
 activiti.db.type: mysql
 #activiti.db.type: postgres
@@ -822,7 +829,6 @@ due.tasks.notification.enabled: true
 upcoming.tasks:
   notification:
     subject: "Task soon to become overdue notification."
-    body.template: "The task %1$s with ID %2$s is due on %3$s."
 overdue.tasks.notification:
   subject: "Task overdue notification"
   body.template: "The task %1$s with ID %2$s was due on %3$s."
@@ -843,6 +849,9 @@ email:
   port: 993
   debug: true
   userId: "mail-service"
+  create:
+    case.enabled: false
+    complaint.enabled: false
   ################### Email Sender Configuration (acmEmailSender.properties) ####################
   sender:
     type: smtp
@@ -854,6 +863,7 @@ email:
     userFrom: "support@armedia.com"
     port: 25
     password: "AcMd3v$"
+    convertDocumentsToPdf: false
 #################### EcmFile Service Configuration (ecmFileService.properties) ####################
 ecm:
   #participantTypes: "['Assignee','Co-owner','Supervisor','Owning Group','Approver','Collaborator','Follower','Reader','No Access']" 
@@ -887,8 +897,19 @@ ecm:
   #viewer.snowbound.tabHeader: fileTypeCapitalized
   #Snowbound URL query string encryption key. Leave this property empty if you don't need encryption
   viewer.snowbound.encryptionKey: "ENC(U2FsdGVkX1+/i7RReaawm2OyEcse1DBxZ0+oGE3ZsT5V1ahjvWhorhAZoUB97sHH)"
+  viewer.snowbound.forcePDF: true
+  viewer.snowbound.enableOCR: false
   #viewer.pdfViewer: value "pdfjs" causes PDF.js to be used.  All other values have no effect.
   viewer.pdfViewer: "default"
+ocr:
+  number.of.files.for.processing: 10
+  purge.attempts: 5
+  provider: "TESSERACT"
+  excludedFileTypes: "user_profile,user_signature,image"
+#################### (alfrescoUpdateMetadata.properties) ####################
+alfresco.metadata.update:
+  file: "[{\"http://www.alfresco.org/model/content/1.0}description\": \"description\"}]"
+  folder:
 #################### Event Types (eventType.properties) ####################
 #Audit business names on the event types:
 #Insert data:
@@ -1279,7 +1300,7 @@ outlook.exchange.integration:
   client-access-server: "https://outlook.office365.com/EWS/Exchange.asmx"
   system_user_id: "ann-acm@armedia.com"
   server.version: "Exchange2010_SP2"
-################### MsOutlook Plugin Configuration (msOutlookPlugin.properties) ####################
+  ################### MsOutlook Plugin Configuration (msOutlookPlugin.properties) ####################
   participants-types-as-outlook-permission: "approver, assignee, follower"
   #Access Levels available : None, Owner, PublishingEditor, Editor, PublishingAuthor, Author, NoneditingAuthor, Reviewer, Contributor, FreeBusyTimeOnly, FreeBusyTimeAndSubjectAndLocation, Custom;
   #Before changing default access level, visit: http://help.unc.edu/help/exchange-what-are-permission-levels-in-outlook/ for further information
@@ -1401,7 +1422,7 @@ search.plugin.facet:
   location_postal_code_sdo: "Postal Code"
   date.dueDate_tdt: "Due Date"
   date.incident_date_tdt: "Incident Date"
-  priority_facet: Priority
+  priority_facet: "Priority"
   incident_type_facet: "Incident Type"
   status_facet: "Status"
   parent_object_type_facet: "Parent Object Type"
@@ -1413,7 +1434,7 @@ search.plugin.facet:
   file_lang_s: "Document Language"
   ## Time periods used by the faceted search
   search:
-    time.period: "[{\"desc\":\"Previous Week\", \"value\":\"[NOW/DAY-7DAY TO *]\"} 
+    time.period: "[{\"desc\":\"Previous Week\", \"value\":\"[NOW/DAY-7DAY TO *]\"}
     ,{\"desc\":\"Previous Month\", \"value\":\"[NOW/DAY-1MONTH TO *]\"}
     ,{\"desc\":\"Previous Year\", \"value\":\"[NOW/DAY-1YEAR TO *]\"}]"
     # Objects that will be excluded from facet search (comma separated, for example: NOTIFICATION,CASE_FILE,COMPLAINT)
@@ -1423,8 +1444,7 @@ search.plugin.facet:
     export.fields: "{\"description_parseable\":\"Description\", \"parent_number_lcs\":\"Object Number\", \"parent_type_s\":\"Object Type\"
     ,\"modified_date_tdt\":\"Modified\", \"name\":\"Name\", \"object_type_s\":\"Type\", \"title_parseable\":\"Title\", \"assignee_full_name_lcs\":\"Assignee\"}"
 search.plugin:
-  facet:
-    "{\"assignee_full_name_facet\": \"Assignee Full Name\",
+  facet: "{\"assignee_full_name_facet\": \"Assignee Full Name\",
     \"date.create_date_tdt\": \"Create Date\",
     \"creator_full_name_facet\": \"Create User\",
     \"date.modified_date_tdt\": \"Modify Date\",
@@ -1443,12 +1463,12 @@ search.plugin:
     \"parent_object_type_facet\": \"Parent Object Type\",
     \"owner_facet\": \"Owner\",
     \"groups_id_ss\": \"Group\",
-    \"tag_token_facet\": \"Tag Token\", 
+    \"tag_token_facet\": \"Tag Token\",
     \"tags_facet\": \"Tags\",
     \"document_repository_name_s\": \"Document Repository Name\",
     \"file_lang_s\": \"Document Language\"}"
   ## Time periods used by the faceted search
-  time.period: "[{\"desc\":\"Previous Week\", \"value\":\"[NOW/DAY-7DAY TO *]\"} 
+  time.period: "[{\"desc\":\"Previous Week\", \"value\":\"[NOW/DAY-7DAY TO *]\"}
   ,{\"desc\":\"Previous Month\", \"value\":\"[NOW/DAY-1MONTH TO *]\"}
   ,{\"desc\":\"Previous Year\", \"value\":\"[NOW/DAY-1YEAR TO *]\"}]"
   # Objects that will be excluded from facet search (comma separated, for example: NOTIFICATION,CASE_FILE,COMPLAINT)
@@ -1577,7 +1597,7 @@ solr.task:
 ################### Time Properties (time.properties) ###################
 time.plugin:
   root.folder: "/Sites/acm/documentLibrary/Timesheets"
-  search.tree.sort: "[{\"desc\":\"Sort Date Ascending\", \"name\":\"create_tdt ASC\"} 
+  search.tree.sort: "[{\"desc\":\"Sort Date Ascending\", \"name\":\"create_tdt ASC\"}
   ,{\"desc\":\"Sort Date Decending\", \"name\":\"create_tdt DESC\"}
   ,{\"desc\":\"Sort Timesheet ID Ascending\", \"name\":\"id ASC\"}
   ,{\"desc\":\"Sort Timesheet ID Decending\", \"name\":\"id DESC\"}
@@ -1650,5 +1670,4 @@ wopi.plugin:
   lockDuration: 1800000
   enabled: true
 ################### (pdfConversionProperties.properties) ###################
-responseFolderConversion: false  
-                  
+responseFolderConversion: false
