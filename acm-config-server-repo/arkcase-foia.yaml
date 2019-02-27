@@ -1,0 +1,10 @@
+maxDaysInHoldQueue: 5
+dashboard.banner.enable: true
+requestExtensionWorkingDaysEnabled: true
+maxDaysInBillingQueue: 5
+receivedDateEnabled: true
+holdedAndAppealedRequestsDueDateUpdateEnabled: true
+purgeRequestEnabled: true
+request.extensionWorkingDays: 10
+notification.groups.enabled: true
+application.roles:  "ROLE_ADMINISTRATOR,ROLE_SUPERVISOR,ROLE_CONTRIBUTOR,ROLE_CONSUMER,ROLE_EXTERNAL,ROLE_ENTITY_ADMINISTRATOR,ROLE_FOIA"
