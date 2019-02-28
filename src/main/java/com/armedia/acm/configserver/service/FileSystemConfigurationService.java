@@ -25,7 +25,7 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private final String propertiesPath;
 
-    public FileSystemConfigurationService(@Value("${propertiesPath}") String propertiesPath)
+    public FileSystemConfigurationService(@Value("${properties.path}") String propertiesPath)
     {
         this.propertiesPath = propertiesPath;
     }
