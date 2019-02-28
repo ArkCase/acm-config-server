@@ -30,7 +30,7 @@ public class FileWatchService
 
     private static Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
-    public FileWatchService(@Value("${propertiesFolderPath}") String propertiesFolderPath,
+    public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
                             ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
