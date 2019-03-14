@@ -1,4 +1,4 @@
-package com.armedia.acm.configserver;
+package com.armedia.acm.configserver.exception;
 
 /*-
  * #%L
@@ -27,19 +27,15 @@ package com.armedia.acm.configserver;
  * #L%
  */
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ConfigServerApplicationTests
+public class ConfigurationException extends Exception
 {
-
-    @Test
-    public void contextLoads()
+    public ConfigurationException(String message)
     {
+        super(message);
     }
 
+    public ConfigurationException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

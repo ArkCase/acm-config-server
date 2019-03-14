@@ -1,4 +1,4 @@
-package com.armedia.acm.configserver;
+package com.armedia.acm.configserver.jms;
 
 /*-
  * #%L
@@ -27,19 +27,28 @@ package com.armedia.acm.configserver;
  * #L%
  */
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Component;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ConfigServerApplicationTests
+import javax.jms.Session;
+
+@Component
+public class ConfigurationChangeMessageProducer
 {
+    private JmsTemplate jmsTemplate;
 
-    @Test
-    public void contextLoads()
+    private static final Logger logger = LoggerFactory.getLogger(ConfigurationChangeMessageProducer.class);
+
+    public ConfigurationChangeMessageProducer(JmsTemplate jmsTemplate)
     {
+        this.jmsTemplate = jmsTemplate;
     }
 
+    public void sendMessage()
+    {
+        logger.info("Sending configuration change topic message...");
+        jmsTemplate.send("configuration.changed", Session::createMessage);
+    }
 }
