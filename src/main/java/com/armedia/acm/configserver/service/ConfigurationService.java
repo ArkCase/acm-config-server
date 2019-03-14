@@ -1,4 +1,4 @@
-package com.armedia.acm.configserver;
+package com.armedia.acm.configserver.service;
 
 /*-
  * #%L
@@ -27,19 +27,11 @@ package com.armedia.acm.configserver;
  * #L%
  */
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import com.armedia.acm.configserver.exception.ConfigurationException;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ConfigServerApplicationTests
+import java.util.Map;
+
+public interface ConfigurationService
 {
-
-    @Test
-    public void contextLoads()
-    {
-    }
-
+    void updateProperties(Map<String, Object> properties) throws ConfigurationException;
 }
