@@ -17,6 +17,32 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <inceptionYear>2019</inceptionYear>
+    <organization>
+        <name>ArkCase LLC</name>
+        <url>https://www.arkcase.com</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.en.html</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:${git.repository}</connection>
+        <developerConnection>scm:git:${git.repository}</developerConnection>
+        <url>${git.repository}</url>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>${release-repository.id}</id>
+            <name>${release-repository.name}</name>
+            <url>${release-repository.url}</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -77,6 +103,13 @@
         </dependencies>
     </dependencyManagement>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>arkcase-local-repo</id>
+            <url>file://${basedir}/arkcase-lib</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <plugins>
             <plugin>
@@ -85,6 +118,35 @@
                 <configuration>
                     <executable>true</executable>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.16</version>
+                <configuration>
+                    <licenseName>arkcase_license</licenseName>
+                    <licenseResolver>classpath://arkcase</licenseResolver>
+                    <includes>
+                        <include>**/*.java</include>
+                        <include>**/*.jsp</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>update-license</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.arkcase</groupId>
+                        <artifactId>arkcase-license-headers</artifactId>
+                        <version>1.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
