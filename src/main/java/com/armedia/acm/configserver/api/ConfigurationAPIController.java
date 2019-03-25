@@ -34,11 +34,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -54,16 +56,18 @@ public class ConfigurationAPIController
         this.configServerService = configServerService;
     }
 
-    @PostMapping
-    public ResponseEntity updateProperties(@RequestBody Map<String, Object> properties)
+    @PostMapping("/{application}/{profile}")
+    public ResponseEntity updateProperties(@PathVariable("application") String applicationName,
+                                           @PathVariable("profile") String runtimeProfile,
+                                           @RequestBody Map<String, Object> properties)
     {
         logger.info("Update properties {}", properties.keySet());
         try
         {
-            configServerService.updateProperties(properties);
+            configServerService.updateProperties(properties, applicationName, runtimeProfile);
             return ResponseEntity.ok().build();
         }
-        catch (ConfigurationException e)
+        catch (ConfigurationException | IOException e)
         {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

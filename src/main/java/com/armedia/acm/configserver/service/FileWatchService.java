@@ -34,19 +34,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Service
 public class FileWatchService
@@ -73,14 +68,6 @@ public class FileWatchService
             Path path = Paths.get(propertiesFolderPath);
             path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 
-            Set<String> configurationFiles = Files.walk(path)
-                    .map(Path::toFile)
-                    .filter(File::isFile)
-                    .map(File::getName)
-                    .collect(Collectors.toSet());
-
-            Predicate<String> isNotTemporaryFile = configurationFiles::contains;
-
             WatchKey key;
             while (true)
             {
@@ -90,13 +77,8 @@ public class FileWatchService
                     {
                         for (WatchEvent<?> event : key.pollEvents())
                         {
-                            Path filePath = (Path) event.context();
-                            File modifiedFile = filePath.toFile();
-                            if (isNotTemporaryFile.test(modifiedFile.getName()))
-                            {
-                                logger.info("Configuration file in folder [{}] has been updated!", propertiesFolderPath);
-                                configurationChangeMessageProducer.sendMessage();
-                            }
+                            logger.info("Configuration file in folder [{}] has been updated!", propertiesFolderPath);
+                            configurationChangeMessageProducer.sendMessage();
 
                         }
                         key.reset();

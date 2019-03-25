@@ -14,7 +14,6 @@ spring:
 #spring.security.user.name: root
 #spring.security.user.password: root
 #management.endpoints.web.exposure.include: *
-properties.path: ${user.home}/.arkcase/acm/acm-config-server-repo/arkcase-runtime.yaml
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
 logging:
   file.max-history: 10
