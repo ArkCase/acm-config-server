@@ -24,3 +24,4 @@ logging:
     com.armedia.acm.configserver: debug
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
+jms.message.buffer.window: 3
