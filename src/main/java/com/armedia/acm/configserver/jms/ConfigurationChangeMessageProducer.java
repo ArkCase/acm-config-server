@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ConfigurationChangeMessageProducer
 {
-    private JmsTemplate jmsTemplate;
+    private JmsTemplate acmJmsTemplate;
 
     private final int delayInSeconds;
 
@@ -52,9 +52,9 @@ public class ConfigurationChangeMessageProducer
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationChangeMessageProducer.class);
 
-    public ConfigurationChangeMessageProducer(@Value("${jms.message.buffer.window}") int delayInSeconds, JmsTemplate jmsTemplate)
+    public ConfigurationChangeMessageProducer(@Value("${jms.message.buffer.window}") int delayInSeconds, JmsTemplate acmJmsTemplate)
     {
-        this.jmsTemplate = jmsTemplate;
+        this.acmJmsTemplate = acmJmsTemplate;
         this.delayInSeconds = delayInSeconds;
         scheduledExecutorService = Executors.newScheduledThreadPool(1);
         lastSendTime = LocalDateTime.MIN;
@@ -70,7 +70,7 @@ public class ConfigurationChangeMessageProducer
             logger.debug("Schedule configuration changed message in [{}] seconds", delayInSeconds);
             scheduledExecutorService.schedule(() -> {
                         logger.info("Sending configuration change topic message...");
-                        jmsTemplate.send("configuration.changed", Session::createMessage);
+                        acmJmsTemplate.send(Session::createMessage);
                     },
                     delayInSeconds, TimeUnit.SECONDS);
         }
