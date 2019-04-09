@@ -61,10 +61,13 @@ public class ConfigurationAPIController
         try
         {
             configServerService.updateProperties(properties);
+            logger.debug("Properties successfully updated");
             return ResponseEntity.ok().build();
         }
         catch (ConfigurationException e)
         {
+            logger.debug("Failed to update properties. {}", e.getMessage());
+            logger.trace("Cause: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
