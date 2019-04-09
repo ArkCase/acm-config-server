@@ -76,6 +76,7 @@ public class FileWatchService
                 {
                     if ((key = watchService.take()) != null)
                     {
+                        logger.debug("Watch key event present...");
                         for (WatchEvent<?> event : key.pollEvents())
                         {
                             Path filePath = (Path) event.context();
@@ -84,11 +85,13 @@ public class FileWatchService
                             configurationChangeMessageProducer.sendMessage();
                         }
                         key.reset();
+                        logger.debug("Reset watch key...");
                     }
                 }
                 catch (Exception e)
                 {
                     logger.error("Monitoring folder [{}] failed. {}", propertiesFolderPath, e.getMessage());
+                    logger.trace("Cause: ", e);
                 }
             }
         }
