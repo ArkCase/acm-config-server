@@ -73,8 +73,6 @@ public class FileSystemConfigurationService implements ConfigurationService
             {
                 configMap = new LinkedHashMap<>();
             }
-            configMap.putAll(properties);
-            yaml.dump(configMap, new FileWriter(yamlResource.getFile()));
 
             for (Map.Entry<String, Object> entry : properties.entrySet())
             {
