@@ -1,8 +1,8 @@
 server.port: 8888
 spring:
   profiles.active: native
-  cloud.config.server.native:
-    searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo
+  cloud.config.server:
+    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo
   jms:
     pub-sub-domain: true
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
@@ -28,3 +28,4 @@ acm.activemq:
   truststore: ${user.home}/.arkcase/acm/private/truststore
   truststore-password: AcMd3v$
   default-destination: configuration.changed
+  timeout: 10 #seconds
