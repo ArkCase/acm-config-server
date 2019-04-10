@@ -47,17 +47,18 @@ import java.nio.file.WatchService;
 @Service
 public class FileWatchService
 {
-    private String propertiesFolderPath;
+    private final String propertiesFolderPath;
 
-    private ConfigurationChangeMessageProducer configurationChangeMessageProducer;
+    private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
 
-    private static Logger logger = LoggerFactory.getLogger(FileWatchService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
                             ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
+        logger.debug("Initializing FileWatchService");
     }
 
     @Async
@@ -74,6 +75,7 @@ public class FileWatchService
             {
                 try
                 {
+                    logger.debug("Waiting for file change on path [{}]", path.toString());
                     if ((key = watchService.take()) != null)
                     {
                         logger.debug("Watch key event present...");

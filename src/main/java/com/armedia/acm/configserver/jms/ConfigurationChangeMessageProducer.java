@@ -30,34 +30,37 @@ package com.armedia.acm.configserver.jms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.jms.Session;
 import java.time.LocalDateTime;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class ConfigurationChangeMessageProducer
 {
-    private JmsTemplate acmJmsTemplate;
+    private final JmsTemplate acmJmsTemplate;
 
     private final int delayInSeconds;
 
     private LocalDateTime lastSendTime;
 
-    private final ScheduledExecutorService scheduledExecutorService;
+    private final ScheduledExecutorService executorService;
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationChangeMessageProducer.class);
 
-    public ConfigurationChangeMessageProducer(@Value("${jms.message.buffer.window}") int delayInSeconds, JmsTemplate acmJmsTemplate)
+    public ConfigurationChangeMessageProducer(@Value("${jms.message.buffer.window}") int delayInSeconds,
+                                              JmsTemplate acmJmsTemplate,
+                                              ScheduledExecutorService executorService)
     {
         this.acmJmsTemplate = acmJmsTemplate;
         this.delayInSeconds = delayInSeconds;
-        scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        this.executorService = executorService;
         lastSendTime = LocalDateTime.MIN;
+        logger.debug("Init ConfigurationChangeMessageProducer");
     }
 
     public void sendMessage()
@@ -68,9 +71,17 @@ public class ConfigurationChangeMessageProducer
         {
             lastSendTime = now;
             logger.debug("Schedule configuration changed message in [{}] seconds", delayInSeconds);
-            scheduledExecutorService.schedule(() -> {
+            executorService.schedule(() -> {
                         logger.info("Sending configuration change topic message...");
-                        acmJmsTemplate.send(Session::createMessage);
+                        try
+                        {
+                            acmJmsTemplate.send(Session::createMessage);
+                            logger.debug("Message successfully sent");
+                        }
+                        catch (JmsException e)
+                        {
+                            logger.warn("Message not sent. [{}]", e.getMessage(), e);
+                        }
                     },
                     delayInSeconds, TimeUnit.SECONDS);
         }
