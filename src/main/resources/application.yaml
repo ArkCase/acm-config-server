@@ -1,4 +1,4 @@
-server.port: 8888
+server.port: 9999
 spring:
   profiles.active: native
   cloud.config.server:
@@ -20,7 +20,7 @@ logging:
     com.armedia.acm.configserver: debug
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
-jms.message.buffer.window: 3
+jms.message.buffer.window: 1
 acm.activemq:
   broker-url: ssl://acm-activemq:61616
   keystore: ${user.home}/.arkcase/acm/private/keystore.old
