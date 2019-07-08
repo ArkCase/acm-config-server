@@ -1,4 +1,4 @@
-server.port: 9999
+server.port: 8787
 spring:
   profiles.active: native
   cloud.config.server:
@@ -12,6 +12,9 @@ spring:
 #management.endpoints.web.exposure.include: *
 properties.path: ${user.home}/.arkcase/acm/acm-config-server-repo/arkcase-runtime.yaml
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
+properties.includefiles.path: ${user.home}/.arkcase/acm/acm-config-server-repo/include.d/
+properties.merge.path: ${user.home}/.arkcase/acm/acm-config-server-repo/arkcase.yaml
+properties.base.path: ${user.home}/.arkcase/acm/acm-config-server-repo/arkcase-base.yaml
 logging:
   file.max-history: 10
   file.max-size: 10MB
