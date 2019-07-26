@@ -5,7 +5,7 @@
 
     <groupId>com.armedia.acm</groupId>
     <artifactId>config-server</artifactId>
-    <version>3.3.2</version>
+    <version>3.3.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>acm-config-server</name>
