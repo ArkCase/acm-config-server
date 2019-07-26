@@ -145,7 +145,6 @@
                         <supportBranchPrefix>support/</supportBranchPrefix>
                         <versionTagPrefix>config-server-</versionTagPrefix>
                         <origin>origin</origin>
-                        <commitDevelopmentVersionAtStart>true</commitDevelopmentVersionAtStart>
                     </gitFlowConfig>
                 </configuration>
             </plugin>
