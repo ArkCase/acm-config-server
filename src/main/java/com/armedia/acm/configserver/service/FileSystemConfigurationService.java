@@ -37,11 +37,15 @@ import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -52,15 +56,33 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private final String propertiesPath;
 
-    public FileSystemConfigurationService(@Value("${properties.path}") String propertiesPath)
+    private final String propertiesFolderPath;
+
+    private static final String RUNTIME = "-runtime";
+
+    public FileSystemConfigurationService(@Value("${properties.path}") String propertiesPath, @Value("${properties.folder.path}") String propertiesFolderPath)
     {
         this.propertiesPath = propertiesPath;
+        this.propertiesFolderPath = propertiesFolderPath;
     }
 
     @Override
     public synchronized void updateProperties(Map<String, Object> properties) throws ConfigurationException
     {
         FileSystemResource yamlResource = new FileSystemResource(propertiesPath);
+        if(!yamlResource.getFile().exists())
+        {
+            File file = new File(yamlResource.getPath());
+            try
+            {
+                file.createNewFile();
+            }
+            catch (IOException e)
+            {
+                logger.warn("Failed to create file to path [{}]", yamlResource.getPath());
+                throw new ConfigurationException(e);
+            }
+        }
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
@@ -89,5 +111,36 @@ public class FileSystemConfigurationService implements ConfigurationService
             logger.warn("Failed to read configuration from path [{}]", propertiesPath);
             throw new ConfigurationException("Failed to read configuration.", e);
         }
+    }
+
+
+    @Override
+    public void resetPropertiesToDefault() throws ConfigurationException
+    {
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(propertiesFolderPath);
+            for(File file : fileList)
+            {
+                if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
+                {
+                    logger.info("Deleting file [{}]", file.getName());
+                    file.delete();
+                }
+            }
+    }
+
+    private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName) {
+        File directory = new File(directoryName);
+
+        List<File> resultList = new ArrayList<>();
+
+        File[] fList = directory.listFiles();
+        for (File file : fList) {
+            if (file.isFile() && file.getName().contains(FileSystemConfigurationService.RUNTIME)) {
+                resultList.add(file);
+            } else if (file.isDirectory()) {
+                resultList.addAll(listAllRuntimeFilesInFolderAndSubfolders(file.getAbsolutePath()));
+            }
+        }
+        return resultList;
     }
 }

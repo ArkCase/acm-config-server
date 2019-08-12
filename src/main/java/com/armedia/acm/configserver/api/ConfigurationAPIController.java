@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +68,24 @@ public class ConfigurationAPIController
         catch (ConfigurationException e)
         {
             logger.debug("Failed to update properties. {}", e.getMessage());
+            logger.trace("Cause: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @DeleteMapping("/reset")
+    public ResponseEntity resetPropertiesToDefault()
+    {
+        logger.info("Resetting all properties");
+        try
+        {
+            configServerService.resetPropertiesToDefault();
+            return ResponseEntity.ok().build();
+        }
+        catch (ConfigurationException e)
+        {
+            logger.debug("Failed to reset properties. {}", e.getMessage());
             logger.trace("Cause: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
