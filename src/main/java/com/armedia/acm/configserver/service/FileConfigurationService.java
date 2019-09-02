@@ -1,7 +1,10 @@
 package com.armedia.acm.configserver.service;
 
+import com.armedia.acm.configserver.api.ConfigurationAPIController;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
@@ -23,6 +26,8 @@ public class FileConfigurationService {
 
     public static final String VIRTUAL_TOPIC_CONFIG_FILE_UPDATED = "VirtualTopic.ConfigFileUpdated";
 
+    private static final Logger logger = LoggerFactory.getLogger(FileConfigurationService.class);
+
 
     public FileConfigurationService(@Value("${properties.folder.path}") String configRepo, JmsTemplate acmJmsTemplate)
     {
@@ -39,7 +44,10 @@ public class FileConfigurationService {
             String profileBasedfile = setProfileBasedResource(fileName);
 
             File logoFile = new File(configServerRepo + "/" + profileBasedfile);
+
             FileUtils.copyInputStreamToFile(logoStream, logoFile);
+
+            logger.info("File is with name {} created on the config server", fileName);
 
             sendNotification(originalFileName,
                     VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
@@ -55,6 +63,8 @@ public class FileConfigurationService {
     {
         String[] splitedFilePath = filePath.split("/");
         String originalFileName = splitedFilePath[splitedFilePath.length - 1];
+
+        logger.debug("Original file name from path {} is {}", filePath, originalFileName);
 
         return originalFileName;
     }
@@ -73,6 +83,9 @@ public class FileConfigurationService {
             TextMessage theTextMessage = inJmsSession.createTextMessage(message);
             return theTextMessage;
         });
+
+        logger.debug("File with name {} is updated and success message is sent for updating", message);
+
     }
 
 }
