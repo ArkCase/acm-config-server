@@ -74,12 +74,12 @@ deploy:jdk8:
     - echo '<settings>' > /root/.m2/settings.xml
     - echo '  <servers>' >> /root/.m2/settings.xml
     - echo '    <server>' >> /root/.m2/settings.xml
-    - echo '      <id>armedia.snapshot</id>' >> /root/.m2/settings.xml
+    - echo '      <id>arkcase.snapshot</id>' >> /root/.m2/settings.xml
     - echo '      <username>admin</username>' >> /root/.m2/settings.xml
     - echo "      <password>$MVN_PASSWORD</password>" >> /root/.m2/settings.xml
     - echo '    </server>' >> /root/.m2/settings.xml
     - echo '  </servers>' >> /root/.m2/settings.xml
     - echo '</settings>' >> /root/.m2/settings.xml
-    - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=armedia.snapshot::default::https://project.armedia.com/nexus/repository/armedia.snapshot/"'
+    - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::https://project.armedia.com/nexus/repository/arkcase.snapshot/"'
   only:
     - develop
