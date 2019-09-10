@@ -2,7 +2,7 @@ server.port: 9999
 spring:
   profiles.active: native
   cloud.config.server:
-    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo
+    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels
   jms:
     pub-sub-domain: true
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
