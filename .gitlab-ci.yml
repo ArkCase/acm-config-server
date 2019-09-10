@@ -81,7 +81,7 @@ deploy:jdk8:
     - echo '  </servers>' >> /root/.m2/settings.xml
     - echo '</settings>' >> /root/.m2/settings.xml
     - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::https://project.armedia.com/nexus/repository/arkcase.snapshot/"'
-    - yum install -y sshpass
+    - apt install -y sshpass
     - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server.jar' 
   only:
     - develop
