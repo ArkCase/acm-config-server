@@ -53,15 +53,15 @@ cache:
 # Validate merge requests using JDK8
 .validate:jdk8:
   <<: *validate
-  image: maven:3.3.9-jdk-8
+  image: maven:3.6.1-jdk-8
 
 # Verify merge requests using JDK8
 .verify:jdk8:
   <<: *verify
-  image: maven:3.3.9-jdk-8
+  image: maven:3.6.1-jdk-8
   
 
-image: maven:3.3.9-jdk-8  
+image: maven:3.6.1-jdk-8
   
 stages:
   - build
@@ -81,5 +81,8 @@ deploy:jdk8:
     - echo '  </servers>' >> /root/.m2/settings.xml
     - echo '</settings>' >> /root/.m2/settings.xml
     - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::https://project.armedia.com/nexus/repository/arkcase.snapshot/"'
+    - apt-get update
+    - apt-get install -y sshpass
+    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server.jar' 
   only:
     - develop
