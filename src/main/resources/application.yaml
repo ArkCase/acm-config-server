@@ -10,7 +10,6 @@ spring:
 #spring.security.user.name: root
 #spring.security.user.password: root
 #management.endpoints.web.exposure.include: *
-properties.path: ${user.home}/.arkcase/acm/acm-config-server-repo/arkcase-runtime.yaml
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
 logging:
   file.max-history: 10
@@ -18,6 +17,7 @@ logging:
   file: logs/acmConfigServer.log
   level:
     com.armedia.acm.configserver: debug
+    org.springframework.cloud.config: debug
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
 jms.message.buffer.window: 1
