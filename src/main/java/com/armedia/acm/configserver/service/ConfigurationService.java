@@ -34,7 +34,15 @@ import java.util.Map;
 
 public interface ConfigurationService
 {
-    void updateProperties(Map<String, Object> properties) throws ConfigurationException;
+    /**
+     * Update properties in yaml file with name - applicationName,
+     * updated properties will be written in the runtime file.
+     *
+     * @param properties - properties for update
+     * @param applicationName - name of the file whose properties will be updated
+     * @throws ConfigurationException
+     */
+    void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException;
 
     void resetPropertiesToDefault() throws ConfigurationException;
 }

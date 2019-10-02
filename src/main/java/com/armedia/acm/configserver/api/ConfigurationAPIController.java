@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,13 +56,13 @@ public class ConfigurationAPIController
         this.configServerService = configServerService;
     }
 
-    @PostMapping
-    public ResponseEntity updateProperties(@RequestBody Map<String, Object> properties)
+    @PostMapping("/{applicationName}")
+    public ResponseEntity updateProperties(@PathVariable String applicationName, @RequestBody Map<String, Object> properties)
     {
         logger.info("Update properties {}", properties.keySet());
         try
         {
-            configServerService.updateProperties(properties);
+            configServerService.updateProperties(properties, applicationName);
             logger.debug("Properties successfully updated");
             return ResponseEntity.ok().build();
         }
