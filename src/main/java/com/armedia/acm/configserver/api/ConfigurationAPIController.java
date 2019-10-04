@@ -41,6 +41,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -62,6 +64,11 @@ public class ConfigurationAPIController
         logger.info("Update properties {}", properties.keySet());
         try
         {
+            List<String> langs = Arrays.asList("-de", "-en", "-en-in", "-es", "-fr", "-hi", "-ja", "-pt", "-ru", "-zh-cn", "-zh-tw");
+            if(langs.parallelStream().anyMatch(applicationName::contains))
+            {
+                applicationName = "labels/" + applicationName;
+            }
             configServerService.updateProperties(properties, applicationName);
             logger.debug("Properties successfully updated");
             return ResponseEntity.ok().build();
