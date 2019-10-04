@@ -27,6 +27,7 @@ package com.armedia.acm.configserver.jms;
  * #L%
  */
 
+import org.apache.activemq.command.ActiveMQTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +65,11 @@ public class ConfigurationChangeMessageProducer
         logger.debug("Init ConfigurationChangeMessageProducer");
     }
 
-    public void sendMessage()
+    /**
+     * Sends JMS message to the destination topic
+     * @param destination - It can be null if it is send to the default destination
+     */
+    public void sendMessage(String destination)
     {
         LocalDateTime now = LocalDateTime.now();
         logger.debug("Last configuration change topic message send in [{}]", lastSendTime);
@@ -76,6 +81,10 @@ public class ConfigurationChangeMessageProducer
                         logger.info("Sending configuration change topic message...");
                         try
                         {
+                            if (destination!=null)
+                            {
+                                acmJmsTemplate.setDefaultDestination(new ActiveMQTopic(destination));
+                            }
                             acmJmsTemplate.send(Session::createMessage);
                             logger.debug("Message successfully sent");
                         }
