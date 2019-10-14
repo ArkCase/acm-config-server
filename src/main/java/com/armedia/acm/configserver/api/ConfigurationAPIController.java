@@ -51,6 +51,8 @@ public class ConfigurationAPIController
 {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationAPIController.class);
 
+    private static final List<String> langs = Arrays.asList("-de", "-en", "-en-in", "-es", "-fr", "-hi", "-ja", "-pt", "-ru", "-zh-cn", "-zh-tw");
+
     private final ConfigurationService configServerService;
 
     public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService)
@@ -64,7 +66,6 @@ public class ConfigurationAPIController
         logger.info("Update properties {}", properties.keySet());
         try
         {
-            List<String> langs = Arrays.asList("-de", "-en", "-en-in", "-es", "-fr", "-hi", "-ja", "-pt", "-ru", "-zh-cn", "-zh-tw");
             if(langs.parallelStream().anyMatch(applicationName::contains))
             {
                 applicationName = "labels/" + applicationName;
