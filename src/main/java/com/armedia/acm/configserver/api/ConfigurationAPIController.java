@@ -99,4 +99,25 @@ public class ConfigurationAPIController
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @DeleteMapping("/reset/{applicationName}")
+    public ResponseEntity resetFilePropertiesToDefault(@PathVariable String applicationName)
+    {
+        logger.info("Resetting all properties");
+        if(langs.parallelStream().anyMatch(applicationName::contains))
+        {
+            applicationName = "labels/" + applicationName;
+        }
+        try
+        {
+            configServerService.resetFilePropertiesToDefault(applicationName);
+            return ResponseEntity.ok().build();
+        }
+        catch (ConfigurationException e)
+        {
+            logger.debug("Failed to reset properties. {}", e.getMessage());
+            logger.trace("Cause: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
