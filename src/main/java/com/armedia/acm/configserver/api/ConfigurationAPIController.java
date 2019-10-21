@@ -32,6 +32,7 @@ import com.armedia.acm.configserver.service.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,13 +52,14 @@ public class ConfigurationAPIController
 {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationAPIController.class);
 
-    private static final List<String> langs = Arrays.asList("-de", "-en", "-en-in", "-es", "-fr", "-hi", "-ja", "-pt", "-ru", "-zh-cn", "-zh-tw");
+    private final List<String> langs;
 
     private final ConfigurationService configServerService;
 
-    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService)
+    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService, @Value("${arkcase.languages}") String arkcaseLanguages)
     {
         this.configServerService = configServerService;
+        this.langs = Arrays.asList(arkcaseLanguages.split(","));
     }
 
     @PostMapping("/{applicationName}")
@@ -66,7 +68,7 @@ public class ConfigurationAPIController
         logger.info("Update properties {}", properties.keySet());
         try
         {
-            if(langs.parallelStream().anyMatch(applicationName::contains))
+            if(langs.stream().anyMatch(applicationName::contains))
             {
                 applicationName = "labels/" + applicationName;
             }
@@ -103,7 +105,7 @@ public class ConfigurationAPIController
     @DeleteMapping("/reset/{applicationName}")
     public ResponseEntity resetFilePropertiesToDefault(@PathVariable String applicationName)
     {
-        logger.info("Resetting all properties");
+        logger.info("Resetting properties for: {}", applicationName);
         if(langs.parallelStream().anyMatch(applicationName::contains))
         {
             applicationName = "labels/" + applicationName;

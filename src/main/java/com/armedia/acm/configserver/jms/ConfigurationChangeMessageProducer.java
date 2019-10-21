@@ -81,11 +81,7 @@ public class ConfigurationChangeMessageProducer
                         logger.info("Sending configuration change topic message...");
                         try
                         {
-                            if (destination!=null)
-                            {
-                                acmJmsTemplate.setDefaultDestination(new ActiveMQTopic(destination));
-                            }
-                            acmJmsTemplate.send(Session::createMessage);
+                            acmJmsTemplate.send(new ActiveMQTopic(destination), Session::createMessage);
                             logger.debug("Message successfully sent");
                         }
                         catch (JmsException e)

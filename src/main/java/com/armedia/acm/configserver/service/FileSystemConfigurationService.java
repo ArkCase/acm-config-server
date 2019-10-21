@@ -42,6 +42,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -133,11 +134,16 @@ public class FileSystemConfigurationService implements ConfigurationService
             resetFilePath = String.format("%s/%s.yaml", propertiesFolderPath, applicationName);
         }
 
-        Path filePath = Paths.get(resetFilePath);
-        File file = filePath.toFile();
-        logger.info("Deleting file [{}]", file.getName());
-        file.delete();
-
+        try
+        {
+            Path filePath = Paths.get(resetFilePath);
+            logger.info("Deleting file [{}]", applicationName);
+            Files.delete(filePath);
+        }
+        catch (IOException e){
+            logger.warn("File [{}] could not be deleted.", applicationName);
+            throw new ConfigurationException(e);
+        }
     }
 
     @Override
@@ -149,7 +155,12 @@ public class FileSystemConfigurationService implements ConfigurationService
             if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
             {
                 logger.info("Deleting file [{}]", file.getName());
-                file.delete();
+                try {
+                    Files.delete(file.toPath());
+                } catch (IOException e) {
+                    logger.warn("File [{}] could not be deleted.", file.getName());
+                    throw new ConfigurationException(e);
+                }
             }
         }
     }

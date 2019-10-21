@@ -30,3 +30,4 @@ acm.activemq:
   default-destination: configuration.changed
   labels-destination: labels.changed
   timeout: 10 #seconds
+arkcase.languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
