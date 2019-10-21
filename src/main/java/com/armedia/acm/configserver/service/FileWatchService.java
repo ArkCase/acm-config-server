@@ -51,16 +51,20 @@ public class FileWatchService
 
     private final String labelsDestination;
 
+    private final String configurationChangedDestination;
+
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
                             @Value("${acm.activemq.labels-destination}") String labelsDestination,
+                            @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
                             ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.labelsDestination = labelsDestination;
+        this.configurationChangedDestination = configurationChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
         logger.debug("Initializing FileWatchService");
     }
@@ -97,7 +101,7 @@ public class FileWatchService
                             }
                             else
                             {
-                                configurationChangeMessageProducer.sendMessage(null);
+                                configurationChangeMessageProducer.sendMessage(configurationChangedDestination);
                             }
                         }
                         key.reset();
