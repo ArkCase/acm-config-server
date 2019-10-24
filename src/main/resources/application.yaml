@@ -28,4 +28,6 @@ acm.activemq:
   truststore: ${user.home}/.arkcase/acm/private/truststore
   truststore-password: AcMd3v$
   default-destination: configuration.changed
+  labels-destination: labels.changed
   timeout: 10 #seconds
+arkcase.languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
