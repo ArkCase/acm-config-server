@@ -49,8 +49,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Qualifier(value = "fileSystemConfigurationService")
@@ -117,18 +115,54 @@ public class FileSystemConfigurationService implements ConfigurationService
     }
 
 
+    /**
+     * Reset properties for file with name 'applicationName'
+     *
+     * @param applicationName - ex. 'cases-en', without the file extension (.yaml)
+     * @throws ConfigurationException
+     */
+    @Override
+    public void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException
+    {
+        String resetFilePath;
+        if(!applicationName.contains(FileSystemConfigurationService.RUNTIME))
+        {
+            resetFilePath = String.format("%s/%s%s.yaml", propertiesFolderPath, applicationName, RUNTIME);
+        }
+        else
+        {
+            resetFilePath = String.format("%s/%s.yaml", propertiesFolderPath, applicationName);
+        }
+
+        try
+        {
+            Path filePath = Paths.get(resetFilePath);
+            logger.info("Deleting file [{}]", applicationName);
+            Files.delete(filePath);
+        }
+        catch (IOException e){
+            logger.warn("File [{}] could not be deleted.", applicationName);
+            throw new ConfigurationException(e);
+        }
+    }
+
     @Override
     public void resetPropertiesToDefault() throws ConfigurationException
     {
         List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(propertiesFolderPath);
-            for(File file : fileList)
+        for(File file : fileList)
+        {
+            if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
             {
-                if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
-                {
-                    logger.info("Deleting file [{}]", file.getName());
-                    file.delete();
+                logger.info("Deleting file [{}]", file.getName());
+                try {
+                    Files.delete(file.toPath());
+                } catch (IOException e) {
+                    logger.warn("File [{}] could not be deleted.", file.getName());
+                    throw new ConfigurationException(e);
                 }
             }
+        }
     }
 
     private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName) {

@@ -45,4 +45,6 @@ public interface ConfigurationService
     void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException;
 
     void resetPropertiesToDefault() throws ConfigurationException;
+
+    void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException;
 }
