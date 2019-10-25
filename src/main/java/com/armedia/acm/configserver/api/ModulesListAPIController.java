@@ -27,30 +27,18 @@ package com.armedia.acm.configserver.api;
  * #L%
  */
 
-import com.armedia.acm.configserver.exception.ConfigurationException;
-import com.armedia.acm.configserver.service.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/config")
@@ -62,13 +50,14 @@ public class ModulesListAPIController
 
     private final String labelsFolderPath;
 
-    public ModulesListAPIController(@Value("${properties.folder.path}") String propertiesFolderPath, @Value("${arkcase.languages}") String arkcaseLanguages)
+    public ModulesListAPIController(@Value("${properties.folder.path}") String propertiesFolderPath,
+            @Value("${arkcase.languages}") String arkcaseLanguages)
     {
         this.labelsFolderPath = propertiesFolderPath + "/labels";
         this.langs = Arrays.asList(arkcaseLanguages.split(","));
     }
 
-    @GetMapping(value="/modules", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/modules", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> getModules()
     {
         return getModulesNames();
@@ -83,7 +72,13 @@ public class ModulesListAPIController
     {
         File modulesDir = new File(labelsFolderPath);
 
-        File[] files = modulesDir.listFiles(File::isFile);
+        File[] files = modulesDir.listFiles(file -> {
+            if (file.isFile() && !file.getName().toLowerCase().contains("-runtime"))
+            {
+                return true;
+            }
+            return false;
+        });
 
         List<String> modules = new ArrayList<>();
 
@@ -104,6 +99,7 @@ public class ModulesListAPIController
             }
         }
 
+        logger.info("Returns modules names. [{}]", modules.toArray());
         return modules;
     }
 }

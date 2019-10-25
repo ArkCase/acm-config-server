@@ -30,6 +30,7 @@ package com.armedia.acm.configserver.service;
 import com.armedia.acm.configserver.exception.ConfigurationException;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 
 public interface ConfigurationService
@@ -46,5 +47,5 @@ public interface ConfigurationService
 
     void resetPropertiesToDefault() throws ConfigurationException;
 
-    void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException;
+    void resetFilePropertiesToDefault(String applicationName) throws NoSuchFileException, ConfigurationException;
 }
