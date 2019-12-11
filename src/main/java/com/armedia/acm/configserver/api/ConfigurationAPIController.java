@@ -85,6 +85,24 @@ public class ConfigurationAPIController
         }
     }
 
+    @PostMapping("/remove/{applicationName}")
+    public ResponseEntity removeProperties(@PathVariable String applicationName, @RequestBody List<String> properties)
+    {
+        logger.info("Remove properties {}", properties);
+        try
+        {
+            configServerService.removeProperties(properties, applicationName);
+            logger.debug("Properties successfully removed");
+            return ResponseEntity.ok().build();
+        }
+        catch (ConfigurationException e)
+        {
+            logger.debug("Failed to remove properties. {}", e.getMessage());
+            logger.trace("Cause: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @DeleteMapping("/reset")
     public ResponseEntity resetPropertiesToDefault()
