@@ -67,44 +67,54 @@ public class FileSystemConfigurationService implements ConfigurationService
     }
 
     @Override
-    public synchronized void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException
-    {
-        String configurationFilePath = String.format("%s/%s%s.yaml", propertiesFolderPath, applicationName, RUNTIME);
+    public synchronized void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException {
+        String configurationFilePath = getRuntimeConfigurationFilePath(applicationName);
 
-        FileSystemResource yamlResource = new FileSystemResource(configurationFilePath);
-        if(!yamlResource.getFile().exists())
-        {
-            File file = new File(yamlResource.getPath());
-            try
-            {
-                file.createNewFile();
-            }
-            catch (IOException e)
-            {
-                logger.warn("Failed to create file to path [{}]", yamlResource.getPath());
-                throw new ConfigurationException(e);
-            }
-        }
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
+        FileSystemResource yamlResource = loadYamlSystemResource(configurationFilePath);
+
+        DumperOptions options = buildDumperOptions();
 
         Yaml yaml = new Yaml(options);
-        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8))
-        {
+        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8)) {
             Map<String, Object> configMap = yaml.load(configStreamReader);
-            if (configMap == null)
-            {
+            if (configMap == null) {
                 configMap = new LinkedHashMap<>();
             }
 
-            for (Map.Entry<String, Object> entry : properties.entrySet())
-            {
+            for (Map.Entry<String, Object> entry : properties.entrySet()) {
                 configMap.put(entry.getKey(), entry.getValue());
             }
 
-            try (FileWriter fw = new FileWriter(yamlResource.getFile()))
-            {
+            try (FileWriter fw = new FileWriter(yamlResource.getFile())) {
+                yaml.dump(configMap, fw);
+            }
+        } catch (IOException e) {
+            logger.warn("Failed to read configuration from path [{}]", configurationFilePath);
+            throw new ConfigurationException("Failed to read configuration.", e);
+        }
+    }
+
+    @Override
+    public synchronized void removeProperties(List<String> properties, String applicationName) throws ConfigurationException {
+        String configurationFilePath = getRuntimeConfigurationFilePath(applicationName);
+
+        FileSystemResource yamlResource = loadYamlSystemResource(configurationFilePath);
+
+        DumperOptions options = buildDumperOptions();
+
+        Yaml yaml = new Yaml(options);
+
+        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8)){
+            Map<String, Object> configMap = yaml.load(configStreamReader);
+            if (configMap == null) {
+                configMap = new LinkedHashMap<>();
+            }
+
+            for (String property : properties) {
+                configMap.remove(property);
+            }
+
+            try (FileWriter fw = new FileWriter(yamlResource.getFile())) {
                 yaml.dump(configMap, fw);
             }
         }
@@ -185,5 +195,34 @@ public class FileSystemConfigurationService implements ConfigurationService
             }
         }
         return resultList;
+    }
+
+    private FileSystemResource loadYamlSystemResource(String configurationFilePath) throws ConfigurationException {
+        FileSystemResource yamlResource = new FileSystemResource(configurationFilePath);
+        if(!yamlResource.getFile().exists())
+        {
+            File file = new File(yamlResource.getPath());
+            try
+            {
+                file.createNewFile();
+            }
+            catch (IOException e)
+            {
+                logger.warn("Failed to create file to path [{}]", yamlResource.getPath());
+                throw new ConfigurationException(e);
+            }
+        }
+        return yamlResource;
+    }
+
+    private String getRuntimeConfigurationFilePath(String applicationName) {
+        return String.format("%s/%s%s.yaml", propertiesFolderPath, applicationName, RUNTIME);
+    }
+
+    private DumperOptions buildDumperOptions() {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
+        return options;
     }
 }
