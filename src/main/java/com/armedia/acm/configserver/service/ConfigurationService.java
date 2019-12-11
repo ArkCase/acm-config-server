@@ -31,6 +31,7 @@ import com.armedia.acm.configserver.exception.ConfigurationException;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.util.List;
 import java.util.Map;
 
 public interface ConfigurationService
@@ -44,6 +45,8 @@ public interface ConfigurationService
      * @throws ConfigurationException
      */
     void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException;
+
+    void removeProperties(List<String> properties, String applicationName) throws ConfigurationException;
 
     void resetPropertiesToDefault() throws ConfigurationException;
 
