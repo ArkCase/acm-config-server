@@ -1,12 +1,8 @@
-server.port: 8888
+server.port: 9999
 spring:
   profiles.active: native
-  cloud.config.server.native:
-    searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo
-  activemq:
-    broker-url: ssl://acm-activemq:61616
-    user: guest
-    password: guest
+  cloud.config.server:
+    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo
   jms:
     pub-sub-domain: true
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
@@ -24,3 +20,12 @@ logging:
     com.armedia.acm.configserver: debug
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
+jms.message.buffer.window: 1
+acm.activemq:
+  broker-url: ssl://acm-activemq:61616
+  keystore: ${user.home}/.arkcase/acm/private/keystore.old
+  keystore-password: password
+  truststore: ${user.home}/.arkcase/acm/private/truststore
+  truststore-password: AcMd3v$
+  default-destination: configuration.changed
+  timeout: 10 #seconds
