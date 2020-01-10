@@ -32,13 +32,19 @@ import com.armedia.acm.configserver.service.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.file.NoSuchFileException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -47,26 +53,94 @@ public class ConfigurationAPIController
 {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationAPIController.class);
 
+    private final List<String> langs;
+
     private final ConfigurationService configServerService;
 
-    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService)
+    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService, @Value("${arkcase.languages}") String arkcaseLanguages)
     {
         this.configServerService = configServerService;
+        this.langs = Arrays.asList(arkcaseLanguages.split(","));
     }
 
-    @PostMapping
-    public ResponseEntity updateProperties(@RequestBody Map<String, Object> properties)
+    @PostMapping("/{applicationName}")
+    public ResponseEntity updateProperties(@PathVariable String applicationName, @RequestBody Map<String, Object> properties)
     {
         logger.info("Update properties {}", properties.keySet());
         try
         {
-            configServerService.updateProperties(properties);
+            if(langs.stream().anyMatch(applicationName::contains))
+            {
+                applicationName = "labels/" + applicationName;
+            }
+            configServerService.updateProperties(properties, applicationName);
             logger.debug("Properties successfully updated");
             return ResponseEntity.ok().build();
         }
         catch (ConfigurationException e)
         {
             logger.debug("Failed to update properties. {}", e.getMessage());
+            logger.trace("Cause: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/remove/{applicationName}")
+    public ResponseEntity removeProperties(@PathVariable String applicationName, @RequestBody List<String> properties)
+    {
+        logger.info("Remove properties {}", properties);
+        try
+        {
+            configServerService.removeProperties(properties, applicationName);
+            logger.debug("Properties successfully removed");
+            return ResponseEntity.ok().build();
+        }
+        catch (ConfigurationException e)
+        {
+            logger.debug("Failed to remove properties. {}", e.getMessage());
+            logger.trace("Cause: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @DeleteMapping("/reset")
+    public ResponseEntity resetPropertiesToDefault()
+    {
+        logger.info("Resetting all properties");
+        try
+        {
+            configServerService.resetPropertiesToDefault();
+            return ResponseEntity.ok().build();
+        }
+        catch (ConfigurationException e)
+        {
+            logger.debug("Failed to reset properties. {}", e.getMessage());
+            logger.trace("Cause: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/reset/{applicationName}")
+    public ResponseEntity resetFilePropertiesToDefault(@PathVariable String applicationName)
+    {
+        logger.info("Resetting properties for: {}", applicationName);
+        if(langs.parallelStream().anyMatch(applicationName::contains))
+        {
+            applicationName = "labels/" + applicationName;
+        }
+        try
+        {
+            configServerService.resetFilePropertiesToDefault(applicationName);
+            return ResponseEntity.ok().build();
+        }
+        catch (NoSuchFileException e)
+        {
+            return ResponseEntity.ok().build();
+        }
+        catch (ConfigurationException e)
+        {
+            logger.debug("Failed to reset properties. {}", e.getMessage());
             logger.trace("Cause: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
