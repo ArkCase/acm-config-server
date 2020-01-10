@@ -5,7 +5,7 @@
 
     <groupId>com.armedia.acm</groupId>
     <artifactId>config-server</artifactId>
-    <version>3.3.2</version>
+    <version>3.3.3-RC1</version>
     <packaging>jar</packaging>
 
     <name>acm-config-server</name>
@@ -102,11 +102,15 @@
             <version>2.11.2</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>1.23</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
         </dependency>
     </dependencies>
 

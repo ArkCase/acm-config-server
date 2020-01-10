@@ -49,14 +49,22 @@ public class FileWatchService
 {
     private final String propertiesFolderPath;
 
+    private final String labelsDestination;
+
+    private final String configurationChangedDestination;
+
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
+                            @Value("${acm.activemq.labels-destination}") String labelsDestination,
+                            @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
                             ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
+        this.labelsDestination = labelsDestination;
+        this.configurationChangedDestination = configurationChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
         logger.debug("Initializing FileWatchService");
     }
@@ -69,6 +77,8 @@ public class FileWatchService
             WatchService watchService = FileSystems.getDefault().newWatchService();
             Path path = Paths.get(propertiesFolderPath);
             path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+            Path labelsPath = Paths.get(propertiesFolderPath + "/labels");
+            labelsPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 
             WatchKey key;
             while (true)
@@ -84,7 +94,15 @@ public class FileWatchService
                             Path filePath = (Path) event.context();
                             File modifiedFile = filePath.toFile();
                             logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
-                            configurationChangeMessageProducer.sendMessage();
+                            String parentDirectory = key.watchable().toString();
+                            if (parentDirectory.contains("labels"))
+                            {
+                                configurationChangeMessageProducer.sendMessage(labelsDestination);
+                            }
+                            else
+                            {
+                                configurationChangeMessageProducer.sendMessage(configurationChangedDestination);
+                            }
                         }
                         key.reset();
                         logger.debug("Reset watch key...");
