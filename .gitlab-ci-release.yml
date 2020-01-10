@@ -76,7 +76,7 @@ release_candidate_1:
     - mvn -B gitflow:release-finish -DskipTestProject=true -DcommitDevelopmentVersionAtStart=true
     - git checkout master
     - mvn -DskipITs -T 4 -B deploy "-DaltDeploymentRepository=arkcase.release::default::https://project.armedia.com/nexus/repository/arkcase.release/"
-    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE-VERSION'.jar' 
+    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE_VERSION'.jar' 
     # Deploy on test servers
     
 start_release_candidate_X:
@@ -115,7 +115,7 @@ release_candidate_X:
     - mvn -B gitflow:hotfix-finish -DpushRemote=true -DhotfixVersion=$RELEASE_VERSION -DskipTestProject=true -DskipMergeDevBranch=true
     - git checkout master
     - mvn -DskipITs -T 4 -B deploy "-DaltDeploymentRepository=arkcase.release::default::https://project.armedia.com/nexus/repository/arkcase.release/"
-    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE-VERSION'.jar'    
+    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE_VERSION'.jar'    
     # Deploy on test servers
 
 release:
@@ -144,7 +144,7 @@ release:
     - mvn -B gitflow:hotfix-finish -DhotfixVersion=$RELEASE_VERSION -DskipTestProject=true -DskipMergeDevBranch=true
     - git checkout master
     - mvn -DskipITs -T 4 -B deploy "-DaltDeploymentRepository=arkcase.release::default::https://project.armedia.com/nexus/repository/arkcase.release/"
-    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE-VERSION'.jar'    
+    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE_VERSION'.jar'    
     # Deploy on test servers
     
 start_support_branch:
@@ -191,5 +191,5 @@ release_hotfix:
     - mvn -B gitflow:hotfix-finish -DpushRemote=true -DhotfixVersion=support/$HOTFIX_SUPPORT_VERSION/$RELEASE_VERSION -DskipTestProject=true -DskipMergeDevBranch=true
     - git checkout --track origin/support/$HOTFIX_SUPPORT_VERSION/$RELEASE_VERSION
     - mvn -DskipITs -T 4 -B deploy "-DaltDeploymentRepository=arkcase.release::default::https://project.armedia.com/nexus/repository/arkcase.release/"
-    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE-VERSION'.jar'    
+    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE_VERSION'.jar'    
     # Deploy on test servers
