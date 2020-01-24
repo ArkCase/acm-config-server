@@ -133,8 +133,7 @@ public class FileSystemConfigurationService implements ConfigurationService
      * @throws ConfigurationException
      */
     @Override
-    public void resetFilePropertiesToDefault(String applicationName) throws NoSuchFileException, ConfigurationException
-    {
+    public void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException, NoSuchFileException {
         String resetFilePath;
         if(!applicationName.contains(FileSystemConfigurationService.RUNTIME))
         {
@@ -145,20 +144,20 @@ public class FileSystemConfigurationService implements ConfigurationService
             resetFilePath = String.format("%s/%s.yaml", propertiesFolderPath, applicationName);
         }
 
-        Path filePath = Paths.get(resetFilePath);
-        String fileName = filePath.toFile().getName();
-        try
+        String[] fileNameHelper = resetFilePath.split("/");
+        String fileName = fileNameHelper[fileNameHelper.length - 1];
+
+        logger.info("Deleting file [{}]", fileName);
+
+        File fileToBeDeleted = new File(resetFilePath);
+        if(!fileToBeDeleted.exists())
         {
-            logger.info("Deleting file [{}]", fileName);
-            Files.delete(filePath);
-        }
-        catch (NoSuchFileException e){
             logger.warn("File [{}] does not exists, nothing to delete.", fileName);
-            throw new NoSuchFileException("File " + fileName + " does not exists, nothing to delete.");
+            throw new NoSuchFileException(String.format("File %s does not exists, nothing to delete.", fileName));
         }
-        catch (IOException e){
-            logger.warn("File [{}] could not be deleted.", fileName);
-            throw new ConfigurationException(e);
+        else if(!fileToBeDeleted.delete())
+        {
+            throw new ConfigurationException(String.format("File %s could not be deleted", fileName));
         }
     }
 
@@ -171,11 +170,9 @@ public class FileSystemConfigurationService implements ConfigurationService
             if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
             {
                 logger.info("Deleting file [{}]", file.getName());
-                try {
-                    Files.delete(file.toPath());
-                } catch (IOException e) {
-                    logger.warn("File [{}] could not be deleted.", file.getName());
-                    throw new ConfigurationException(e);
+                if(!file.delete())
+                {
+                    throw new ConfigurationException(String.format("File %s could not be deleted", file.getName()));
                 }
             }
         }
