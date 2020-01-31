@@ -76,9 +76,10 @@ public class FileWatchService
         {
             WatchService watchService = FileSystems.getDefault().newWatchService();
             Path path = Paths.get(propertiesFolderPath);
-            path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
             Path labelsPath = Paths.get(propertiesFolderPath + "/labels");
-            labelsPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+            labelsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
             WatchKey key;
             while (true)
