@@ -22,7 +22,7 @@ logging:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
 jms.message.buffer.window: 1
 acm.activemq:
-  broker-url: ssl://acm-activemq:61616
+  broker-url: ssl://acm-arkcase:61616
   keystore: ${user.home}/.arkcase/acm/private/arkcase.ks
   keystore-password: AcMd3v$
   truststore: ${user.home}/.arkcase/acm/private/arkcase.ts
