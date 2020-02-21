@@ -10,7 +10,7 @@ variables:
   # `installAtEnd` and `deployAtEnd` are only effective with recent version of the corresponding plugins.
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
   GIT_SSL_NO_VERIFY: "true"
-  GIT_STRATEGY: fetch
+  GIT_STRATEGY: clone
 
 
 # Cache downloaded dependencies and plugins between builds.
@@ -25,10 +25,11 @@ stages:
   - build
   - release
 
-# For `develop` branch run `mvn deploy` automatically.
-# Here you need to decide whether you want to use JDK7 or 8.
-deploy:jdk8:
+build_snapshot:
   stage: build
+  except:
+    changes:
+      #- .gitlab-ci.yaml
   script:
     - echo '<settings>' > /root/.m2/settings.xml
     - echo '  <servers>' >> /root/.m2/settings.xml
