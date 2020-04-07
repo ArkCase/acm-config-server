@@ -51,6 +51,8 @@ public class FileWatchService
 
     private final String labelsDestination;
 
+    private final String ldapDestination;
+
     private final String configurationChangedDestination;
 
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
@@ -59,11 +61,13 @@ public class FileWatchService
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
                             @Value("${acm.activemq.labels-destination}") String labelsDestination,
+                            @Value("${acm.activemq.ldap-destination}") String ldapDestination,
                             @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
                             ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.labelsDestination = labelsDestination;
+        this.ldapDestination = ldapDestination;
         this.configurationChangedDestination = configurationChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
         logger.debug("Initializing FileWatchService");
@@ -81,6 +85,9 @@ public class FileWatchService
             Path labelsPath = Paths.get(propertiesFolderPath + "/labels");
             labelsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
+            Path ldapPath = Paths.get(propertiesFolderPath + "/ldap");
+            ldapPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
             WatchKey key;
             while (true)
             {
@@ -96,7 +103,12 @@ public class FileWatchService
                             File modifiedFile = filePath.toFile();
                             logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
                             String parentDirectory = key.watchable().toString();
-                            if (parentDirectory.contains("labels"))
+
+                            if(parentDirectory.contains("ldap"))
+                            {
+                                configurationChangeMessageProducer.sendMessage(ldapDestination);
+                            }
+                            else if (parentDirectory.contains("labels"))
                             {
                                 configurationChangeMessageProducer.sendMessage(labelsDestination);
                             }
