@@ -59,6 +59,8 @@ public class FileWatchService
 
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
 
+    private final FileConfigurationService fileConfigurationService;
+
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
@@ -66,7 +68,8 @@ public class FileWatchService
                             @Value("${acm.activemq.ldap-destination}") String ldapDestination,
                             @Value("${acm.activemq.rules-destination}") String rulesDestination,
                             @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
-                            ConfigurationChangeMessageProducer configurationChangeMessageProducer)
+                            ConfigurationChangeMessageProducer configurationChangeMessageProducer,
+                            FileConfigurationService fileConfigurationService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.labelsDestination = labelsDestination;
@@ -74,6 +77,7 @@ public class FileWatchService
         this.rulesDestination = rulesDestination;
         this.configurationChangedDestination = configurationChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
+        this.fileConfigurationService = fileConfigurationService;
         logger.debug("Initializing FileWatchService");
     }
 
@@ -121,7 +125,7 @@ public class FileWatchService
                             }
                             else if (parentDirectory.contains("rules"))
                             {
-                                configurationChangeMessageProducer.sendMessage(rulesDestination);
+                                fileConfigurationService.sendNotification(filePath.toString(), rulesDestination);
                             }
                             else
                             {
