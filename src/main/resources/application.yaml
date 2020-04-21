@@ -2,7 +2,7 @@ server.port: 9999
 spring:
   profiles.active: native
   cloud.config.server:
-    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels
+    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap
   jms:
     pub-sub-domain: true
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
@@ -29,5 +29,6 @@ acm.activemq:
   truststore-password: password
   default-destination: configuration.changed
   labels-destination: labels.changed
+  ldap-destination: ldap.changed
   timeout: 10 #seconds
 arkcase.languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
