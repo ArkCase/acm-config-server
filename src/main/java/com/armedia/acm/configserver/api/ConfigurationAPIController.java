@@ -73,6 +73,9 @@ public class ConfigurationAPIController
             {
                 applicationName = "labels/" + applicationName;
             }
+            else if(applicationName.equals("ldap")){
+                applicationName = "ldap/" + applicationName;
+            }
             configServerService.updateProperties(properties, applicationName);
             logger.debug("Properties successfully updated");
             return ResponseEntity.ok().build();
