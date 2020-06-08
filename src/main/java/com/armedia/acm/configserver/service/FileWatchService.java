@@ -27,10 +27,11 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import com.armedia.acm.configserver.jms.ConfigurationChangeMessageProducer;
+import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.bus.endpoint.RefreshBusEndpoint;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -49,27 +50,18 @@ public class FileWatchService
 {
     private final String propertiesFolderPath;
 
-    private final String labelsDestination;
+    private final RefreshBusEndpoint refreshBusEndpoint;
 
-    private final String ldapDestination;
-
-    private final String configurationChangedDestination;
-
-    private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
+    private final ConfigurationChangeProducer configurationChangeProducer;
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
-                            @Value("${acm.activemq.labels-destination}") String labelsDestination,
-                            @Value("${acm.activemq.ldap-destination}") String ldapDestination,
-                            @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
-                            ConfigurationChangeMessageProducer configurationChangeMessageProducer)
+            RefreshBusEndpoint refreshBusEndpoint, ConfigurationChangeProducer configurationChangeProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
-        this.labelsDestination = labelsDestination;
-        this.ldapDestination = ldapDestination;
-        this.configurationChangedDestination = configurationChangedDestination;
-        this.configurationChangeMessageProducer = configurationChangeMessageProducer;
+        this.refreshBusEndpoint = refreshBusEndpoint;
+        this.configurationChangeProducer = configurationChangeProducer;
         logger.debug("Initializing FileWatchService");
     }
 
@@ -104,18 +96,22 @@ public class FileWatchService
                             logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
                             String parentDirectory = key.watchable().toString();
 
+                            // Send message to ArkCase to update its configuration
                             if(parentDirectory.contains("ldap"))
                             {
-                                configurationChangeMessageProducer.sendMessage(ldapDestination);
+                                configurationChangeProducer.sendLdapChangedMessage();
                             }
                             else if (parentDirectory.contains("labels"))
                             {
-                                configurationChangeMessageProducer.sendMessage(labelsDestination);
+                                configurationChangeProducer.sendLabelsChangedMessage();
                             }
                             else
                             {
-                                configurationChangeMessageProducer.sendMessage(configurationChangedDestination);
+                                configurationChangeProducer.sendConfigurationChangedMessage();
                             }
+
+                            // Send message to all subscribed nodes (mServices) in spring cloud bus to update their configuration
+                            refreshBusEndpoint.busRefresh();
                         }
                         key.reset();
                         logger.debug("Reset watch key...");
