@@ -46,4 +46,14 @@ public class KafkaTopicsConfiguration
                 .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
                 .build();
     }
+
+    @Bean
+    public NewTopic configurationFileCreatedTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getConfigurationFileCreatedTopic())
+                .partitions(kafkaTopicsProperties.getConfigurationFileCreatedTopicPartitions())
+                .replicas(kafkaTopicsProperties.getConfigurationFileCreatedTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
 }

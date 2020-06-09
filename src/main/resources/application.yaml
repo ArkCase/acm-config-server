@@ -38,6 +38,9 @@ arkcase:
     ldap-changed-topic: ldap_changed_topic
     ldap-changed-topic-replicas: 1
     ldap-changed-topic-partitions: 1
+    configuration-file-created-topic: configuration_file_created_topic
+    configuration-file-created-topic-replicas: 1
+    configuration-file-created-topic-partitions: 1
     retention-ms: "86400000"
 management:
   endpoints:

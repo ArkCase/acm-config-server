@@ -16,6 +16,9 @@ public class KafkaTopicsProperties
     private String ldapChangedTopic;
     private int ldapChangedTopicReplicas;
     private int ldapChangedTopicPartitions;
+    private String configurationFileCreatedTopic;
+    private int configurationFileCreatedTopicReplicas;
+    private int configurationFileCreatedTopicPartitions;
     private String retentionMs;
 
     public String getConfigurationChangedTopic()
@@ -106,6 +109,36 @@ public class KafkaTopicsProperties
     public void setLdapChangedTopicPartitions(int ldapChangedTopicPartitions)
     {
         this.ldapChangedTopicPartitions = ldapChangedTopicPartitions;
+    }
+
+    public String getConfigurationFileCreatedTopic()
+    {
+        return configurationFileCreatedTopic;
+    }
+
+    public void setConfigurationFileCreatedTopic(String configurationFileCreatedTopic)
+    {
+        this.configurationFileCreatedTopic = configurationFileCreatedTopic;
+    }
+
+    public int getConfigurationFileCreatedTopicReplicas()
+    {
+        return configurationFileCreatedTopicReplicas;
+    }
+
+    public void setConfigurationFileCreatedTopicReplicas(int configurationFileCreatedTopicReplicas)
+    {
+        this.configurationFileCreatedTopicReplicas = configurationFileCreatedTopicReplicas;
+    }
+
+    public int getConfigurationFileCreatedTopicPartitions()
+    {
+        return configurationFileCreatedTopicPartitions;
+    }
+
+    public void setConfigurationFileCreatedTopicPartitions(int configurationFileCreatedTopicPartitions)
+    {
+        this.configurationFileCreatedTopicPartitions = configurationFileCreatedTopicPartitions;
     }
 
     public String getRetentionMs()
