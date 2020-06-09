@@ -27,6 +27,7 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
+import com.armedia.acm.configserver.config.KafkaTopicsProperties;
 import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.time.LocalDateTime;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class FileWatchService
@@ -54,14 +58,27 @@ public class FileWatchService
 
     private final ConfigurationChangeProducer configurationChangeProducer;
 
+    private final KafkaTopicsProperties kafkaTopicsProperties;
+
+    private final ScheduledExecutorService executorService;
+
+    private LocalDateTime lastSendTime;
+
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
-            RefreshBusEndpoint refreshBusEndpoint, ConfigurationChangeProducer configurationChangeProducer)
+            RefreshBusEndpoint refreshBusEndpoint,
+            ConfigurationChangeProducer configurationChangeProducer,
+            KafkaTopicsProperties kafkaTopicsProperties, ScheduledExecutorService executorService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.refreshBusEndpoint = refreshBusEndpoint;
         this.configurationChangeProducer = configurationChangeProducer;
+        this.kafkaTopicsProperties = kafkaTopicsProperties;
+        this.executorService = executorService;
+
+        lastSendTime = LocalDateTime.MIN;
+
         logger.debug("Initializing FileWatchService");
     }
 
@@ -95,23 +112,7 @@ public class FileWatchService
                             File modifiedFile = filePath.toFile();
                             logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
                             String parentDirectory = key.watchable().toString();
-
-                            // Send message to ArkCase to update its configuration
-                            if(parentDirectory.contains("ldap"))
-                            {
-                                configurationChangeProducer.sendLdapChangedMessage();
-                            }
-                            else if (parentDirectory.contains("labels"))
-                            {
-                                configurationChangeProducer.sendLabelsChangedMessage();
-                            }
-                            else
-                            {
-                                configurationChangeProducer.sendConfigurationChangedMessage();
-                            }
-
-                            // Send message to all subscribed nodes (mServices) in spring cloud bus to update their configuration
-                            refreshBusEndpoint.busRefresh();
+                            refreshConfiguration(parentDirectory);
                         }
                         key.reset();
                         logger.debug("Reset watch key...");
@@ -127,6 +128,34 @@ public class FileWatchService
         catch (IOException e)
         {
             logger.error("Error trying to find folder path [{}]. {}", propertiesFolderPath, e.getMessage());
+        }
+    }
+
+    private void refreshConfiguration(String parentDirectory) {
+        LocalDateTime now = LocalDateTime.now();
+        logger.debug("Last configuration change topic message send in [{}]", lastSendTime);
+        if (now.isAfter(lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow())))
+        {
+            lastSendTime = now;
+            logger.debug("Schedule configuration changed message in [{}] seconds", lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow()));
+            executorService.schedule(() -> {
+                // Send message to ArkCase to update its configuration
+                if(parentDirectory.contains("ldap"))
+                {
+                    configurationChangeProducer.sendLdapChangedMessage();
+                }
+                else if (parentDirectory.contains("labels"))
+                {
+                    configurationChangeProducer.sendLabelsChangedMessage();
+                }
+                else
+                {
+                    configurationChangeProducer.sendConfigurationChangedMessage();
+                }
+
+                // Send message to all subscribed nodes (mServices) in spring cloud bus to update their configuration
+                refreshBusEndpoint.busRefresh();
+            }, kafkaTopicsProperties.getMessageBufferWindow(), TimeUnit.SECONDS);
         }
     }
 }

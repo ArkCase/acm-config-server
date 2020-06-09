@@ -42,7 +42,7 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
-    public void configurationFileCreatedMessage(String message)
+    public void sendConfigurationFileCreatedMessage(String message)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate.send(kafkaTopicsProperties.getConfigurationFileCreatedTopic(), message);
         future.addCallback(callback);

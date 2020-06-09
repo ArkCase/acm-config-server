@@ -97,7 +97,7 @@ public class FileConfigurationService {
 
     public void sendNotification(String message)
     {
-        configurationChangeProducer.configurationFileCreatedMessage(message);
+        configurationChangeProducer.sendConfigurationFileCreatedMessage(message);
 
         logger.debug("File with name {} is updated and success message is sent for updating", message);
 

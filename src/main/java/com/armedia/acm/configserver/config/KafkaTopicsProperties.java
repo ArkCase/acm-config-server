@@ -20,6 +20,7 @@ public class KafkaTopicsProperties
     private int configurationFileCreatedTopicReplicas;
     private int configurationFileCreatedTopicPartitions;
     private String retentionMs;
+    private int messageBufferWindow;
 
     public String getConfigurationChangedTopic()
     {
@@ -149,5 +150,15 @@ public class KafkaTopicsProperties
     public void setRetentionMs(String retentionMs)
     {
         this.retentionMs = retentionMs;
+    }
+
+    public int getMessageBufferWindow()
+    {
+        return messageBufferWindow;
+    }
+
+    public void setMessageBufferWindow(int messageBufferWindow)
+    {
+        this.messageBufferWindow = messageBufferWindow;
     }
 }

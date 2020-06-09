@@ -28,6 +28,7 @@ logging:
 arkcase.languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
 arkcase:
   kafka:
+    messageBufferWindow: 1
     bootstrapAddress: http://10.50.10.105:9092
     configuration-changed-topic: configuration_changed_topic
     configuration-changed-topic-replicas: 1
