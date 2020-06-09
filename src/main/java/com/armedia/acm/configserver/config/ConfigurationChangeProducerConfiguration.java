@@ -19,7 +19,8 @@ public class ConfigurationChangeProducerConfiguration
     private String bootstrapAddress;
 
     @Bean
-    public ProducerFactory<String, String> configurationChangeProducerFactory() {
+    public ProducerFactory<String, String> configurationChangeProducerFactory()
+    {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -34,7 +35,8 @@ public class ConfigurationChangeProducerConfiguration
     }
 
     @Bean
-    public KafkaTemplate<String, String> configurationChangeKafkaTemplate() {
+    public KafkaTemplate<String, String> configurationChangeKafkaTemplate()
+    {
         return new KafkaTemplate<>(configurationChangeProducerFactory());
     }
 }

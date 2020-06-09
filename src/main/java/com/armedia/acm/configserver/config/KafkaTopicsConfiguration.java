@@ -16,7 +16,6 @@ public class KafkaTopicsConfiguration
         this.kafkaTopicsProperties = kafkaTopicsProperties;
     }
 
-
     @Bean
     public NewTopic configurationChangedTopic()
     {

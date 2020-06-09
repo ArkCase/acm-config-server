@@ -1,6 +1,7 @@
 package com.armedia.acm.configserver.kafka;
 
 import com.armedia.acm.configserver.config.KafkaTopicsProperties;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -26,25 +27,29 @@ public class ConfigurationChangeProducer
 
     public void sendConfigurationChangedMessage()
     {
-        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate.send(kafkaTopicsProperties.getConfigurationChangedTopic(), "Configuration changed");
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getConfigurationChangedTopic(), "Configuration changed");
         future.addCallback(callback);
     }
 
     public void sendLabelsChangedMessage()
     {
-        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate.send(kafkaTopicsProperties.getLabelsChangedTopic(), "Labels changed");
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getLabelsChangedTopic(), "Labels changed");
         future.addCallback(callback);
     }
 
     public void sendLdapChangedMessage()
     {
-        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate.send(kafkaTopicsProperties.getLdapChangedTopic(), "Ldap changed");
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getLdapChangedTopic(), "Ldap changed");
         future.addCallback(callback);
     }
 
     public void sendConfigurationFileCreatedMessage(String message)
     {
-        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate.send(kafkaTopicsProperties.getConfigurationFileCreatedTopic(), message);
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getConfigurationFileCreatedTopic(), message);
         future.addCallback(callback);
     }
 
