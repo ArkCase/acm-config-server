@@ -1,8 +1,13 @@
 server.port: 9999
 spring:
   profiles.active: native
-  cloud.config.server:
-    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap
+  cloud:
+    config.server:
+      native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap
+    bus:
+      enabled: true
+  kafka:
+    bootstrap-servers: http://10.50.10.105:9092
   jms:
     pub-sub-domain: true
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
@@ -14,21 +19,32 @@ properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
 logging:
   file.max-history: 10
   file.max-size: 10MB
-  file: logs/acmConfigServer.log
+  file.name: logs/acmConfigServer.log
   level:
     com.armedia.acm.configserver: debug
     org.springframework.cloud.config: debug
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
-jms.message.buffer.window: 1
-acm.activemq:
-  broker-url: ssl://acm-arkcase:61616
-  keystore: ${user.home}/.arkcase/acm/private/arkcase.ks
-  keystore-password: AcMd3v$
-  truststore: ${user.home}/.arkcase/acm/private/arkcase.ts
-  truststore-password: password
-  default-destination: configuration.changed
-  labels-destination: labels.changed
-  ldap-destination: ldap.changed
-  timeout: 10 #seconds
 arkcase.languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
+arkcase:
+  kafka:
+    messageBufferWindow: 1
+    bootstrapAddress: http://10.50.10.105:9092
+    configuration-changed-topic: configuration_changed_topic
+    configuration-changed-topic-replicas: 1
+    configuration-changed-topic-partitions: 1
+    labels-changed-topic: labels_changed_topic
+    labels-changed-topic-replicas: 1
+    labels-changed-topic-partitions: 1
+    ldap-changed-topic: ldap_changed_topic
+    ldap-changed-topic-replicas: 1
+    ldap-changed-topic-partitions: 1
+    configuration-file-created-topic: configuration_file_created_topic
+    configuration-file-created-topic-replicas: 1
+    configuration-file-created-topic-partitions: 1
+    retention-ms: "86400000"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
