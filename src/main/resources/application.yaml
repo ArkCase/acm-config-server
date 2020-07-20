@@ -7,7 +7,7 @@ spring:
     bus:
       enabled: true
   kafka:
-    bootstrap-servers: http://10.50.10.105:9092
+    bootstrap-servers: acm-arkcase:9092
   jms:
     pub-sub-domain: true
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
@@ -29,7 +29,7 @@ arkcase.languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
 arkcase:
   kafka:
     messageBufferWindow: 1
-    bootstrapAddress: http://10.50.10.105:9092
+    bootstrapAddress: acm-arkcase:9092
     configuration-changed-topic: configuration_changed_topic
     configuration-changed-topic-replicas: 1
     configuration-changed-topic-partitions: 1
