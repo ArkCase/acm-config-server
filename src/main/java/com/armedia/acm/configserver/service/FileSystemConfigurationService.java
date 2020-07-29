@@ -59,11 +59,17 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private final String propertiesFolderPath;
 
+    private final String brandingFilesFolder;
+
+    private FileConfigurationService fileConfigurationService;
+
     private static final String RUNTIME = "-runtime";
 
-    public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath)
+    public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath, @Value("${branding.files.folder.path}") String brandingFilesFolder, FileConfigurationService fileConfigurationService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
+        this.brandingFilesFolder = brandingFilesFolder;
+        this.fileConfigurationService = fileConfigurationService;
     }
 
     @Override
@@ -159,6 +165,28 @@ public class FileSystemConfigurationService implements ConfigurationService
         {
             throw new ConfigurationException(String.format("File %s could not be deleted", fileName));
         }
+    }
+
+    @Override
+    public void resetConfigurationBrandingFilesToDefault() throws ConfigurationException {
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(brandingFilesFolder);
+
+        for(File file : fileList)
+        {
+            if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            {
+                logger.info("Getting fresh copy file [{}]", file.getName());
+                String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
+                fileConfigurationService.sendNotification(originalFileName,FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+
+                if(!file.delete())
+                {
+                    throw new ConfigurationException(String.format("File %s could not be fetched", file.getName()));
+                }
+            }
+        }
+
+
     }
 
     @Override
