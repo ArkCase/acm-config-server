@@ -175,11 +175,13 @@ public class FileSystemConfigurationService implements ConfigurationService
         {
             if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
             {
-                logger.info("Getting fresh copy file [{}]", file.getName());
-                String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
-                fileConfigurationService.sendNotification(originalFileName,FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+                if(file.delete()){
+                    logger.info("Getting fresh copy file [{}]", file.getName());
+                    String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
+                    fileConfigurationService.sendNotification(originalFileName,FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
 
-                if(!file.delete())
+                }
+                else
                 {
                     throw new ConfigurationException(String.format("File %s could not be fetched", file.getName()));
                 }
