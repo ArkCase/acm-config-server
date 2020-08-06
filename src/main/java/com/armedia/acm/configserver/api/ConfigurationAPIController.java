@@ -75,6 +75,8 @@ public class ConfigurationAPIController
             }
             else if(applicationName.equals("ldap")){
                 applicationName = "ldap/" + applicationName;
+            } else if (applicationName.equals("lookups")){
+                applicationName = "lookups/" + applicationName;
             }
             configServerService.updateProperties(properties, applicationName);
             logger.debug("Properties successfully updated");
