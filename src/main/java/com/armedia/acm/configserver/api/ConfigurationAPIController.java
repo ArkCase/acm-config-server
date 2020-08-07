@@ -29,6 +29,7 @@ package com.armedia.acm.configserver.api;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.service.ConfigurationService;
+import com.armedia.acm.configserver.service.FileConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,11 +57,13 @@ public class ConfigurationAPIController
     private final List<String> langs;
 
     private final ConfigurationService configServerService;
+    private final FileConfigurationService fileConfigurationService;
 
-    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService, @Value("${arkcase.languages}") String arkcaseLanguages)
+    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService, @Value("${arkcase.languages}") String arkcaseLanguages, FileConfigurationService fileConfigurationService)
     {
         this.configServerService = configServerService;
         this.langs = Arrays.asList(arkcaseLanguages.split(","));
+        this.fileConfigurationService = fileConfigurationService;
     }
 
     @PostMapping("/{applicationName}")
@@ -115,6 +118,7 @@ public class ConfigurationAPIController
         logger.info("Resetting all properties");
         try
         {
+            configServerService.resetConfigurationBrandingFilesToDefault();
             configServerService.resetPropertiesToDefault();
             return ResponseEntity.ok().build();
         }
@@ -137,6 +141,7 @@ public class ConfigurationAPIController
         try
         {
             configServerService.resetFilePropertiesToDefault(applicationName);
+
             return ResponseEntity.ok().build();
         }
         catch (NoSuchFileException e)
