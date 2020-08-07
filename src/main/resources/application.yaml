@@ -11,6 +11,7 @@ spring:
 #spring.security.user.password: root
 #management.endpoints.web.exposure.include: *
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
+branding.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/branding
 logging:
   file.max-history: 10
   file.max-size: 10MB
