@@ -61,6 +61,8 @@ public class FileWatchService
 
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
 
+    private final FileConfigurationService fileConfigurationService;
+
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
@@ -100,7 +102,6 @@ public class FileWatchService
 
             Path lookupsPath = Paths.get(propertiesFolderPath + "/lookups");
             lookupsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
 
             Path rulesPath = Paths.get(propertiesFolderPath + "/rules");
             rulesPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
