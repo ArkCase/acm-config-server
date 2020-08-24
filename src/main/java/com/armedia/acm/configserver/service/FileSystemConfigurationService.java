@@ -271,6 +271,8 @@ public class FileSystemConfigurationService implements ConfigurationService
     private DumperOptions buildDumperOptions()
     {
         DumperOptions options = new DumperOptions();
+        options.setSplitLines(false);
+        options.setMaxSimpleKeyLength(1024);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
         return options;
