@@ -68,9 +68,9 @@ public class FileConfigurationService {
 
             String originalFileName = getOriginalFileNameFromFilePath(fileName);
 
-            String profileBasedfile = setProfileBasedResource(fileName);
+            String profileBasedFile = setProfileBasedResource(fileName);
 
-            File logoFile = new File(configServerRepo + "/" + profileBasedfile);
+            File logoFile = new File(configServerRepo + "/" + profileBasedFile);
 
             FileUtils.copyInputStreamToFile(logoStream, logoFile);
 
@@ -106,10 +106,7 @@ public class FileConfigurationService {
         ActiveMQTopic topic = new ActiveMQTopic(destination);
 
         acmJmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
-        acmJmsTemplate.send(topic, inJmsSession -> {
-            TextMessage theTextMessage = inJmsSession.createTextMessage(message);
-            return theTextMessage;
-        });
+        acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
 
         logger.debug("File with name {} is updated and success message is sent for updating", message);
 
