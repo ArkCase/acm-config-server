@@ -59,15 +59,23 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private final String propertiesFolderPath;
 
+    private final String brandingFilesFolder;
+
+    private FileConfigurationService fileConfigurationService;
+
     private static final String RUNTIME = "-runtime";
 
-    public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath)
+    public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
+            @Value("${branding.files.folder.path}") String brandingFilesFolder, FileConfigurationService fileConfigurationService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
+        this.brandingFilesFolder = brandingFilesFolder;
+        this.fileConfigurationService = fileConfigurationService;
     }
 
     @Override
-    public synchronized void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException {
+    public synchronized void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException
+    {
         String configurationFilePath = getRuntimeConfigurationFilePath(applicationName);
 
         FileSystemResource yamlResource = loadYamlSystemResource(configurationFilePath);
@@ -75,46 +83,21 @@ public class FileSystemConfigurationService implements ConfigurationService
         DumperOptions options = buildDumperOptions();
 
         Yaml yaml = new Yaml(options);
-        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8)) {
+        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8))
+        {
             Map<String, Object> configMap = yaml.load(configStreamReader);
-            if (configMap == null) {
+            if (configMap == null)
+            {
                 configMap = new LinkedHashMap<>();
             }
 
-            for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            for (Map.Entry<String, Object> entry : properties.entrySet())
+            {
                 configMap.put(entry.getKey(), entry.getValue());
             }
 
-            try (FileWriter fw = new FileWriter(yamlResource.getFile())) {
-                yaml.dump(configMap, fw);
-            }
-        } catch (IOException e) {
-            logger.warn("Failed to read configuration from path [{}]", configurationFilePath);
-            throw new ConfigurationException("Failed to read configuration.", e);
-        }
-    }
-
-    @Override
-    public synchronized void removeProperties(List<String> properties, String applicationName) throws ConfigurationException {
-        String configurationFilePath = getRuntimeConfigurationFilePath(applicationName);
-
-        FileSystemResource yamlResource = loadYamlSystemResource(configurationFilePath);
-
-        DumperOptions options = buildDumperOptions();
-
-        Yaml yaml = new Yaml(options);
-
-        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8)){
-            Map<String, Object> configMap = yaml.load(configStreamReader);
-            if (configMap == null) {
-                configMap = new LinkedHashMap<>();
-            }
-
-            for (String property : properties) {
-                configMap.remove(property);
-            }
-
-            try (FileWriter fw = new FileWriter(yamlResource.getFile())) {
+            try (FileWriter fw = new FileWriter(yamlResource.getFile()))
+            {
                 yaml.dump(configMap, fw);
             }
         }
@@ -125,17 +108,54 @@ public class FileSystemConfigurationService implements ConfigurationService
         }
     }
 
+    @Override
+    public synchronized void removeProperties(List<String> properties, String applicationName) throws ConfigurationException
+    {
+        String configurationFilePath = getRuntimeConfigurationFilePath(applicationName);
+
+        FileSystemResource yamlResource = loadYamlSystemResource(configurationFilePath);
+
+        DumperOptions options = buildDumperOptions();
+
+        Yaml yaml = new Yaml(options);
+
+        try (InputStreamReader configStreamReader = new InputStreamReader(yamlResource.getInputStream(), StandardCharsets.UTF_8))
+        {
+            Map<String, Object> configMap = yaml.load(configStreamReader);
+            if (configMap == null)
+            {
+                configMap = new LinkedHashMap<>();
+            }
+
+            for (String property : properties)
+            {
+                configMap.remove(property);
+            }
+
+            try (FileWriter fw = new FileWriter(yamlResource.getFile()))
+            {
+                yaml.dump(configMap, fw);
+            }
+        }
+        catch (IOException e)
+        {
+            logger.warn("Failed to read configuration from path [{}]", configurationFilePath);
+            throw new ConfigurationException("Failed to read configuration.", e);
+        }
+    }
 
     /**
      * Reset properties for file with name 'applicationName'
      *
-     * @param applicationName - ex. 'cases-en', without the file extension (.yaml)
+     * @param applicationName
+     *            - ex. 'cases-en', without the file extension (.yaml)
      * @throws ConfigurationException
      */
     @Override
-    public void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException, NoSuchFileException {
+    public void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException, NoSuchFileException
+    {
         String resetFilePath;
-        if(!applicationName.contains(FileSystemConfigurationService.RUNTIME))
+        if (!applicationName.contains(FileSystemConfigurationService.RUNTIME))
         {
             resetFilePath = String.format("%s/%s%s.yaml", propertiesFolderPath, applicationName, RUNTIME);
         }
@@ -150,27 +170,52 @@ public class FileSystemConfigurationService implements ConfigurationService
         logger.info("Deleting file [{}]", fileName);
 
         File fileToBeDeleted = new File(resetFilePath);
-        if(!fileToBeDeleted.exists())
+        if (!fileToBeDeleted.exists())
         {
             logger.warn("File [{}] does not exists, nothing to delete.", fileName);
             throw new NoSuchFileException(String.format("File %s does not exists, nothing to delete.", fileName));
         }
-        else if(!fileToBeDeleted.delete())
+        else if (!fileToBeDeleted.delete())
         {
             throw new ConfigurationException(String.format("File %s could not be deleted", fileName));
         }
     }
 
     @Override
+    public void resetConfigurationBrandingFilesToDefault() throws ConfigurationException
+    {
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(brandingFilesFolder);
+
+        for (File file : fileList)
+        {
+            if (file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            {
+                if (file.delete())
+                {
+                    logger.info("Reset file [{}] to default version.", file.getName());
+                    String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
+                    fileConfigurationService.sendNotification(originalFileName, FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+
+                }
+                else
+                {
+                    throw new ConfigurationException(String.format("File %s could not be fetched", file.getName()));
+                }
+            }
+        }
+
+    }
+
+    @Override
     public void resetPropertiesToDefault() throws ConfigurationException
     {
         List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(propertiesFolderPath);
-        for(File file : fileList)
+        for (File file : fileList)
         {
-            if(file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            if (file.getName().contains(FileSystemConfigurationService.RUNTIME))
             {
                 logger.info("Deleting file [{}]", file.getName());
-                if(!file.delete())
+                if (!file.delete())
                 {
                     throw new ConfigurationException(String.format("File %s could not be deleted", file.getName()));
                 }
@@ -178,25 +223,31 @@ public class FileSystemConfigurationService implements ConfigurationService
         }
     }
 
-    private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName) {
+    private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName)
+    {
         File directory = new File(directoryName);
 
         List<File> resultList = new ArrayList<>();
 
         File[] fList = directory.listFiles();
-        for (File file : fList) {
-            if (file.isFile() && file.getName().contains(FileSystemConfigurationService.RUNTIME)) {
+        for (File file : fList)
+        {
+            if (file.isFile() && file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            {
                 resultList.add(file);
-            } else if (file.isDirectory()) {
+            }
+            else if (file.isDirectory())
+            {
                 resultList.addAll(listAllRuntimeFilesInFolderAndSubfolders(file.getAbsolutePath()));
             }
         }
         return resultList;
     }
 
-    private FileSystemResource loadYamlSystemResource(String configurationFilePath) throws ConfigurationException {
+    private FileSystemResource loadYamlSystemResource(String configurationFilePath) throws ConfigurationException
+    {
         FileSystemResource yamlResource = new FileSystemResource(configurationFilePath);
-        if(!yamlResource.getFile().exists())
+        if (!yamlResource.getFile().exists())
         {
             File file = new File(yamlResource.getPath());
             try
@@ -212,12 +263,16 @@ public class FileSystemConfigurationService implements ConfigurationService
         return yamlResource;
     }
 
-    private String getRuntimeConfigurationFilePath(String applicationName) {
+    private String getRuntimeConfigurationFilePath(String applicationName)
+    {
         return String.format("%s/%s%s.yaml", propertiesFolderPath, applicationName, RUNTIME);
     }
 
-    private DumperOptions buildDumperOptions() {
+    private DumperOptions buildDumperOptions()
+    {
         DumperOptions options = new DumperOptions();
+        options.setSplitLines(false);
+        options.setMaxSimpleKeyLength(1024);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
         return options;

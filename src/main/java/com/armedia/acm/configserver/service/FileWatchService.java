@@ -53,23 +53,35 @@ public class FileWatchService
 
     private final String ldapDestination;
 
+    private final String lookupsDestination;
+
+    private final String rulesDestination;
+
     private final String configurationChangedDestination;
 
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
+
+    private final FileConfigurationService fileConfigurationService;
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
                             @Value("${acm.activemq.labels-destination}") String labelsDestination,
                             @Value("${acm.activemq.ldap-destination}") String ldapDestination,
+                            @Value("${acm.activemq.lookups-destination}") String lookupsDestination,
+                            @Value("${acm.activemq.rules-destination}") String rulesDestination,
                             @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
-                            ConfigurationChangeMessageProducer configurationChangeMessageProducer)
+                            ConfigurationChangeMessageProducer configurationChangeMessageProducer,
+                            FileConfigurationService fileConfigurationService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.labelsDestination = labelsDestination;
         this.ldapDestination = ldapDestination;
+        this.lookupsDestination = lookupsDestination;
+        this.rulesDestination = rulesDestination;
         this.configurationChangedDestination = configurationChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
+        this.fileConfigurationService = fileConfigurationService;
         logger.debug("Initializing FileWatchService");
     }
 
@@ -87,6 +99,12 @@ public class FileWatchService
 
             Path ldapPath = Paths.get(propertiesFolderPath + "/ldap");
             ldapPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
+            Path lookupsPath = Paths.get(propertiesFolderPath + "/lookups");
+            lookupsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
+            Path rulesPath = Paths.get(propertiesFolderPath + "/rules");
+            rulesPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
             WatchKey key;
             while (true)
@@ -111,6 +129,14 @@ public class FileWatchService
                             else if (parentDirectory.contains("labels"))
                             {
                                 configurationChangeMessageProducer.sendMessage(labelsDestination);
+                            }
+                            else if (parentDirectory.contains("rules"))
+                            {
+                                fileConfigurationService.sendNotification(filePath.toString(), rulesDestination);
+                            }
+                            else if (parentDirectory.contains("lookups"))
+                            {
+                                configurationChangeMessageProducer.sendMessage(lookupsDestination);
                             }
                             else
                             {

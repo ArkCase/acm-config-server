@@ -51,4 +51,6 @@ public interface ConfigurationService
     void resetPropertiesToDefault() throws ConfigurationException;
 
     void resetFilePropertiesToDefault(String applicationName) throws NoSuchFileException, ConfigurationException;
+
+    void resetConfigurationBrandingFilesToDefault() throws ConfigurationException;
 }
