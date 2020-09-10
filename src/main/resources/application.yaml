@@ -16,6 +16,7 @@ spring:
 #spring.security.user.password: root
 #management.endpoints.web.exposure.include: *
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
+branding.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/branding
 logging:
   file.max-history: 10
   file.max-size: 10MB
@@ -39,6 +40,12 @@ arkcase:
     ldap-changed-topic: ldap_changed_topic
     ldap-changed-topic-replicas: 1
     ldap-changed-topic-partitions: 1
+    lookups-changed-topic: lookups_changed_topic
+    lookups-changed-topic-replicas: 1
+    lookups-changed-topic-partitions: 1
+    rules-changed-topic: rules_changed_topic
+    rules-changed-topic-replicas: 1
+    rules-changed-topic-partitions: 1
     configuration-file-created-topic: configuration_file_created_topic
     configuration-file-created-topic-replicas: 1
     configuration-file-created-topic-partitions: 1

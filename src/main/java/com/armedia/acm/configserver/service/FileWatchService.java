@@ -97,6 +97,12 @@ public class FileWatchService
             Path ldapPath = Paths.get(propertiesFolderPath + "/ldap");
             ldapPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
+            Path lookupsPath = Paths.get(propertiesFolderPath + "/lookups");
+            lookupsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
+            Path rulesPath = Paths.get(propertiesFolderPath + "/rules");
+            rulesPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
             WatchKey key;
             while (true)
             {
@@ -147,6 +153,14 @@ public class FileWatchService
                 else if (parentDirectory.contains("labels"))
                 {
                     configurationChangeProducer.sendLabelsChangedMessage();
+                }
+                else if (parentDirectory.contains("rules"))
+                {
+                    configurationChangeProducer.sendRulesChangedMessage();
+                }
+                else if (parentDirectory.contains("lookups"))
+                {
+                    configurationChangeProducer.sendLookupsChangedMessage();
                 }
                 else
                 {

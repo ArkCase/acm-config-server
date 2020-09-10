@@ -29,6 +29,7 @@ package com.armedia.acm.configserver.api;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.service.ConfigurationService;
+import com.armedia.acm.configserver.service.FileConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -75,6 +76,8 @@ public class ConfigurationAPIController
             }
             else if(applicationName.equals("ldap")){
                 applicationName = "ldap/" + applicationName;
+            } else if (applicationName.equals("lookups")){
+                applicationName = "lookups/" + applicationName;
             }
             configServerService.updateProperties(properties, applicationName);
             logger.debug("Properties successfully updated");
@@ -113,6 +116,7 @@ public class ConfigurationAPIController
         logger.info("Resetting all properties");
         try
         {
+            configServerService.resetConfigurationBrandingFilesToDefault();
             configServerService.resetPropertiesToDefault();
             return ResponseEntity.ok().build();
         }
@@ -135,6 +139,7 @@ public class ConfigurationAPIController
         try
         {
             configServerService.resetFilePropertiesToDefault(applicationName);
+
             return ResponseEntity.ok().build();
         }
         catch (NoSuchFileException e)

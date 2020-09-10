@@ -74,6 +74,26 @@ public class KafkaTopicsConfiguration
     }
 
     @Bean
+    public NewTopic lookupsChangedTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getLookupsChangedTopic())
+                .partitions(kafkaTopicsProperties.getLookupsChangedTopicPartitions())
+                .replicas(kafkaTopicsProperties.getLookupsChangedTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
+
+    @Bean
+    public NewTopic rulesChangedTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getRulesChangedTopic())
+                .partitions(kafkaTopicsProperties.getRulesChangedTopicPartitions())
+                .replicas(kafkaTopicsProperties.getRulesChangedTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
+
+    @Bean
     public NewTopic configurationFileCreatedTopic()
     {
         return TopicBuilder.name(kafkaTopicsProperties.getConfigurationFileCreatedTopic())

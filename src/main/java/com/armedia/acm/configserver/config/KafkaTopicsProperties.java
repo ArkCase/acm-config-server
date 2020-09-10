@@ -43,6 +43,12 @@ public class KafkaTopicsProperties
     private String ldapChangedTopic;
     private int ldapChangedTopicReplicas;
     private int ldapChangedTopicPartitions;
+    private String lookupsChangedTopic;
+    private int lookupsChangedTopicReplicas;
+    private int lookupsChangedTopicPartitions;
+    private String rulesChangedTopic;
+    private int rulesChangedTopicReplicas;
+    private int rulesChangedTopicPartitions;
     private String configurationFileCreatedTopic;
     private int configurationFileCreatedTopicReplicas;
     private int configurationFileCreatedTopicPartitions;
@@ -119,6 +125,54 @@ public class KafkaTopicsProperties
         this.ldapChangedTopic = ldapChangedTopic;
     }
 
+    public String getLookupsChangedTopic() {
+        return lookupsChangedTopic;
+    }
+
+    public void setLookupsChangedTopic(String lookupsChangedTopic) {
+        this.lookupsChangedTopic = lookupsChangedTopic;
+    }
+
+    public int getLookupsChangedTopicReplicas() {
+        return lookupsChangedTopicReplicas;
+    }
+
+    public void setLookupsChangedTopicReplicas(int lookupsChangedTopicReplicas) {
+        this.lookupsChangedTopicReplicas = lookupsChangedTopicReplicas;
+    }
+
+    public int getLookupsChangedTopicPartitions() {
+        return lookupsChangedTopicPartitions;
+    }
+
+    public void setLookupsChangedTopicPartitions(int lookupsChangedTopicPartitions) {
+        this.lookupsChangedTopicPartitions = lookupsChangedTopicPartitions;
+    }
+
+    public String getRulesChangedTopic() {
+        return rulesChangedTopic;
+    }
+
+    public void setRulesChangedTopic(String rulesChangedTopic) {
+        this.rulesChangedTopic = rulesChangedTopic;
+    }
+
+    public int getRulesChangedTopicReplicas() {
+        return rulesChangedTopicReplicas;
+    }
+
+    public void setRulesChangedTopicReplicas(int rulesChangedTopicReplicas) {
+        this.rulesChangedTopicReplicas = rulesChangedTopicReplicas;
+    }
+
+    public int getRulesChangedTopicPartitions() {
+        return rulesChangedTopicPartitions;
+    }
+
+    public void setRulesChangedTopicPartitions(int rulesChangedTopicPartitions) {
+        this.rulesChangedTopicPartitions = rulesChangedTopicPartitions;
+    }
+
     public int getLdapChangedTopicReplicas()
     {
         return ldapChangedTopicReplicas;
@@ -188,4 +242,8 @@ public class KafkaTopicsProperties
     {
         this.messageBufferWindow = messageBufferWindow;
     }
+
+
+
+
 }
