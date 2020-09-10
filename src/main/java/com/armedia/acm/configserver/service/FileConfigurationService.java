@@ -63,9 +63,9 @@ public class FileConfigurationService {
 
             String originalFileName = getOriginalFileNameFromFilePath(fileName);
 
-            String profileBasedfile = setProfileBasedResource(fileName);
+            String profileBasedFile = setProfileBasedResource(fileName);
 
-            File logoFile = new File(configServerRepo + "/" + profileBasedfile);
+            File logoFile = new File(configServerRepo + "/" + profileBasedFile);
 
             FileUtils.copyInputStreamToFile(logoStream, logoFile);
 
