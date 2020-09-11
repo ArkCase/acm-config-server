@@ -2,7 +2,7 @@ package com.armedia.acm.configserver;
 
 /*-
  * #%L
- * acm-config-server
+ * acm-config-server test
  * %%
  * Copyright (C) 2019 ArkCase LLC
  * %%
