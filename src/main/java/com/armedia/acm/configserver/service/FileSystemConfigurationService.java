@@ -28,6 +28,11 @@ package com.armedia.acm.configserver.service;
  */
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
+import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,15 +42,15 @@ import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.PostConstruct;
+
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,22 +60,31 @@ import java.util.Map;
 @Qualifier(value = "fileSystemConfigurationService")
 public class FileSystemConfigurationService implements ConfigurationService
 {
+    public static final String FORM_DIRECTORY = "form";
     private static final Logger logger = LoggerFactory.getLogger(FileSystemConfigurationService.class);
-
-    private final String propertiesFolderPath;
-
-    private final String brandingFilesFolder;
-
-    private FileConfigurationService fileConfigurationService;
-
     private static final String RUNTIME = "-runtime";
+    private final String propertiesFolderPath;
+    private final String brandingFilesFolder;
+    private final String schemaFilesFolder;
+    private FileConfigurationService fileConfigurationService;
+    private ConfigurationChangeProducer configurationChangeProducer;
 
     public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
-            @Value("${branding.files.folder.path}") String brandingFilesFolder, FileConfigurationService fileConfigurationService)
+            @Value("${branding.files.folder.path}") String brandingFilesFolder,
+            @Value("${schema.files.folder.path}") String schemaFilesFolder, FileConfigurationService fileConfigurationService,
+            ConfigurationChangeProducer configurationChangeProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.brandingFilesFolder = brandingFilesFolder;
+        this.schemaFilesFolder = schemaFilesFolder;
         this.fileConfigurationService = fileConfigurationService;
+        this.configurationChangeProducer = configurationChangeProducer;
+    }
+
+    @PostConstruct
+    private void initSchemasFiles() throws IOException, ParseException
+    {
+        listAllSchemaFilesInFolderStructureAndPostMessage(schemaFilesFolder);
     }
 
     @Override
@@ -221,6 +235,73 @@ public class FileSystemConfigurationService implements ConfigurationService
                 }
             }
         }
+    }
+
+    public void sendMessageAfterUpdatingTheSchema(String filePath) throws IOException, ParseException
+    {
+        File file = new File(filePath);
+        String message = null;
+        if (file.exists())
+        {
+            JSONParser parser = new JSONParser();
+            Object schemaJsonObject = parser.parse(new FileReader(filePath));
+
+            message = createKafkaMessageObject((JSONObject) schemaJsonObject, file.getParentFile().getName()).toString();
+        }
+
+        if (file.getParentFile().getName().equals(FORM_DIRECTORY))
+        {
+            configurationChangeProducer.sendFormSchemasFileMessage(message, file.getName());
+        }
+        else
+        {
+            configurationChangeProducer.sendAvroSchemasFileMessage(message, file.getName());
+        }
+    }
+
+    private List<File> listAllSchemaFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
+    {
+        File directory = new File(directoryName);
+        JSONParser parser = new JSONParser();
+        List<File> resultList = new ArrayList<>();
+        File[] filePathList = directory.listFiles();
+
+        if (filePathList != null)
+        {
+            for (File filePath : filePathList)
+            {
+                if (filePath.isFile())
+                {
+                    Object schemaJsonObject = parser.parse(new FileReader(filePath));
+                    JSONObject kafkaMessageObject = createKafkaMessageObject((JSONObject) schemaJsonObject,
+                            filePath.getParentFile().getName());
+
+                    if (filePath.getParentFile().getName().equals(FORM_DIRECTORY))
+                    {
+                        configurationChangeProducer.sendFormSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+                    }
+                    else
+                    {
+                        configurationChangeProducer.sendAvroSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+                    }
+                }
+                else if (filePath.isDirectory())
+                {
+                    resultList.addAll(listAllSchemaFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
+                }
+            }
+        }
+        return resultList;
+    }
+
+    @SuppressWarnings("unchecked")
+    private JSONObject createKafkaMessageObject(JSONObject schemaJsonObject, String schemaDirName)
+    {
+        JSONObject kafkaMessageObject = new JSONObject();
+        kafkaMessageObject.put("schemaType", schemaDirName);
+        kafkaMessageObject.put("schemaJsonObject", schemaJsonObject.toString());
+
+        return kafkaMessageObject;
     }
 
     private List<File> listAllRuntimeFilesInFolderAndSubFolders(String directoryName)

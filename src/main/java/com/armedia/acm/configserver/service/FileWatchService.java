@@ -29,8 +29,11 @@ package com.armedia.acm.configserver.service;
 
 import com.armedia.acm.configserver.config.KafkaTopicsProperties;
 import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
+
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.bus.endpoint.RefreshBusEndpoint;
 import org.springframework.scheduling.annotation.Async;
@@ -39,12 +42,16 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -52,30 +59,27 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class FileWatchService
 {
-    private final String propertiesFolderPath;
-
-    private final RefreshBusEndpoint refreshBusEndpoint;
-
-    private final ConfigurationChangeProducer configurationChangeProducer;
-
-    private final KafkaTopicsProperties kafkaTopicsProperties;
-
-    private final ScheduledExecutorService executorService;
-
-    private LocalDateTime lastSendTime;
-
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
+    private final String propertiesFolderPath;
+    private final RefreshBusEndpoint refreshBusEndpoint;
+    private final ConfigurationChangeProducer configurationChangeProducer;
+    private final KafkaTopicsProperties kafkaTopicsProperties;
+    private final ScheduledExecutorService executorService;
+    private LocalDateTime lastSendTime;
+    private FileSystemConfigurationService fileSystemConfigurationService;
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
             RefreshBusEndpoint refreshBusEndpoint,
             ConfigurationChangeProducer configurationChangeProducer,
-            KafkaTopicsProperties kafkaTopicsProperties, ScheduledExecutorService executorService)
+            KafkaTopicsProperties kafkaTopicsProperties, ScheduledExecutorService executorService,
+            @Qualifier(value = "fileSystemConfigurationService") FileSystemConfigurationService fileSystemConfigurationService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.refreshBusEndpoint = refreshBusEndpoint;
         this.configurationChangeProducer = configurationChangeProducer;
         this.kafkaTopicsProperties = kafkaTopicsProperties;
         this.executorService = executorService;
+        this.fileSystemConfigurationService = fileSystemConfigurationService;
 
         lastSendTime = LocalDateTime.MIN;
 
@@ -88,20 +92,9 @@ public class FileWatchService
         try
         {
             WatchService watchService = FileSystems.getDefault().newWatchService();
+
             Path path = Paths.get(propertiesFolderPath);
-            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            Path labelsPath = Paths.get(propertiesFolderPath + "/labels");
-            labelsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            Path ldapPath = Paths.get(propertiesFolderPath + "/ldap");
-            ldapPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            Path lookupsPath = Paths.get(propertiesFolderPath + "/lookups");
-            lookupsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            Path rulesPath = Paths.get(propertiesFolderPath + "/rules");
-            rulesPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            registerConfigDirIncludingTheSubFolders(path, watchService);
 
             WatchKey key;
             while (true)
@@ -118,7 +111,7 @@ public class FileWatchService
                             File modifiedFile = filePath.toFile();
                             logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
                             String parentDirectory = key.watchable().toString();
-                            refreshConfiguration(parentDirectory);
+                            refreshConfiguration(parentDirectory, parentDirectory + "\\" + modifiedFile.getName());
                         }
                         key.reset();
                         logger.debug("Reset watch key...");
@@ -137,16 +130,18 @@ public class FileWatchService
         }
     }
 
-    private void refreshConfiguration(String parentDirectory) {
+    private void refreshConfiguration(String parentDirectory, String filePath)
+    {
         LocalDateTime now = LocalDateTime.now();
         logger.debug("Last configuration change topic message send in [{}]", lastSendTime);
         if (now.isAfter(lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow())))
         {
             lastSendTime = now;
-            logger.debug("Schedule configuration changed message in [{}] seconds", lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow()));
+            logger.debug("Schedule configuration changed message in [{}] seconds",
+                    lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow()));
             executorService.schedule(() -> {
                 // Send message to ArkCase to update its configuration
-                if(parentDirectory.contains("ldap"))
+                if (parentDirectory.contains("ldap"))
                 {
                     configurationChangeProducer.sendLdapChangedMessage();
                 }
@@ -162,6 +157,20 @@ public class FileWatchService
                 {
                     configurationChangeProducer.sendLookupsChangedMessage();
                 }
+                // Send message to Schema Service to update form/avro schema
+                else if (parentDirectory.contains("schemas"))
+                {
+                    try
+                    {
+                        fileSystemConfigurationService.sendMessageAfterUpdatingTheSchema(filePath);
+                        // Need to stop the execution here. We don't need this change on spring cloud config bus.
+                        return;
+                    }
+                    catch (IOException | ParseException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
                 else
                 {
                     configurationChangeProducer.sendConfigurationChangedMessage();
@@ -171,5 +180,19 @@ public class FileWatchService
                 refreshBusEndpoint.busRefresh();
             }, kafkaTopicsProperties.getMessageBufferWindow(), TimeUnit.SECONDS);
         }
+    }
+
+    private void registerConfigDirIncludingTheSubFolders(final Path root, WatchService watchService) throws IOException
+    {
+        Files.walkFileTree(root, new SimpleFileVisitor<Path>()
+        {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
+            {
+                dir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
+                        StandardWatchEventKinds.ENTRY_DELETE);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }

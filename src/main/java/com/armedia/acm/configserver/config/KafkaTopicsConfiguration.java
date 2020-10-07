@@ -102,4 +102,24 @@ public class KafkaTopicsConfiguration
                 .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
                 .build();
     }
+
+    @Bean
+    public NewTopic avroSchemaFileConfigurationTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getAvroSchemaFileTopic())
+                .partitions(kafkaTopicsProperties.getAvroSchemaFileTopicPartitions())
+                .replicas(kafkaTopicsProperties.getAvroSchemaFileTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
+
+    @Bean
+    public NewTopic formSchemaFileConfigurationTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getFormSchemaFileTopic())
+                .partitions(kafkaTopicsProperties.getFormSchemaFileTopicPartitions())
+                .replicas(kafkaTopicsProperties.getFormSchemaFileTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
 }
