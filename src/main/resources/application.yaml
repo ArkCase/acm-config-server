@@ -17,6 +17,7 @@ spring:
 #management.endpoints.web.exposure.include: *
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
 branding.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/branding
+schema.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/schemas
 logging:
   file.max-history: 10
   file.max-size: 10MB
@@ -49,6 +50,12 @@ arkcase:
     configuration-file-created-topic: configuration_file_created_topic
     configuration-file-created-topic-replicas: 1
     configuration-file-created-topic-partitions: 1
+    form-schema-file-topic: ark-event-form-config-schema
+    form-schema-file-topic-replicas: 1
+    form-schema-file-topic-partitions: 1
+    avro-schema-file-topic: ark-event-avro-config-schema
+    avro-schema-file-topic-replicas: 1
+    avro-schema-file-topic-partitions: 1
     retention-ms: "86400000"
 management:
   endpoints:

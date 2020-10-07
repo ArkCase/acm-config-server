@@ -94,6 +94,20 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
+    public void sendAvroSchemasFileMessage(String message, String messageKey)
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getAvroSchemaFileTopic(), messageKey, message);
+        future.addCallback(callback);
+    }
+
+    public void sendFormSchemasFileMessage(String message, String messageKey)
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getFormSchemaFileTopic(), messageKey, message);
+        future.addCallback(callback);
+    }
+
     private ListenableFutureCallback<SendResult<String, String>> callback = new ListenableFutureCallback<SendResult<String, String>>()
     {
         @Override

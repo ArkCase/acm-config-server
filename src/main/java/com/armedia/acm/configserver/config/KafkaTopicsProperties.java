@@ -54,6 +54,13 @@ public class KafkaTopicsProperties
     private int configurationFileCreatedTopicPartitions;
     private String retentionMs;
     private int messageBufferWindow;
+    private String formSchemaFileTopic;
+    private int formSchemaFileTopicReplicas;
+    private int formSchemaFileTopicPartitions;
+    private String avroSchemaFileTopic;
+    private int avroSchemaFileTopicReplicas;
+    private int avroSchemaFileTopicPartitions;
+
 
     public String getConfigurationChangedTopic()
     {
@@ -243,7 +250,51 @@ public class KafkaTopicsProperties
         this.messageBufferWindow = messageBufferWindow;
     }
 
+    public String getFormSchemaFileTopic() {
+        return formSchemaFileTopic;
+    }
 
+    public void setFormSchemaFileTopic(String formSchemaFileTopic) {
+        this.formSchemaFileTopic = formSchemaFileTopic;
+    }
 
+    public int getFormSchemaFileTopicReplicas() {
+        return formSchemaFileTopicReplicas;
+    }
 
+    public void setFormSchemaFileTopicReplicas(int formSchemaFileTopicReplicas) {
+        this.formSchemaFileTopicReplicas = formSchemaFileTopicReplicas;
+    }
+
+    public int getFormSchemaFileTopicPartitions() {
+        return formSchemaFileTopicPartitions;
+    }
+
+    public void setFormSchemaFileTopicPartitions(int formSchemaFileTopicPartitions) {
+        this.formSchemaFileTopicPartitions = formSchemaFileTopicPartitions;
+    }
+
+    public String getAvroSchemaFileTopic() {
+        return avroSchemaFileTopic;
+    }
+
+    public void setAvroSchemaFileTopic(String avroSchemaFileTopic) {
+        this.avroSchemaFileTopic = avroSchemaFileTopic;
+    }
+
+    public int getAvroSchemaFileTopicReplicas() {
+        return avroSchemaFileTopicReplicas;
+    }
+
+    public void setAvroSchemaFileTopicReplicas(int avroSchemaFileTopicReplicas) {
+        this.avroSchemaFileTopicReplicas = avroSchemaFileTopicReplicas;
+    }
+
+    public int getAvroSchemaFileTopicPartitions() {
+        return avroSchemaFileTopicPartitions;
+    }
+
+    public void setAvroSchemaFileTopicPartitions(int avroSchemaFileTopicPartitions) {
+        this.avroSchemaFileTopicPartitions = avroSchemaFileTopicPartitions;
+    }
 }
