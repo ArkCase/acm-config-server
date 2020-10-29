@@ -13,8 +13,6 @@ variables:
   GIT_STRATEGY: clone
 
 
-# Cache downloaded dependencies and plugins between builds.
-# To keep cache across branches add 'key: "$CI_JOB_NAME"'
 cache:
   paths:
     - .m2/repository
@@ -40,9 +38,9 @@ build_snapshot:
     - echo '    </server>' >> /root/.m2/settings.xml
     - echo '  </servers>' >> /root/.m2/settings.xml
     - echo '</settings>' >> /root/.m2/settings.xml
-    - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::https://project.armedia.com/nexus/repository/arkcase.snapshot/"'
+    - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::$NEXUS_URL/repository/arkcase.snapshot/"'
     - apt-get update
     - apt-get install -y sshpass
-    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arkcase@fileshare.armedia.com <<< $'put target/*.jar /from-arkcase/config-server.jar' 
+    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@$SFTP_SERVER <<< $'put target/*.jar /from-arkcase/config-server.jar' 
   only:
     - develop
