@@ -39,7 +39,7 @@ variables:
   # RELEASE_HOTFIX: true
   # HOTFIX_SUPPORT_VERSION: 3.3.2
   # RELEASE_VERSION: 3.3.2.1
-  GIT_URL: 'git@$GITLAB_SEVER:arkcase/acm-config-server.git'
+  GIT_URL: 'git@$GITLAB_SERVER:arkcase/acm-config-server.git'
 
 
 release_start:
