@@ -61,8 +61,6 @@ public class FileWatchService
 
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
 
-    private final FileConfigurationService fileConfigurationService;
-
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
@@ -71,8 +69,7 @@ public class FileWatchService
                             @Value("${acm.activemq.lookups-destination}") String lookupsDestination,
                             @Value("${acm.activemq.rules-destination}") String rulesDestination,
                             @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
-                            ConfigurationChangeMessageProducer configurationChangeMessageProducer,
-                            FileConfigurationService fileConfigurationService)
+                            ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.labelsDestination = labelsDestination;
@@ -81,7 +78,6 @@ public class FileWatchService
         this.rulesDestination = rulesDestination;
         this.configurationChangedDestination = configurationChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
-        this.fileConfigurationService = fileConfigurationService;
         logger.debug("Initializing FileWatchService");
     }
 
@@ -122,7 +118,7 @@ public class FileWatchService
                             logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
                             String parentDirectory = key.watchable().toString();
 
-                            if(parentDirectory.contains("ldap"))
+                            if (parentDirectory.contains("ldap"))
                             {
                                 configurationChangeMessageProducer.sendMessage(ldapDestination);
                             }
@@ -132,7 +128,8 @@ public class FileWatchService
                             }
                             else if (parentDirectory.contains("rules"))
                             {
-                                fileConfigurationService.sendNotification(filePath.toString(), rulesDestination);
+                                configurationChangeMessageProducer.sendTextMessage(rulesDestination,
+                                        filePath.toString());
                             }
                             else if (parentDirectory.contains("lookups"))
                             {
