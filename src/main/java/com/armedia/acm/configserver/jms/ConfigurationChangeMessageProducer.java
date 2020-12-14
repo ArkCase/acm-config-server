@@ -50,6 +50,10 @@ public class ConfigurationChangeMessageProducer
 
     private LocalDateTime lastSendTime;
 
+    private LocalDateTime lastTextSendTime;
+    
+    private String lastText;
+
     private final ScheduledExecutorService executorService;
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationChangeMessageProducer.class);
@@ -62,6 +66,8 @@ public class ConfigurationChangeMessageProducer
         this.delayInSeconds = delayInSeconds;
         this.executorService = executorService;
         lastSendTime = LocalDateTime.MIN;
+        lastTextSendTime = LocalDateTime.MIN;
+        lastText = null;
         logger.debug("Init ConfigurationChangeMessageProducer");
     }
 
@@ -82,6 +88,32 @@ public class ConfigurationChangeMessageProducer
                         try
                         {
                             acmJmsTemplate.send(new ActiveMQTopic(destination), Session::createMessage);
+                            logger.debug("Message successfully sent");
+                        }
+                        catch (JmsException e)
+                        {
+                            logger.warn("Message not sent. [{}]", e.getMessage(), e);
+                        }
+                    },
+                    delayInSeconds, TimeUnit.SECONDS);
+        }
+    }
+
+    public void sendTextMessage(String destination, String text)
+    {
+        LocalDateTime now = LocalDateTime.now();
+        logger.debug("Last configuration change topic text ['{}'] message send in [{}]", lastText, lastTextSendTime);
+        if (now.isAfter(lastTextSendTime.plusSeconds(delayInSeconds)) || text != null && !text.equals(lastText))
+        {
+            lastTextSendTime = now;
+            lastText = text;
+            logger.debug("Schedule configuration changed message in [{}] seconds", delayInSeconds);
+            executorService.schedule(() -> {
+                        logger.info("Sending configuration change topic text ['{}'] message...", text);
+                        try
+                        {
+                            acmJmsTemplate.send(new ActiveMQTopic(destination),
+                                    inJmsSession -> inJmsSession.createTextMessage(text));
                             logger.debug("Message successfully sent");
                         }
                         catch (JmsException e)
