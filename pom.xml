@@ -5,7 +5,7 @@
 
     <groupId>com.armedia.acm</groupId>
     <artifactId>config-server</artifactId>
-    <version>2020.18-SNAPSHOT</version>
+    <version>2020.18</version>
     <packaging>jar</packaging>
 
     <name>acm-config-server</name>
