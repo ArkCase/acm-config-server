@@ -108,6 +108,13 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
+    public void sendProcessesFileMessage(String message, String messageKey)
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getProcessFileTopic(), messageKey, message);
+        future.addCallback(callback);
+    }
+
     private ListenableFutureCallback<SendResult<String, String>> callback = new ListenableFutureCallback<SendResult<String, String>>()
     {
         @Override

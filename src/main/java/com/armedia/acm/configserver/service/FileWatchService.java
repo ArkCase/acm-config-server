@@ -171,6 +171,20 @@ public class FileWatchService
                         e.printStackTrace();
                     }
                 }
+                // Send message to Process Service to update bpmn process
+                else if (parentDirectory.contains("processes"))
+                {
+                    try
+                    {
+                        fileSystemConfigurationService.sendMessageAfterUpdatingTheProcess(filePath);
+                        // Need to stop the execution here. We don't need this change on spring cloud config bus.
+                        return;
+                    }
+                    catch (IOException | ParseException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
                 else
                 {
                     configurationChangeProducer.sendConfigurationChangedMessage();
