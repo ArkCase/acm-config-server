@@ -122,4 +122,14 @@ public class KafkaTopicsConfiguration
                 .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
                 .build();
     }
+
+    @Bean
+    public NewTopic processFileConfigurationTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getProcessFileTopic())
+                .partitions(kafkaTopicsProperties.getProcessFileTopicPartitions())
+                .replicas(kafkaTopicsProperties.getProcessFileTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
 }
