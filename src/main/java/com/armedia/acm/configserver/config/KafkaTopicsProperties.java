@@ -60,7 +60,9 @@ public class KafkaTopicsProperties
     private String avroSchemaFileTopic;
     private int avroSchemaFileTopicReplicas;
     private int avroSchemaFileTopicPartitions;
-
+    private String processFileTopic;
+    private int processFileTopicReplicas;
+    private int processFileTopicPartitions;
 
     public String getConfigurationChangedTopic()
     {
@@ -296,5 +298,35 @@ public class KafkaTopicsProperties
 
     public void setAvroSchemaFileTopicPartitions(int avroSchemaFileTopicPartitions) {
         this.avroSchemaFileTopicPartitions = avroSchemaFileTopicPartitions;
+    }
+
+    public String getProcessFileTopic()
+    {
+        return processFileTopic;
+    }
+
+    public void setProcessFileTopic(String processFileTopic)
+    {
+        this.processFileTopic = processFileTopic;
+    }
+
+    public int getProcessFileTopicReplicas()
+    {
+        return processFileTopicReplicas;
+    }
+
+    public void setProcessFileTopicReplicas(int processFileTopicReplicas)
+    {
+        this.processFileTopicReplicas = processFileTopicReplicas;
+    }
+
+    public int getProcessFileTopicPartitions()
+    {
+        return processFileTopicPartitions;
+    }
+
+    public void setProcessFileTopicPartitions(int processFileTopicPartitions)
+    {
+        this.processFileTopicPartitions = processFileTopicPartitions;
     }
 }

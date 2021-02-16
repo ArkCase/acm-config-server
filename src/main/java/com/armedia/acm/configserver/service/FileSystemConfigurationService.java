@@ -30,6 +30,7 @@ package com.armedia.acm.configserver.service;
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
 
+import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -66,25 +67,30 @@ public class FileSystemConfigurationService implements ConfigurationService
     private final String propertiesFolderPath;
     private final String brandingFilesFolder;
     private final String schemaFilesFolder;
+    private final String processFilesFolder;
     private FileConfigurationService fileConfigurationService;
     private ConfigurationChangeProducer configurationChangeProducer;
 
     public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
             @Value("${branding.files.folder.path}") String brandingFilesFolder,
-            @Value("${schema.files.folder.path}") String schemaFilesFolder, FileConfigurationService fileConfigurationService,
+            @Value("${schema.files.folder.path}") String schemaFilesFolder,
+            @Value("${process.files.folder.path}") String processFilesFolder,
+            FileConfigurationService fileConfigurationService,
             ConfigurationChangeProducer configurationChangeProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.brandingFilesFolder = brandingFilesFolder;
         this.schemaFilesFolder = schemaFilesFolder;
+        this.processFilesFolder = processFilesFolder;
         this.fileConfigurationService = fileConfigurationService;
         this.configurationChangeProducer = configurationChangeProducer;
     }
 
     @PostConstruct
-    private void initSchemasFiles() throws IOException, ParseException
+    private void initSchemasAndProcessesFiles() throws IOException, ParseException
     {
         listAllSchemaFilesInFolderStructureAndPostMessage(schemaFilesFolder);
+        listAllProcessFilesInFolderStructureAndPostMessage(processFilesFolder);
     }
 
     @Override
@@ -259,6 +265,17 @@ public class FileSystemConfigurationService implements ConfigurationService
         }
     }
 
+    public void sendMessageAfterUpdatingTheProcess(String filePath) throws IOException, ParseException
+    {
+        File file = new File(filePath);
+        String processXml = null;
+        if (file.exists())
+        {
+            processXml = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        }
+        configurationChangeProducer.sendProcessesFileMessage(processXml, file.getName());
+    }
+
     private List<File> listAllSchemaFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
     {
         File directory = new File(directoryName);
@@ -288,6 +305,30 @@ public class FileSystemConfigurationService implements ConfigurationService
                 else if (filePath.isDirectory())
                 {
                     resultList.addAll(listAllSchemaFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
+                }
+            }
+        }
+        return resultList;
+    }
+
+    private List<File> listAllProcessFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
+    {
+        File directory = new File(directoryName);
+        List<File> resultList = new ArrayList<>();
+        File[] filePathList = directory.listFiles();
+
+        if (filePathList != null)
+        {
+            for (File filePath : filePathList)
+            {
+                if (filePath.isFile())
+                {
+                    String processXml = FileUtils.readFileToString(filePath, StandardCharsets.UTF_8);
+                    configurationChangeProducer.sendProcessesFileMessage(processXml, filePath.getName());
+                }
+                else if (filePath.isDirectory())
+                {
+                    resultList.addAll(listAllProcessFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
                 }
             }
         }

@@ -18,6 +18,7 @@ spring:
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
 branding.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/branding
 schema.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/schemas
+process.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/processes
 logging:
   file.max-history: 10
   file.max-size: 10MB
@@ -56,6 +57,9 @@ arkcase:
     avro-schema-file-topic: ark-event-avro-config-schema
     avro-schema-file-topic-replicas: 1
     avro-schema-file-topic-partitions: 1
+    process-file-topic: ark-event-process
+    process-file-topic-replicas: 1
+    process-file-topic-partitions: 1
     retention-ms: "86400000"
 management:
   endpoints:
