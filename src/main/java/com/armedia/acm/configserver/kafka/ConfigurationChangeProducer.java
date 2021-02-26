@@ -108,6 +108,14 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
+
+    public void sendMenuSchemasFileMessage(String message, String messageKey)
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getFormSchemaFileTopic(), messageKey, message);
+        future.addCallback(callback);
+    }
+
     public void sendProcessesFileMessage(String message, String messageKey)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate

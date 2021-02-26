@@ -64,6 +64,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     public static final String FORM_DIRECTORY = "form";
     private static final Logger logger = LoggerFactory.getLogger(FileSystemConfigurationService.class);
     private static final String RUNTIME = "-runtime";
+    private static final String MENU_DIRECTORY = "menu";
     private final String propertiesFolderPath;
     private final String brandingFilesFolder;
     private final String schemaFilesFolder;
@@ -258,6 +259,10 @@ public class FileSystemConfigurationService implements ConfigurationService
         if (file.getParentFile().getName().equals(FORM_DIRECTORY))
         {
             configurationChangeProducer.sendFormSchemasFileMessage(message, file.getName());
+        }
+        else if(file.getParentFile().getName().equals(MENU_DIRECTORY))
+        {
+            configurationChangeProducer.sendMenuSchemasFileMessage(message, file.getName());
         }
         else
         {
