@@ -124,6 +124,16 @@ public class KafkaTopicsConfiguration
     }
 
     @Bean
+    public NewTopic menuSchemaFileConfigurationTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getMenuSchemaFileTopic())
+                .partitions(kafkaTopicsProperties.getMenuSchemaFileTopicPartitions())
+                .replicas(kafkaTopicsProperties.getMenuSchemaFileTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
+
+    @Bean
     public NewTopic processFileConfigurationTopic()
     {
         return TopicBuilder.name(kafkaTopicsProperties.getProcessFileTopic())

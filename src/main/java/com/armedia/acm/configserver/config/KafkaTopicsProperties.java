@@ -57,6 +57,9 @@ public class KafkaTopicsProperties
     private String formSchemaFileTopic;
     private int formSchemaFileTopicReplicas;
     private int formSchemaFileTopicPartitions;
+    private String menuSchemaFileTopic;
+    private int menuSchemaFileTopicReplicas;
+    private int menuSchemaFileTopicPartitions;
     private String avroSchemaFileTopic;
     private int avroSchemaFileTopicReplicas;
     private int avroSchemaFileTopicPartitions;
@@ -134,51 +137,63 @@ public class KafkaTopicsProperties
         this.ldapChangedTopic = ldapChangedTopic;
     }
 
-    public String getLookupsChangedTopic() {
+    public String getLookupsChangedTopic()
+    {
         return lookupsChangedTopic;
     }
 
-    public void setLookupsChangedTopic(String lookupsChangedTopic) {
+    public void setLookupsChangedTopic(String lookupsChangedTopic)
+    {
         this.lookupsChangedTopic = lookupsChangedTopic;
     }
 
-    public int getLookupsChangedTopicReplicas() {
+    public int getLookupsChangedTopicReplicas()
+    {
         return lookupsChangedTopicReplicas;
     }
 
-    public void setLookupsChangedTopicReplicas(int lookupsChangedTopicReplicas) {
+    public void setLookupsChangedTopicReplicas(int lookupsChangedTopicReplicas)
+    {
         this.lookupsChangedTopicReplicas = lookupsChangedTopicReplicas;
     }
 
-    public int getLookupsChangedTopicPartitions() {
+    public int getLookupsChangedTopicPartitions()
+    {
         return lookupsChangedTopicPartitions;
     }
 
-    public void setLookupsChangedTopicPartitions(int lookupsChangedTopicPartitions) {
+    public void setLookupsChangedTopicPartitions(int lookupsChangedTopicPartitions)
+    {
         this.lookupsChangedTopicPartitions = lookupsChangedTopicPartitions;
     }
 
-    public String getRulesChangedTopic() {
+    public String getRulesChangedTopic()
+    {
         return rulesChangedTopic;
     }
 
-    public void setRulesChangedTopic(String rulesChangedTopic) {
+    public void setRulesChangedTopic(String rulesChangedTopic)
+    {
         this.rulesChangedTopic = rulesChangedTopic;
     }
 
-    public int getRulesChangedTopicReplicas() {
+    public int getRulesChangedTopicReplicas()
+    {
         return rulesChangedTopicReplicas;
     }
 
-    public void setRulesChangedTopicReplicas(int rulesChangedTopicReplicas) {
+    public void setRulesChangedTopicReplicas(int rulesChangedTopicReplicas)
+    {
         this.rulesChangedTopicReplicas = rulesChangedTopicReplicas;
     }
 
-    public int getRulesChangedTopicPartitions() {
+    public int getRulesChangedTopicPartitions()
+    {
         return rulesChangedTopicPartitions;
     }
 
-    public void setRulesChangedTopicPartitions(int rulesChangedTopicPartitions) {
+    public void setRulesChangedTopicPartitions(int rulesChangedTopicPartitions)
+    {
         this.rulesChangedTopicPartitions = rulesChangedTopicPartitions;
     }
 
@@ -252,51 +267,93 @@ public class KafkaTopicsProperties
         this.messageBufferWindow = messageBufferWindow;
     }
 
-    public String getFormSchemaFileTopic() {
+    public String getFormSchemaFileTopic()
+    {
         return formSchemaFileTopic;
     }
 
-    public void setFormSchemaFileTopic(String formSchemaFileTopic) {
+    public void setFormSchemaFileTopic(String formSchemaFileTopic)
+    {
         this.formSchemaFileTopic = formSchemaFileTopic;
     }
 
-    public int getFormSchemaFileTopicReplicas() {
+    public int getFormSchemaFileTopicReplicas()
+    {
         return formSchemaFileTopicReplicas;
     }
 
-    public void setFormSchemaFileTopicReplicas(int formSchemaFileTopicReplicas) {
+    public void setFormSchemaFileTopicReplicas(int formSchemaFileTopicReplicas)
+    {
         this.formSchemaFileTopicReplicas = formSchemaFileTopicReplicas;
     }
 
-    public int getFormSchemaFileTopicPartitions() {
+    public int getFormSchemaFileTopicPartitions()
+    {
         return formSchemaFileTopicPartitions;
     }
 
-    public void setFormSchemaFileTopicPartitions(int formSchemaFileTopicPartitions) {
+    public void setFormSchemaFileTopicPartitions(int formSchemaFileTopicPartitions)
+    {
         this.formSchemaFileTopicPartitions = formSchemaFileTopicPartitions;
     }
 
-    public String getAvroSchemaFileTopic() {
+    public String getMenuSchemaFileTopic()
+    {
+        return menuSchemaFileTopic;
+    }
+
+    public void setMenuSchemaFileTopic(String menuSchemaFileTopic)
+    {
+        this.menuSchemaFileTopic = menuSchemaFileTopic;
+    }
+
+    public int getMenuSchemaFileTopicReplicas()
+    {
+        return menuSchemaFileTopicReplicas;
+    }
+
+    public void setMenuSchemaFileTopicReplicas(int menuSchemaFileTopicReplicas)
+    {
+        this.menuSchemaFileTopicReplicas = menuSchemaFileTopicReplicas;
+    }
+
+    public int getMenuSchemaFileTopicPartitions()
+    {
+        return menuSchemaFileTopicPartitions;
+    }
+
+    public void setMenuSchemaFileTopicPartitions(int menuSchemaFileTopicPartitions)
+    {
+        this.menuSchemaFileTopicPartitions = menuSchemaFileTopicPartitions;
+    }
+
+    public String getAvroSchemaFileTopic()
+    {
         return avroSchemaFileTopic;
     }
 
-    public void setAvroSchemaFileTopic(String avroSchemaFileTopic) {
+    public void setAvroSchemaFileTopic(String avroSchemaFileTopic)
+    {
         this.avroSchemaFileTopic = avroSchemaFileTopic;
     }
 
-    public int getAvroSchemaFileTopicReplicas() {
+    public int getAvroSchemaFileTopicReplicas()
+    {
         return avroSchemaFileTopicReplicas;
     }
 
-    public void setAvroSchemaFileTopicReplicas(int avroSchemaFileTopicReplicas) {
+    public void setAvroSchemaFileTopicReplicas(int avroSchemaFileTopicReplicas)
+    {
         this.avroSchemaFileTopicReplicas = avroSchemaFileTopicReplicas;
     }
 
-    public int getAvroSchemaFileTopicPartitions() {
+    public int getAvroSchemaFileTopicPartitions()
+    {
         return avroSchemaFileTopicPartitions;
     }
 
-    public void setAvroSchemaFileTopicPartitions(int avroSchemaFileTopicPartitions) {
+    public void setAvroSchemaFileTopicPartitions(int avroSchemaFileTopicPartitions)
+    {
         this.avroSchemaFileTopicPartitions = avroSchemaFileTopicPartitions;
     }
 

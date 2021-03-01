@@ -54,6 +54,9 @@ arkcase:
     form-schema-file-topic: ark-event-form-config-schema
     form-schema-file-topic-replicas: 1
     form-schema-file-topic-partitions: 1
+    menu-schema-file-topic: ark-event-menu-config-schema
+    menu-schema-file-topic-replicas: 1
+    menu-schema-file-topic-partitions: 1
     avro-schema-file-topic: ark-event-avro-config-schema
     avro-schema-file-topic-replicas: 1
     avro-schema-file-topic-partitions: 1
