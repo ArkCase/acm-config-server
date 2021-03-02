@@ -302,6 +302,10 @@ public class FileSystemConfigurationService implements ConfigurationService
                     {
                         configurationChangeProducer.sendFormSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
                     }
+                    else if(filePath.getParentFile().getName().equals(MENU_DIRECTORY))
+                    {
+                        configurationChangeProducer.sendMenuSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+                    }
                     else
                     {
                         configurationChangeProducer.sendAvroSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
