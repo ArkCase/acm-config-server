@@ -38,9 +38,9 @@ build_snapshot:
     - echo '    </server>' >> /root/.m2/settings.xml
     - echo '  </servers>' >> /root/.m2/settings.xml
     - echo '</settings>' >> /root/.m2/settings.xml
-    - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::$NEXUS_URL/repository/arkcase.snapshot/"'
+    - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::$NEXUS_URL/repository/arkcase.snapshot/" -Dmaven.wagon.http.ssl.insecure=true'
     - apt-get update
     - apt-get install -y sshpass
-    - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@$SFTP_SERVER <<< $'put target/*.jar /from-arkcase/config-server.jar' 
+    - sshpass -e sftp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@$SFTP_SERVER <<< $'put target/*.jar /from-arkcase/config-server.jar' 
   only:
     - develop
