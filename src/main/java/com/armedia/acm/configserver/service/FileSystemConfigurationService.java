@@ -63,14 +63,16 @@ public class FileSystemConfigurationService implements ConfigurationService
 {
     public static final String FORM_DIRECTORY = "form";
     private static final Logger logger = LoggerFactory.getLogger(FileSystemConfigurationService.class);
+
     private static final String RUNTIME = "-runtime";
     private static final String MENU_DIRECTORY = "menu";
     private final String propertiesFolderPath;
     private final String brandingFilesFolder;
     private final String schemaFilesFolder;
     private final String processFilesFolder;
-    private FileConfigurationService fileConfigurationService;
-    private ConfigurationChangeProducer configurationChangeProducer;
+    private final FileConfigurationService fileConfigurationService;
+    private final ConfigurationChangeProducer configurationChangeProducer;
+
 
     public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
             @Value("${branding.files.folder.path}") String brandingFilesFolder,
@@ -88,8 +90,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     }
 
     @PostConstruct
-    private void initSchemasAndProcessesFiles() throws IOException, ParseException
-    {
+    private void initSchemasAndProcessesFiles() throws IOException, ParseException {
         listAllSchemaFilesInFolderStructureAndPostMessage(schemaFilesFolder);
         listAllProcessFilesInFolderStructureAndPostMessage(processFilesFolder);
     }
@@ -205,7 +206,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     @Override
     public void resetConfigurationBrandingFilesToDefault() throws ConfigurationException
     {
-        List<File> fileList = listAllRuntimeFilesInFolderAndSubFolders(brandingFilesFolder);
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(brandingFilesFolder);
 
         for (File file : fileList)
         {
@@ -215,6 +216,7 @@ public class FileSystemConfigurationService implements ConfigurationService
                 {
                     logger.info("Reset file [{}] to default version.", file.getName());
                     String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
+
                     fileConfigurationService.sendNotification(originalFileName);
 
                 }
@@ -230,7 +232,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     @Override
     public void resetPropertiesToDefault() throws ConfigurationException
     {
-        List<File> fileList = listAllRuntimeFilesInFolderAndSubFolders(propertiesFolderPath);
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(propertiesFolderPath);
         for (File file : fileList)
         {
             if (file.getName().contains(FileSystemConfigurationService.RUNTIME))
@@ -354,7 +356,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         return kafkaMessageObject;
     }
 
-    private List<File> listAllRuntimeFilesInFolderAndSubFolders(String directoryName)
+    private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName)
     {
         File directory = new File(directoryName);
 
@@ -369,7 +371,7 @@ public class FileSystemConfigurationService implements ConfigurationService
             }
             else if (file.isDirectory())
             {
-                resultList.addAll(listAllRuntimeFilesInFolderAndSubFolders(file.getAbsolutePath()));
+                resultList.addAll(listAllRuntimeFilesInFolderAndSubfolders(file.getAbsolutePath()));
             }
         }
         return resultList;

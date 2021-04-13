@@ -57,11 +57,13 @@ public class ConfigurationAPIController
     private final List<String> langs;
 
     private final ConfigurationService configServerService;
+    private final FileConfigurationService fileConfigurationService;
 
-    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService, @Value("${arkcase.languages}") String arkcaseLanguages)
+    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService, @Value("${arkcase.languages}") String arkcaseLanguages, FileConfigurationService fileConfigurationService)
     {
         this.configServerService = configServerService;
         this.langs = Arrays.asList(arkcaseLanguages.split(","));
+        this.fileConfigurationService = fileConfigurationService;
     }
 
     @PostMapping("/{applicationName}")
