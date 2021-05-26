@@ -28,6 +28,8 @@ acm.activemq:
   keystore-password: AcMd3v$
   truststore: ${user.home}/.arkcase/acm/private/arkcase.ts
   truststore-password: password
+  user: "guest"
+  password: "guest"
   default-destination: configuration.changed
   labels-destination: labels.changed
   ldap-destination: ldap.changed
