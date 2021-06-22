@@ -122,6 +122,7 @@ release:
     - echo "Last commit on master branch = $last_commit"
     - git checkout release/$RELEASE_VERSION
     - mvn -B gitflow:release-finish -DskipTestProject=true -DcommitDevelopmentVersionAtStart=true -Dmaven.wagon.http.ssl.insecure=true
+    - git checkout master
     - mvn -DskipITs -T 4 -B deploy "-DaltDeploymentRepository=arkcase.release::default::$NEXUS_URL/repository/arkcase.release/" -Dmaven.wagon.http.ssl.insecure=true
     - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@$SFTP_SERVER <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE_VERSION'.jar'    
     #- git remote add github git@github.com:ArkCase/.arkcase.git
