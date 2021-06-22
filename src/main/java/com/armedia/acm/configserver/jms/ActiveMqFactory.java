@@ -64,6 +64,8 @@ public class ActiveMqFactory
             factory.setKeyStorePassword(configuration.getKeystorePassword());
             factory.setSendTimeout(timeout);
             factory.setConnectResponseTimeout(timeout);
+            factory.setUserName(configuration.getUser());
+            factory.setPassword(configuration.getPassword());
         }
         catch (Exception e)
         {
