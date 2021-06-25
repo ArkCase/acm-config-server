@@ -125,7 +125,7 @@ release:
     - git checkout master
     - mvn -DskipITs -T 4 -B deploy "-DaltDeploymentRepository=arkcase.release::default::$NEXUS_URL/repository/arkcase.release/" -Dmaven.wagon.http.ssl.insecure=true
     - sshpass -e sftp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@$SFTP_SERVER <<< $'put target/*.jar /from-arkcase/config-server-'$RELEASE_VERSION'.jar'    
-    #- git remote add github git@github.com:ArkCase/.arkcase.git
+    #- git remote add github git@github.com:ArkCase/acm-config-server.git
     #- git fetch github
     #- git checkout main
     #- git cherry-pick -m 1 --strategy=recursive -X theirs --allow-empty --keep-redundant-commits $last_commit..master
