@@ -8,6 +8,12 @@ spring:
       enabled: true
   kafka:
     bootstrap-servers: acm-arkcase:9092
+    producer:
+      retries: 1
+      bootstrap-servers:
+      - acm-arkcase:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
 #spring.cloud.config.server.git.clone-on-start: true
 #spring.security.user.name: root
