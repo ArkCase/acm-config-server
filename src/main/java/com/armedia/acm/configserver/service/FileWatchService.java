@@ -151,7 +151,7 @@ public class FileWatchService
                 }
                 else if (parentDirectory.contains("rules"))
                 {
-                    configurationChangeProducer.sendRulesChangedMessage();
+                    configurationChangeProducer.sendRulesChangedMessage(filePath);
                 }
                 else if (parentDirectory.contains("lookups"))
                 {
