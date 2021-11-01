@@ -37,22 +37,22 @@ arkcase:
   kafka:
     messageBufferWindow: 1
     bootstrapAddress: acm-arkcase:9092
-    configuration-changed-topic: configuration_changed_topic
+    configuration-changed-topic: config-event-configuration
     configuration-changed-topic-replicas: 1
     configuration-changed-topic-partitions: 1
-    labels-changed-topic: labels_changed_topic
+    labels-changed-topic: config-event-labels
     labels-changed-topic-replicas: 1
     labels-changed-topic-partitions: 1
-    ldap-changed-topic: ldap_changed_topic
+    ldap-changed-topic: config-event-ldap
     ldap-changed-topic-replicas: 1
     ldap-changed-topic-partitions: 1
-    lookups-changed-topic: lookups_changed_topic
+    lookups-changed-topic: config-event-lookups
     lookups-changed-topic-replicas: 1
     lookups-changed-topic-partitions: 1
-    rules-changed-topic: rules_changed_topic
+    rules-changed-topic: config-event-rules
     rules-changed-topic-replicas: 1
     rules-changed-topic-partitions: 1
-    configuration-file-created-topic: configuration_file_created_topic
+    configuration-file-created-topic: config-event-configuration-file
     configuration-file-created-topic-replicas: 1
     configuration-file-created-topic-partitions: 1
     form-schema-file-topic: ark-event-form-config-schema
