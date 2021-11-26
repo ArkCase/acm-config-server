@@ -31,34 +31,34 @@ arkcase:
   kafka:
     messageBufferWindow: 1
     bootstrapAddress: acm-arkcase:9092
-    configuration-changed-topic: configuration_changed_topic
+    configuration-changed-topic: ark-config-event-configuration
     configuration-changed-topic-replicas: 1
     configuration-changed-topic-partitions: 1
-    labels-changed-topic: labels_changed_topic
+    labels-changed-topic: ark-config-event-labels
     labels-changed-topic-replicas: 1
     labels-changed-topic-partitions: 1
-    ldap-changed-topic: ldap_changed_topic
+    ldap-changed-topic: ark-config-event-ldap
     ldap-changed-topic-replicas: 1
     ldap-changed-topic-partitions: 1
-    lookups-changed-topic: lookups_changed_topic
+    lookups-changed-topic: ark-config-event-lookups
     lookups-changed-topic-replicas: 1
     lookups-changed-topic-partitions: 1
-    rules-changed-topic: rules_changed_topic
+    rules-changed-topic: ark-config-event-rules
     rules-changed-topic-replicas: 1
     rules-changed-topic-partitions: 1
-    forms-changed-topic: forms_changed_topic
+    forms-changed-topic: ark-config-event-forms
     forms-changed-topic-replicas: 1
     forms-changed-topic-partitions: 1
-    configuration-file-created-topic: configuration_file_created_topic
+    configuration-file-created-topic: ark-config-event-configuration-file
     configuration-file-created-topic-replicas: 1
     configuration-file-created-topic-partitions: 1
-    form-schema-file-topic: ark-event-form-config-schema
+    form-schema-file-topic: ark-event-form-schema
     form-schema-file-topic-replicas: 1
     form-schema-file-topic-partitions: 1
-    menu-schema-file-topic: ark-event-menu-config-schema
+    menu-schema-file-topic: ark-event-menu-schema
     menu-schema-file-topic-replicas: 1
     menu-schema-file-topic-partitions: 1
-    avro-schema-file-topic: ark-event-avro-config-schema
+    avro-schema-file-topic: ark-event-avro-schema
     avro-schema-file-topic-replicas: 1
     avro-schema-file-topic-partitions: 1
     process-file-topic: ark-event-process
