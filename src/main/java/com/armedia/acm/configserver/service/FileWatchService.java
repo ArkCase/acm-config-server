@@ -57,6 +57,8 @@ public class FileWatchService
 
     private final String rulesDestination;
 
+    private final String formsDestination;
+
     private final String configurationChangedDestination;
 
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
@@ -68,6 +70,7 @@ public class FileWatchService
                             @Value("${acm.activemq.ldap-destination}") String ldapDestination,
                             @Value("${acm.activemq.lookups-destination}") String lookupsDestination,
                             @Value("${acm.activemq.rules-destination}") String rulesDestination,
+                            @Value("${acm.activemq.forms-destination}") String formsDestination,
                             @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
                             ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
@@ -76,6 +79,7 @@ public class FileWatchService
         this.ldapDestination = ldapDestination;
         this.lookupsDestination = lookupsDestination;
         this.rulesDestination = rulesDestination;
+        this.formsDestination = formsDestination;
         this.configurationChangedDestination = configurationChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
         logger.debug("Initializing FileWatchService");
@@ -101,6 +105,9 @@ public class FileWatchService
 
             Path rulesPath = Paths.get(propertiesFolderPath + "/rules");
             rulesPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
+            Path formsPath = Paths.get(propertiesFolderPath + "/forms");
+            formsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
             WatchKey key;
             while (true)
@@ -129,6 +136,11 @@ public class FileWatchService
                             else if (parentDirectory.contains("rules"))
                             {
                                 configurationChangeMessageProducer.sendTextMessage(rulesDestination,
+                                        filePath.toString());
+                            }
+                            else if (parentDirectory.contains("forms"))
+                            {
+                                configurationChangeMessageProducer.sendTextMessage(formsDestination,
                                         filePath.toString());
                             }
                             else if (parentDirectory.contains("lookups"))
