@@ -49,6 +49,9 @@ public class KafkaTopicsProperties
     private String rulesChangedTopic;
     private int rulesChangedTopicReplicas;
     private int rulesChangedTopicPartitions;
+    private String formsChangedTopic;
+    private int formsChangedTopicReplicas;
+    private int formsChangedTopicPartitions;
     private String configurationFileCreatedTopic;
     private int configurationFileCreatedTopicReplicas;
     private int configurationFileCreatedTopicPartitions;
@@ -66,6 +69,27 @@ public class KafkaTopicsProperties
     private String processFileTopic;
     private int processFileTopicReplicas;
     private int processFileTopicPartitions;
+
+    public int getFormsChangedTopicPartitions() { return formsChangedTopicPartitions; }
+
+    public void setFormsChangedTopicPartitions(int formsChangedTopicPartitions)
+    {
+        this.formsChangedTopicPartitions = formsChangedTopicPartitions;
+    }
+
+    public int getFormsChangedTopicReplicas() { return formsChangedTopicReplicas; }
+
+    public void setFormsChangedTopicReplicas(int formsChangedTopicReplicas)
+    {
+        this.formsChangedTopicReplicas = formsChangedTopicReplicas;
+    }
+
+    public String getFormsChangedTopic() { return formsChangedTopic; }
+
+    public void setFormsChangedTopic(String formsChangedTopic)
+    {
+        this.formsChangedTopic = formsChangedTopic;
+    }
 
     public String getConfigurationChangedTopic()
     {

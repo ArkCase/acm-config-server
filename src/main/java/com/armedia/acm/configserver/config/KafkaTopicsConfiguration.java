@@ -94,6 +94,16 @@ public class KafkaTopicsConfiguration
     }
 
     @Bean
+    public NewTopic formsChangedTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getFormsChangedTopic())
+                .partitions(kafkaTopicsProperties.getFormsChangedTopicPartitions())
+                .replicas(kafkaTopicsProperties.getFormsChangedTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
+
+    @Bean
     public NewTopic configurationFileCreatedTopic()
     {
         return TopicBuilder.name(kafkaTopicsProperties.getConfigurationFileCreatedTopic())

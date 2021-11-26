@@ -157,6 +157,10 @@ public class FileWatchService
                 {
                     configurationChangeProducer.sendLookupsChangedMessage();
                 }
+                else if (parentDirectory.contains("forms"))
+                {
+                    configurationChangeProducer.sendFormsChangedMessage();
+                }
                 // Send message to Schema Service to update form/avro schema
                 else if (parentDirectory.contains("schemas"))
                 {
