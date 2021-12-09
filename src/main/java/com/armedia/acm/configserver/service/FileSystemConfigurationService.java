@@ -68,7 +68,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     private static final String MENU_DIRECTORY = "menu";
     private final String propertiesFolderPath;
     private final String brandingFilesFolder;
-    private final String schemaFilesFolder;
+    private final String avroSchemaFilesFolder;
     private final String processFilesFolder;
     private final FileConfigurationService fileConfigurationService;
     private final ConfigurationChangeProducer configurationChangeProducer;
@@ -76,14 +76,14 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
             @Value("${branding.files.folder.path}") String brandingFilesFolder,
-            @Value("${schema.files.folder.path}") String schemaFilesFolder,
+            @Value("${avro.schema.files.folder.path}") String avroSchemaFilesFolder,
             @Value("${process.files.folder.path}") String processFilesFolder,
             FileConfigurationService fileConfigurationService,
             ConfigurationChangeProducer configurationChangeProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.brandingFilesFolder = brandingFilesFolder;
-        this.schemaFilesFolder = schemaFilesFolder;
+        this.avroSchemaFilesFolder = avroSchemaFilesFolder;
         this.processFilesFolder = processFilesFolder;
         this.fileConfigurationService = fileConfigurationService;
         this.configurationChangeProducer = configurationChangeProducer;
@@ -91,7 +91,7 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     @PostConstruct
     private void initSchemasAndProcessesFiles() throws IOException, ParseException {
-        listAllSchemaFilesInFolderStructureAndPostMessage(schemaFilesFolder);
+        listAllSchemaFilesInFolderStructureAndPostMessage(avroSchemaFilesFolder);
         listAllProcessFilesInFolderStructureAndPostMessage(processFilesFolder);
     }
 
@@ -246,7 +246,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         }
     }
 
-    public void sendMessageAfterUpdatingTheSchema(String filePath) throws IOException, ParseException
+    public void sendMessageAfterUpdatingTheAvroSchema(String filePath) throws IOException, ParseException
     {
         File file = new File(filePath);
         String message = null;
@@ -258,18 +258,8 @@ public class FileSystemConfigurationService implements ConfigurationService
             message = createKafkaMessageObject((JSONObject) schemaJsonObject, file.getParentFile().getName()).toString();
         }
 
-        if (file.getParentFile().getName().equals(FORM_DIRECTORY))
-        {
-            configurationChangeProducer.sendFormSchemasFileMessage(message, file.getName());
-        }
-        else if(file.getParentFile().getName().equals(MENU_DIRECTORY))
-        {
-            configurationChangeProducer.sendMenuSchemasFileMessage(message, file.getName());
-        }
-        else
-        {
-            configurationChangeProducer.sendAvroSchemasFileMessage(message, file.getName());
-        }
+        configurationChangeProducer.sendAvroSchemasFileMessage(message, file.getName());
+
     }
 
     public void sendMessageAfterUpdatingTheProcess(String filePath) throws IOException, ParseException

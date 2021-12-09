@@ -157,16 +157,20 @@ public class FileWatchService
                 {
                     configurationChangeProducer.sendLookupsChangedMessage();
                 }
-                else if (parentDirectory.contains("forms"))
+                else if (parentDirectory.contains("form"))
                 {
                     configurationChangeProducer.sendFormsChangedMessage();
                 }
+                else if (parentDirectory.contains("menu"))
+                {
+                    configurationChangeProducer.sendMenuSchemasFileMessage( "Menu changed", filePath);
+                }
                 // Send message to Schema Service to update form/avro schema
-                else if (parentDirectory.contains("schemas"))
+                else if (parentDirectory.contains("avro"))
                 {
                     try
                     {
-                        fileSystemConfigurationService.sendMessageAfterUpdatingTheSchema(filePath);
+                        fileSystemConfigurationService.sendMessageAfterUpdatingTheAvroSchema(filePath);
                         // Need to stop the execution here. We don't need this change on spring cloud config bus.
                         return;
                     }
