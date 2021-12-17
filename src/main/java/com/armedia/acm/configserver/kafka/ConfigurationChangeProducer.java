@@ -94,6 +94,13 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
+    public void sendMenuChangedMessage()
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getMenuChangedTopic(), "Menu changed");
+        future.addCallback(callback);
+    }
+
     public void sendConfigurationFileCreatedMessage(String message)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
