@@ -49,6 +49,9 @@ arkcase:
     forms-changed-topic: ark-config-event-forms
     forms-changed-topic-replicas: 1
     forms-changed-topic-partitions: 1
+    menu-changed-topic: ark-config-event-menu
+    menu-changed-topic-replicas: 1
+    menu-changed-topic-partitions: 1
     configuration-file-created-topic: ark-config-event-configuration-file
     configuration-file-created-topic-replicas: 1
     configuration-file-created-topic-partitions: 1

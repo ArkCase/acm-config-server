@@ -163,7 +163,7 @@ public class FileWatchService
                 }
                 else if (parentDirectory.contains("menu"))
                 {
-                    configurationChangeProducer.sendMenuSchemasFileMessage( "Menu changed", filePath);
+                    configurationChangeProducer.sendMenuChangedMessage();
                 }
                 // Send message to Schema Service to update form/avro schema
                 else if (parentDirectory.contains("avro"))
