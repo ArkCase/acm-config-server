@@ -29,7 +29,6 @@ package com.armedia.acm.configserver.service;
 
 import com.armedia.acm.configserver.config.KafkaTopicsProperties;
 import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
-
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +52,8 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -65,7 +66,7 @@ public class FileWatchService
     private final ConfigurationChangeProducer configurationChangeProducer;
     private final KafkaTopicsProperties kafkaTopicsProperties;
     private final ScheduledExecutorService executorService;
-    private LocalDateTime lastSendTime;
+    private Map<String, LocalDateTime> filesLastSendTime = new HashMap<>();
     private FileSystemConfigurationService fileSystemConfigurationService;
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
@@ -80,8 +81,6 @@ public class FileWatchService
         this.kafkaTopicsProperties = kafkaTopicsProperties;
         this.executorService = executorService;
         this.fileSystemConfigurationService = fileSystemConfigurationService;
-
-        lastSendTime = LocalDateTime.MIN;
 
         logger.debug("Initializing FileWatchService");
     }
@@ -108,10 +107,14 @@ public class FileWatchService
                         for (WatchEvent<?> event : key.pollEvents())
                         {
                             Path filePath = (Path) event.context();
-                            File modifiedFile = filePath.toFile();
-                            logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
                             String parentDirectory = key.watchable().toString();
-                            refreshConfiguration(parentDirectory, parentDirectory + "\\" + modifiedFile.getName());
+                            File modifiedFile = new File(parentDirectory + File.separator + filePath.getFileName());
+                            logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
+
+                            if (isNotTemporaryFile(modifiedFile))
+                            {
+                                refreshConfiguration(parentDirectory, modifiedFile.getAbsolutePath());
+                            }
                         }
                         key.reset();
                         logger.debug("Reset watch key...");
@@ -130,13 +133,24 @@ public class FileWatchService
         }
     }
 
+    private boolean isNotTemporaryFile(File modifiedFile) throws IOException
+    {
+        return !modifiedFile.isHidden() && Files.probeContentType(modifiedFile.toPath()) != null;
+    }
+
     private void refreshConfiguration(String parentDirectory, String filePath)
     {
         LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime lastSendTime = filesLastSendTime.get(filePath);
+        lastSendTime = lastSendTime != null ? lastSendTime : LocalDateTime.MIN;
+
         logger.debug("Last configuration change topic message send in [{}]", lastSendTime);
+
         if (now.isAfter(lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow())))
         {
             lastSendTime = now;
+            filesLastSendTime.put(filePath, lastSendTime);
             logger.debug("Schedule configuration changed message in [{}] seconds",
                     lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow()));
             executorService.schedule(() -> {
