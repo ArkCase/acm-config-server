@@ -76,14 +76,14 @@ public class ConfigurationChangeProducer
     public void sendRulesChangedMessage()
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getLdapChangedTopic(), "Rules changed");
+                .send(kafkaTopicsProperties.getRulesChangedTopic(), "Rules changed");
         future.addCallback(callback);
     }
 
     public void sendLookupsChangedMessage()
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getLdapChangedTopic(), "Lookups changed");
+                .send(kafkaTopicsProperties.getLookupsChangedTopic(), "Lookups changed");
         future.addCallback(callback);
     }
 
