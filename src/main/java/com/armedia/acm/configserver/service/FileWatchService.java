@@ -179,6 +179,10 @@ public class FileWatchService
                 {
                     configurationChangeProducer.sendMenuChangedMessage();
                 }
+                else if (parentDirectory.contains("query"))
+                {
+                    configurationChangeProducer.sendQueryChangedMessage();
+                }
                 // Send message to Schema Service to update form/avro schema
                 else if (parentDirectory.contains("avro"))
                 {

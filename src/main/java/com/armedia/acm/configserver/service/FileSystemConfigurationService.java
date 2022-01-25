@@ -66,6 +66,7 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private static final String RUNTIME = "-runtime";
     private static final String MENU_DIRECTORY = "menu";
+    private static final String QUERY_DIRECTORY = "query";
     private final String propertiesFolderPath;
     private final String brandingFilesFolder;
     private final String avroSchemaFilesFolder;
@@ -297,6 +298,10 @@ public class FileSystemConfigurationService implements ConfigurationService
                     else if(filePath.getParentFile().getName().equals(MENU_DIRECTORY))
                     {
                         configurationChangeProducer.sendMenuSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+                    }
+                    else if(filePath.getParentFile().getName().equals(QUERY_DIRECTORY))
+                    {
+                        configurationChangeProducer.sendQuerySchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
                     }
                     else
                     {

@@ -55,6 +55,9 @@ public class KafkaTopicsProperties
     private String menuChangedTopic;
     private int menuChangedTopicReplicas;
     private int menuChangedTopicPartitions;
+    private String queryChangedTopic;
+    private int queryChangedTopicReplicas;
+    private int queryChangedTopicPartitions;
     private String configurationFileCreatedTopic;
     private int configurationFileCreatedTopicReplicas;
     private int configurationFileCreatedTopicPartitions;
@@ -66,6 +69,9 @@ public class KafkaTopicsProperties
     private String menuSchemaFileTopic;
     private int menuSchemaFileTopicReplicas;
     private int menuSchemaFileTopicPartitions;
+    private String querySchemaFileTopic;
+    private int querySchemaFileTopicReplicas;
+    private int querySchemaFileTopicPartitions;
     private String avroSchemaFileTopic;
     private int avroSchemaFileTopicReplicas;
     private int avroSchemaFileTopicPartitions;
@@ -442,5 +448,65 @@ public class KafkaTopicsProperties
     public void setProcessFileTopicPartitions(int processFileTopicPartitions)
     {
         this.processFileTopicPartitions = processFileTopicPartitions;
+    }
+
+    public String getQueryChangedTopic()
+    {
+        return queryChangedTopic;
+    }
+
+    public void setQueryChangedTopic(String queryChangedTopic)
+    {
+        this.queryChangedTopic = queryChangedTopic;
+    }
+
+    public int getQueryChangedTopicReplicas()
+    {
+        return queryChangedTopicReplicas;
+    }
+
+    public void setQueryChangedTopicReplicas(int queryChangedTopicReplicas)
+    {
+        this.queryChangedTopicReplicas = queryChangedTopicReplicas;
+    }
+
+    public int getQueryChangedTopicPartitions()
+    {
+        return queryChangedTopicPartitions;
+    }
+
+    public void setQueryChangedTopicPartitions(int queryChangedTopicPartitions)
+    {
+        this.queryChangedTopicPartitions = queryChangedTopicPartitions;
+    }
+
+    public String getQuerySchemaFileTopic()
+    {
+        return querySchemaFileTopic;
+    }
+
+    public void setQuerySchemaFileTopic(String querySchemaFileTopic)
+    {
+        this.querySchemaFileTopic = querySchemaFileTopic;
+    }
+
+    public int getQuerySchemaFileTopicReplicas()
+    {
+        return querySchemaFileTopicReplicas;
+    }
+
+    public void setQuerySchemaFileTopicReplicas(int querySchemaFileTopicReplicas)
+    {
+        this.querySchemaFileTopicReplicas = querySchemaFileTopicReplicas;
+    }
+
+    public int getQuerySchemaFileTopicPartitions()
+    {
+        return querySchemaFileTopicPartitions;
+    }
+
+    public void setQuerySchemaFileTopicPartitions(int querySchemaFileTopicPartitions)
+    {
+        this.querySchemaFileTopicPartitions = querySchemaFileTopicPartitions;
     }
 }
