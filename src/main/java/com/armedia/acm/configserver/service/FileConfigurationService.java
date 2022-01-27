@@ -27,19 +27,15 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import com.armedia.acm.configserver.api.ConfigurationAPIController;
-import org.apache.activemq.command.ActiveMQTopic;
+import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.jms.DeliveryMode;
-import javax.jms.TextMessage;
 import java.io.File;
 import java.io.InputStream;
 
@@ -49,17 +45,16 @@ public class FileConfigurationService {
 
     private final String configServerRepo;
 
-    private final JmsTemplate acmJmsTemplate;
-
-    public static final String VIRTUAL_TOPIC_CONFIG_FILE_UPDATED = "VirtualTopic.ConfigFileUpdated";
+    private final ConfigurationChangeProducer configurationChangeProducer;
 
     private static final Logger logger = LoggerFactory.getLogger(FileConfigurationService.class);
 
 
-    public FileConfigurationService(@Value("${properties.folder.path}") String configRepo, JmsTemplate acmJmsTemplate)
+    public FileConfigurationService(@Value("${properties.folder.path}") String configRepo,
+            ConfigurationChangeProducer configurationChangeProducer)
     {
         this.configServerRepo = configRepo;
-        this.acmJmsTemplate = acmJmsTemplate;
+        this.configurationChangeProducer = configurationChangeProducer;
     }
 
     public void moveFileToConfiguration(MultipartFile file, String fileName) throws Exception {
@@ -76,8 +71,7 @@ public class FileConfigurationService {
 
             logger.info("File is with name {} created on the config server", fileName);
 
-            sendNotification(originalFileName,
-                    VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+            sendNotification(originalFileName);
 
         }
         catch (Exception e)
@@ -101,12 +95,9 @@ public class FileConfigurationService {
         return new StringBuilder(fileName).insert(fileName.indexOf("."), "-" + "runtime").toString();
     }
 
-    public void sendNotification(String message, String destination)
+    public void sendNotification(String message)
     {
-        ActiveMQTopic topic = new ActiveMQTopic(destination);
-
-        acmJmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
-        acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
+        configurationChangeProducer.sendConfigurationFileCreatedMessage(message);
 
         logger.debug("File with name {} is updated and success message is sent for updating", message);
 
