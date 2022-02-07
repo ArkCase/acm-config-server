@@ -3,7 +3,7 @@ spring:
   profiles.active: native
   cloud:
     config.server:
-      native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/form,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/menu
+      native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/form,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/menu,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/query
     bus:
       env:
         enabled: true
