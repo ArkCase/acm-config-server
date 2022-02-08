@@ -111,7 +111,7 @@ public class FileWatchService
                             File modifiedFile = new File(parentDirectory + File.separator + filePath.getFileName());
                             logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
 
-                            if (isNotTemporaryFile(modifiedFile))
+                            if (!isTemporaryFile(modifiedFile))
                             {
                                 refreshConfiguration(parentDirectory, modifiedFile.getAbsolutePath());
                             }
@@ -133,9 +133,9 @@ public class FileWatchService
         }
     }
 
-    private boolean isNotTemporaryFile(File modifiedFile) throws IOException
+    private boolean isTemporaryFile(File modifiedFile) throws IOException
     {
-        return !modifiedFile.isHidden() && Files.probeContentType(modifiedFile.toPath()) != null;
+        return modifiedFile.isHidden();
     }
 
     private void refreshConfiguration(String parentDirectory, String filePath)
