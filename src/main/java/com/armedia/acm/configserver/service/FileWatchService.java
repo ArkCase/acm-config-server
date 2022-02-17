@@ -173,15 +173,18 @@ public class FileWatchService
                 }
                 else if (parentDirectory.contains("form"))
                 {
-                    configurationChangeProducer.sendFormsChangedMessage();
+                    String fileName = getOriginalFileNameFromFilePath(filePath);
+                    configurationChangeProducer.sendFormsChangedMessage(fileName);
                 }
                 else if (parentDirectory.contains("menu"))
                 {
-                    configurationChangeProducer.sendMenuChangedMessage();
+                    String fileName = getOriginalFileNameFromFilePath(filePath);
+                    configurationChangeProducer.sendMenuChangedMessage(fileName);
                 }
                 else if (parentDirectory.contains("query"))
                 {
-                    configurationChangeProducer.sendQueryChangedMessage();
+                    String fileName = getOriginalFileNameFromFilePath(filePath);
+                    configurationChangeProducer.sendQueryChangedMessage(fileName);
                 }
                 // Send message to Schema Service to update form/avro schema
                 else if (parentDirectory.contains("avro"))
@@ -222,6 +225,7 @@ public class FileWatchService
         }
     }
 
+
     private void registerConfigDirIncludingTheSubFolders(final Path root, WatchService watchService) throws IOException
     {
         Files.walkFileTree(root, new SimpleFileVisitor<Path>()
@@ -235,4 +239,10 @@ public class FileWatchService
             }
         });
     }
+
+    private String getOriginalFileNameFromFilePath(String filePath)
+    {
+        return filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.lastIndexOf("."));
+    }
+
 }

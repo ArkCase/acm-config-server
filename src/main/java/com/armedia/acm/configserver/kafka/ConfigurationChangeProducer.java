@@ -87,24 +87,24 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
-    public void sendFormsChangedMessage()
+    public void sendFormsChangedMessage(String fileName)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getFormsChangedTopic(), "Forms changed");
+                .send(kafkaTopicsProperties.getFormsChangedTopic(), fileName);
         future.addCallback(callback);
     }
 
-    public void sendMenuChangedMessage()
+    public void sendMenuChangedMessage(String fileName)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getMenuChangedTopic(), "Menu changed");
+                .send(kafkaTopicsProperties.getMenuChangedTopic(), fileName);
         future.addCallback(callback);
     }
 
-    public void sendQueryChangedMessage()
+    public void sendQueryChangedMessage(String fileName)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getQueryChangedTopic(), "Query changed");
+                .send(kafkaTopicsProperties.getQueryChangedTopic(), fileName);
         future.addCallback(callback);
     }
 
