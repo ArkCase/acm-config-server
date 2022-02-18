@@ -3,7 +3,7 @@ spring:
   profiles.active: native
   cloud:
     config.server:
-      native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/form,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/menu
+      native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/form,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/menu,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/query
     bus:
       env:
         enabled: true
@@ -53,6 +53,9 @@ arkcase:
     menu-changed-topic: ark-config-event-menu
     menu-changed-topic-replicas: 1
     menu-changed-topic-partitions: 1
+    query-changed-topic: ark-config-event-query
+    query-changed-topic-replicas: 1
+    query-changed-topic-partitions: 1
     configuration-file-created-topic: ark-config-event-configuration-file
     configuration-file-created-topic-replicas: 1
     configuration-file-created-topic-partitions: 1
@@ -62,6 +65,9 @@ arkcase:
     menu-schema-file-topic: ark-event-menu-schema
     menu-schema-file-topic-replicas: 1
     menu-schema-file-topic-partitions: 1
+    query-schema-file-topic: ark-event-query-schema
+    query-schema-file-topic-replicas: 1
+    query-schema-file-topic-partitions: 1
     avro-schema-file-topic: ark-event-avro-schema
     avro-schema-file-topic-replicas: 1
     avro-schema-file-topic-partitions: 1

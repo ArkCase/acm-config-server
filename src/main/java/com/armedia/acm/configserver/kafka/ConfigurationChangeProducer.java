@@ -87,17 +87,24 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
-    public void sendFormsChangedMessage()
+    public void sendFormsChangedMessage(String fileName)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getFormsChangedTopic(), "Forms changed");
+                .send(kafkaTopicsProperties.getFormsChangedTopic(), fileName);
         future.addCallback(callback);
     }
 
-    public void sendMenuChangedMessage()
+    public void sendMenuChangedMessage(String fileName)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getMenuChangedTopic(), "Menu changed");
+                .send(kafkaTopicsProperties.getMenuChangedTopic(), fileName);
+        future.addCallback(callback);
+    }
+
+    public void sendQueryChangedMessage(String fileName)
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getQueryChangedTopic(), fileName);
         future.addCallback(callback);
     }
 
@@ -122,11 +129,17 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
-
     public void sendMenuSchemasFileMessage(String message, String messageKey)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
                 .send(kafkaTopicsProperties.getMenuSchemaFileTopic(), messageKey, message);
+        future.addCallback(callback);
+    }
+
+    public void sendQuerySchemasFileMessage(String message, String messageKey)
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getQuerySchemaFileTopic(), messageKey, message);
         future.addCallback(callback);
     }
 
