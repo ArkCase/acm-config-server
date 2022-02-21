@@ -17,6 +17,7 @@ spring:
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
 branding.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/branding
 avro.schema.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/schemas/avro
+schema.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/schemas
 process.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/processes
 logging:
   file.max-history: 10

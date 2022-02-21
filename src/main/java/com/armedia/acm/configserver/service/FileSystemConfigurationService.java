@@ -61,15 +61,18 @@ import java.util.Map;
 @Qualifier(value = "fileSystemConfigurationService")
 public class FileSystemConfigurationService implements ConfigurationService
 {
-    public static final String FORM_DIRECTORY = "form";
+
     private static final Logger logger = LoggerFactory.getLogger(FileSystemConfigurationService.class);
 
     private static final String RUNTIME = "-runtime";
     private static final String MENU_DIRECTORY = "menu";
+    public static final String FORM_DIRECTORY = "form";
     private static final String QUERY_DIRECTORY = "query";
+    private static final String AVRO_DIRECTORY = "avro";
     private final String propertiesFolderPath;
     private final String brandingFilesFolder;
     private final String avroSchemaFilesFolder;
+    private final String schemaFilesFolder;
     private final String processFilesFolder;
     private final FileConfigurationService fileConfigurationService;
     private final ConfigurationChangeProducer configurationChangeProducer;
@@ -78,6 +81,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
             @Value("${branding.files.folder.path}") String brandingFilesFolder,
             @Value("${avro.schema.files.folder.path}") String avroSchemaFilesFolder,
+            @Value("${schema.files.folder.path}") String schemaFilesFolder,
             @Value("${process.files.folder.path}") String processFilesFolder,
             FileConfigurationService fileConfigurationService,
             ConfigurationChangeProducer configurationChangeProducer)
@@ -85,14 +89,17 @@ public class FileSystemConfigurationService implements ConfigurationService
         this.propertiesFolderPath = propertiesFolderPath;
         this.brandingFilesFolder = brandingFilesFolder;
         this.avroSchemaFilesFolder = avroSchemaFilesFolder;
+        this.schemaFilesFolder = schemaFilesFolder;
         this.processFilesFolder = processFilesFolder;
         this.fileConfigurationService = fileConfigurationService;
         this.configurationChangeProducer = configurationChangeProducer;
     }
 
     @PostConstruct
-    private void initSchemasAndProcessesFiles() throws IOException, ParseException {
-        listAllSchemaFilesInFolderStructureAndPostMessage(avroSchemaFilesFolder);
+    private void initSchemasAndProcessesFiles() throws IOException, ParseException
+    {
+        listAllSchemaYAMLFilesInFolderStructureAndPostMessage(schemaFilesFolder);
+        listAllSchemaJsonFilesInFolderStructureAndPostMessage(avroSchemaFilesFolder);
         listAllProcessFilesInFolderStructureAndPostMessage(processFilesFolder);
     }
 
@@ -274,7 +281,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         configurationChangeProducer.sendProcessesFileMessage(processXml, file.getName());
     }
 
-    private List<File> listAllSchemaFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
+    private List<File> listAllSchemaJsonFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
     {
         File directory = new File(directoryName);
         JSONParser parser = new JSONParser();
@@ -291,26 +298,54 @@ public class FileSystemConfigurationService implements ConfigurationService
                     JSONObject kafkaMessageObject = createKafkaMessageObject((JSONObject) schemaJsonObject,
                             filePath.getParentFile().getName());
 
+                    configurationChangeProducer.sendAvroSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+
+                }
+                else if (filePath.isDirectory())
+                {
+                    resultList.addAll(listAllSchemaJsonFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
+                }
+            }
+        }
+        return resultList;
+    }
+
+    private List<File> listAllSchemaYAMLFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
+    {
+        File directory = new File(directoryName);
+        List<File> resultList = new ArrayList<>();
+        File[] filePathList = directory.listFiles();
+
+        if (filePathList != null)
+        {
+            for (File filePath : filePathList)
+            {
+                if (filePath.getParentFile().getName().equals(AVRO_DIRECTORY))
+                {
+                    continue;
+                }
+                if (filePath.isFile())
+                {
+                    String schemaJsonObject = FileUtils.readFileToString(filePath, StandardCharsets.UTF_8);
+                    JSONObject kafkaMessageObject = createKafkaMessageObject(schemaJsonObject,
+                            filePath.getParentFile().getName());
+
                     if (filePath.getParentFile().getName().equals(FORM_DIRECTORY))
                     {
-                        configurationChangeProducer.sendFormSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+                        configurationChangeProducer.sendFormSchemasFileMessage(filePath.getName(), kafkaMessageObject.toString());
                     }
                     else if(filePath.getParentFile().getName().equals(MENU_DIRECTORY))
                     {
-                        configurationChangeProducer.sendMenuSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+                        configurationChangeProducer.sendMenuSchemasFileMessage(filePath.getName(), kafkaMessageObject.toString());
                     }
                     else if(filePath.getParentFile().getName().equals(QUERY_DIRECTORY))
                     {
-                        configurationChangeProducer.sendQuerySchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
-                    }
-                    else
-                    {
-                        configurationChangeProducer.sendAvroSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
+                        configurationChangeProducer.sendQuerySchemasFileMessage(filePath.getName(), kafkaMessageObject.toString());
                     }
                 }
                 else if (filePath.isDirectory())
                 {
-                    resultList.addAll(listAllSchemaFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
+                    resultList.addAll(listAllSchemaYAMLFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
                 }
             }
         }
@@ -347,6 +382,16 @@ public class FileSystemConfigurationService implements ConfigurationService
         JSONObject kafkaMessageObject = new JSONObject();
         kafkaMessageObject.put("schemaType", schemaDirName);
         kafkaMessageObject.put("schemaJsonObject", schemaJsonObject.toString());
+
+        return kafkaMessageObject;
+    }
+
+    @SuppressWarnings("unchecked")
+    private JSONObject createKafkaMessageObject(String schemaJsonObject, String schemaDirName)
+    {
+        JSONObject kafkaMessageObject = new JSONObject();
+        kafkaMessageObject.put("schemaType", schemaDirName);
+        kafkaMessageObject.put("schemaJsonObject", schemaJsonObject);
 
         return kafkaMessageObject;
     }

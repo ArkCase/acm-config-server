@@ -139,7 +139,7 @@ public class ConfigurationChangeProducer
     public void sendQuerySchemasFileMessage(String message, String messageKey)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getQuerySchemaFileTopic(), messageKey, message);
+                .send(kafkaTopicsProperties.getQuerySchemaFileTopic(),messageKey, message);
         future.addCallback(callback);
     }
 
