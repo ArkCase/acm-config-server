@@ -17,7 +17,7 @@ cache:
   paths:
     - .m2/repository
 
-image: arkcase-gitlab-ci:1.0.2
+image: $NEXUS_IMAGE_BASE/arkcase-gitlab-ci:1.0.5
 
 stages:
   - build
