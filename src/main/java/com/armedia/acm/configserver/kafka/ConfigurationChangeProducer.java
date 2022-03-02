@@ -73,10 +73,10 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
-    public void sendRulesChangedMessage()
+    public void sendRulesChangedMessage(String filePath)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
-                .send(kafkaTopicsProperties.getRulesChangedTopic(), "Rules changed");
+                .send(kafkaTopicsProperties.getRulesChangedTopic(), filePath);
         future.addCallback(callback);
     }
 
