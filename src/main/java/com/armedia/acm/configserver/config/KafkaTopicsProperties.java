@@ -27,6 +27,7 @@ package com.armedia.acm.configserver.config;
  * #L%
  */
 
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -78,22 +79,53 @@ public class KafkaTopicsProperties
     private String processFileTopic;
     private int processFileTopicReplicas;
     private int processFileTopicPartitions;
+    private String securityProtocol;
+    private List<String> bootstrapAddress;    
 
-    public int getFormsChangedTopicPartitions() { return formsChangedTopicPartitions; }
+    public List<String> getBootstrapAddress() 
+    {
+        return bootstrapAddress;
+    }
+
+    public void setBootstrapAddress(List<String> bootstrapAddress) 
+    {
+        this.bootstrapAddress = bootstrapAddress;
+    }
+
+    public String getSecurityProtocol() 
+    {
+        return securityProtocol;
+    }
+
+    public void setSecurityProtocol(String securityProtocol) 
+    {
+        this.securityProtocol = securityProtocol;
+    }
+
+    public int getFormsChangedTopicPartitions() 
+    { 
+        return formsChangedTopicPartitions; 
+    }
 
     public void setFormsChangedTopicPartitions(int formsChangedTopicPartitions)
     {
         this.formsChangedTopicPartitions = formsChangedTopicPartitions;
     }
 
-    public int getFormsChangedTopicReplicas() { return formsChangedTopicReplicas; }
+    public int getFormsChangedTopicReplicas() 
+    { 
+        return formsChangedTopicReplicas; 
+    }
 
     public void setFormsChangedTopicReplicas(int formsChangedTopicReplicas)
     {
         this.formsChangedTopicReplicas = formsChangedTopicReplicas;
     }
 
-    public String getFormsChangedTopic() { return formsChangedTopic; }
+    public String getFormsChangedTopic() 
+    { 
+        return formsChangedTopic; 
+    }
 
     public void setFormsChangedTopic(String formsChangedTopic)
     {

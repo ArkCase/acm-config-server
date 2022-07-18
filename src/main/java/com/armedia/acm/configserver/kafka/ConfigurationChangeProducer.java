@@ -29,8 +29,14 @@ package com.armedia.acm.configserver.kafka;
 
 import com.armedia.acm.configserver.config.KafkaTopicsProperties;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -45,11 +51,18 @@ public class ConfigurationChangeProducer
     private final KafkaTopicsProperties kafkaTopicsProperties;
     private final KafkaTemplate<String, String> configurationChangeKafkaTemplate;
 
-    public ConfigurationChangeProducer(KafkaTopicsProperties kafkaTopicsProperties,
-            KafkaTemplate<String, String> configurationChangeKafkaTemplate)
+    public ConfigurationChangeProducer(KafkaTopicsProperties kafkaTopicsProperties)
     {
         this.kafkaTopicsProperties = kafkaTopicsProperties;
-        this.configurationChangeKafkaTemplate = configurationChangeKafkaTemplate;
+
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaTopicsProperties.getBootstrapAddress());
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+
+        configProps.put("security.protocol", kafkaTopicsProperties.getSecurityProtocol());
+        
+        this.configurationChangeKafkaTemplate = new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(configProps));
     }
 
     public void sendConfigurationChangedMessage()

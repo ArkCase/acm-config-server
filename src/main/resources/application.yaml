@@ -13,8 +13,6 @@ spring:
       retries: 1
       bootstrap-servers:
       - acm-arkcase:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
 #spring.cloud.config.server.git.clone-on-start: true
 #spring.security.user.name: root
@@ -38,7 +36,9 @@ arkcase:
   languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
   kafka:
     messageBufferWindow: 1
-    bootstrapAddress: acm-arkcase:9092
+    bootstrapAddress: 
+      - acm-arkcase:9092
+    security-protocol: PLAINTEXT
     configuration-changed-topic: ark-config-event-configuration
     configuration-changed-topic-replicas: 1
     configuration-changed-topic-partitions: 1
