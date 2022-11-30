@@ -48,7 +48,7 @@ release_start:
     git config --global user.name "${GIT_USERNAME}"
     git config --global user.email "${GIT_USERMAIL}"
     git remote set-url origin "${GIT_URL}"
-    mvn -B gitflow:release-start -DpushRemote=true -DversionProperty=revision -DreleaseVersion="${RELEASE_VERSION}" -DcommitDevelopmentVersionAtStart=true -DdevelopmentVersion="${DEVELOP_NEW_VERSION}"
+    mvn -B gitflow:release-start -DpushRemote=true -DversionProperty=revision -DreleaseVersion="${RELEASE_VERSION}" -DcommitDevelopmentVersionAtStart=true -DdevelopmentVersion="${DEVELOP_NEW_VERSION}" -DskipUpdateVersion=true
 
 release_candidate_X:
   stage: release
