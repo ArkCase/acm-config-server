@@ -166,7 +166,7 @@ release_hotfix:
     - git config --global user.name "$GIT_USERNAME"
     - git config --global user.email "$GIT_USERMAIL"
     - git remote set-url origin "$GIT_URL"
-    - apt-get update
+    # - apt-get update
     - apt-get install -y zip sshpass
     - export SSHPASS=$SSHPASS_ARKCASE
     - git checkout hotfix/support/$HOTFIX_SUPPORT_VERSION/$RELEASE_VERSION
