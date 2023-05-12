@@ -61,7 +61,7 @@ release_start:
     - git config --global user.name "$GIT_USERNAME"
     - git config --global user.email "$GIT_USERMAIL"
     - git remote set-url origin "$GIT_URL"
-    - apt-get update
+    # - apt-get update
     - apt-get install -y zip sshpass
     - export SSHPASS=$SSHPASS_ARKCASE
     - mvn -B gitflow:release-start -DpushRemote=true -DreleaseVersion=$RELEASE_VERSION -DcommitDevelopmentVersionAtStart=true -DdevelopmentVersion=$DEVELOP_NEW_VERSION -Dmaven.wagon.http.ssl.insecure=true
@@ -85,7 +85,7 @@ release_candidate_X:
     - git config --global user.name "$GIT_USERNAME"
     - git config --global user.email "$GIT_USERMAIL"
     - git remote set-url origin "$GIT_URL"
-    - apt-get update
+    # - apt-get update
     - apt-get install -y zip sshpass
     - export SSHPASS=$SSHPASS_ARKCASE
     - curl --silent --create-dirs -o /usr/share/maven/lib/ext/pom-manipulation-ext-3.8.1.jar https://repo1.maven.org/maven2/org/commonjava/maven/ext/pom-manipulation-ext/3.8.1/pom-manipulation-ext-3.8.1.jar
@@ -114,7 +114,7 @@ release:
     - git config --global user.name "$GIT_USERNAME"
     - git config --global user.email "$GIT_USERMAIL"
     - git remote set-url origin "$GIT_URL"
-    - apt-get update
+    # - apt-get update
     - apt-get install -y zip sshpass
     - export SSHPASS=$SSHPASS_ARKCASE
     - git checkout master
@@ -174,7 +174,7 @@ release_hotfix:
     - git config --global user.name "$GIT_USERNAME"
     - git config --global user.email "$GIT_USERMAIL"
     - git remote set-url origin "$GIT_URL"
-    - apt-get update
+    # - apt-get update
     - apt-get install -y zip sshpass
     - export SSHPASS=$SSHPASS_ARKCASE
     - git checkout hotfix/support/$HOTFIX_SUPPORT_VERSION/$RELEASE_VERSION
