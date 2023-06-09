@@ -186,6 +186,11 @@ public class FileWatchService
                     String fileName = getOriginalFileNameFromFilePath(filePath);
                     configurationChangeProducer.sendQueryChangedMessage(fileName);
                 }
+                else if (parentDirectory.contains("permissions"))
+                {
+                    String fileName = getOriginalFileNameFromFilePath(filePath);
+                    configurationChangeProducer.sendQueryChangedMessage(fileName);
+                }
                 // Send message to Schema Service to update form/avro schema
                 else if (parentDirectory.contains("avro"))
                 {
