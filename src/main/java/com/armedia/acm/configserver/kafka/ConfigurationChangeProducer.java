@@ -121,6 +121,13 @@ public class ConfigurationChangeProducer
         future.addCallback(callback);
     }
 
+    public void sendPermissionChangeMessage(String fileName)
+    {
+        ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate
+                .send(kafkaTopicsProperties.getPermissionsChangedTopic(), fileName);
+        future.addCallback(callback);
+    }
+
     public void sendConfigurationFileCreatedMessage(String message)
     {
         ListenableFuture<SendResult<String, String>> future = configurationChangeKafkaTemplate

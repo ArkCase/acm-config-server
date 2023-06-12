@@ -6,22 +6,22 @@ package com.armedia.acm.configserver.config;
  * %%
  * Copyright (C) 2019 - 2020 ArkCase LLC
  * %%
- * This file is part of the ArkCase software. 
- * 
- * If the software was purchased under a paid ArkCase license, the terms of 
- * the paid license agreement will prevail.  Otherwise, the software is 
+ * This file is part of the ArkCase software.
+ *
+ * If the software was purchased under a paid ArkCase license, the terms of
+ * the paid license agreement will prevail.  Otherwise, the software is
  * provided under the following open source license terms:
- * 
+ *
  * ArkCase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *  
+ *
  * ArkCase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -43,7 +43,11 @@ public class KafkaTopicsProperties
     private int labelsChangedTopicPartitions;
     private String ldapChangedTopic;
     private int ldapChangedTopicReplicas;
+
     private int ldapChangedTopicPartitions;
+    private String permissionsChangedTopic;
+    private int permissionsChangedTopicReplicas;
+    private int permissionsChangedTopicPartitions;
     private String lookupsChangedTopic;
     private int lookupsChangedTopicReplicas;
     private int lookupsChangedTopicPartitions;
@@ -80,31 +84,31 @@ public class KafkaTopicsProperties
     private int processFileTopicReplicas;
     private int processFileTopicPartitions;
     private String securityProtocol;
-    private List<String> bootstrapAddress;    
+    private List<String> bootstrapAddress;
 
-    public List<String> getBootstrapAddress() 
+    public List<String> getBootstrapAddress()
     {
         return bootstrapAddress;
     }
 
-    public void setBootstrapAddress(List<String> bootstrapAddress) 
+    public void setBootstrapAddress(List<String> bootstrapAddress)
     {
         this.bootstrapAddress = bootstrapAddress;
     }
 
-    public String getSecurityProtocol() 
+    public String getSecurityProtocol()
     {
         return securityProtocol;
     }
 
-    public void setSecurityProtocol(String securityProtocol) 
+    public void setSecurityProtocol(String securityProtocol)
     {
         this.securityProtocol = securityProtocol;
     }
 
-    public int getFormsChangedTopicPartitions() 
-    { 
-        return formsChangedTopicPartitions; 
+    public int getFormsChangedTopicPartitions()
+    {
+        return formsChangedTopicPartitions;
     }
 
     public void setFormsChangedTopicPartitions(int formsChangedTopicPartitions)
@@ -112,9 +116,9 @@ public class KafkaTopicsProperties
         this.formsChangedTopicPartitions = formsChangedTopicPartitions;
     }
 
-    public int getFormsChangedTopicReplicas() 
-    { 
-        return formsChangedTopicReplicas; 
+    public int getFormsChangedTopicReplicas()
+    {
+        return formsChangedTopicReplicas;
     }
 
     public void setFormsChangedTopicReplicas(int formsChangedTopicReplicas)
@@ -122,9 +126,9 @@ public class KafkaTopicsProperties
         this.formsChangedTopicReplicas = formsChangedTopicReplicas;
     }
 
-    public String getFormsChangedTopic() 
-    { 
-        return formsChangedTopic; 
+    public String getFormsChangedTopic()
+    {
+        return formsChangedTopic;
     }
 
     public void setFormsChangedTopic(String formsChangedTopic)
@@ -320,6 +324,36 @@ public class KafkaTopicsProperties
     public void setConfigurationFileCreatedTopic(String configurationFileCreatedTopic)
     {
         this.configurationFileCreatedTopic = configurationFileCreatedTopic;
+    }
+
+    public String getPermissionsChangedTopic()
+    {
+        return permissionsChangedTopic;
+    }
+
+    public void setPermissionsChangedTopic(String permissionConfigChangedTopic)
+    {
+        this.permissionsChangedTopic = permissionConfigChangedTopic;
+    }
+
+    public int getPermissionsChangedTopicReplicas()
+    {
+        return permissionsChangedTopicReplicas;
+    }
+
+    public void setPermissionsChangedTopicReplicas(int permissionsChangedTopicReplicas)
+    {
+        this.permissionsChangedTopicReplicas = permissionsChangedTopicReplicas;
+    }
+
+    public int getPermissionsChangedTopicPartitions()
+    {
+        return permissionsChangedTopicPartitions;
+    }
+
+    public void setPermissionsChangedTopicPartitions(int permissionsChangedTopicPartitions)
+    {
+        this.permissionsChangedTopicPartitions = permissionsChangedTopicPartitions;
     }
 
     public int getConfigurationFileCreatedTopicReplicas()

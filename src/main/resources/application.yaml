@@ -48,6 +48,9 @@ arkcase:
     ldap-changed-topic: ark-config-event-ldap
     ldap-changed-topic-replicas: 1
     ldap-changed-topic-partitions: 1
+    permissions-changed-topic: ark-config-event-permissions
+    permissions-changed-topic-replicas: 1
+    permissions-changed-topic-partitions: 1
     lookups-changed-topic: ark-config-event-lookups
     lookups-changed-topic-replicas: 1
     lookups-changed-topic-partitions: 1
