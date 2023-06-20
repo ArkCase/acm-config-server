@@ -189,7 +189,7 @@ public class FileWatchService
                 else if (parentDirectory.contains("permissions"))
                 {
                     String fileName = getOriginalFileNameFromFilePath(filePath);
-                    configurationChangeProducer.sendQueryChangedMessage(fileName);
+                    configurationChangeProducer.sendPermissionChangeMessage(fileName);
                 }
                 // Send message to Schema Service to update form/avro schema
                 else if (parentDirectory.contains("avro"))
