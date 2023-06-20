@@ -182,4 +182,14 @@ public class KafkaTopicsConfiguration
                 .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
                 .build();
     }
+
+    @Bean
+    public NewTopic permissionChangeConfigurationTopic()
+    {
+        return TopicBuilder.name(kafkaTopicsProperties.getPermissionsChangedTopic())
+                .partitions(kafkaTopicsProperties.getPermissionsChangedTopicPartitions())
+                .replicas(kafkaTopicsProperties.getPermissionsChangedTopicReplicas())
+                .config(TopicConfig.RETENTION_MS_CONFIG, kafkaTopicsProperties.getRetentionMs())
+                .build();
+    }
 }
