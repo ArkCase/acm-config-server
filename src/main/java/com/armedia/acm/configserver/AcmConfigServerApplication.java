@@ -27,6 +27,8 @@ package com.armedia.acm.configserver;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;
@@ -40,8 +42,36 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class AcmConfigServerApplication
 {
 
-    public static void main(String[] args)
+    private static final Logger LOG = LoggerFactory.getLogger(AcmConfigServerApplication.class);
+
+    private static void run(String... args)
     {
         SpringApplication.run(AcmConfigServerApplication.class, args);
+    }
+
+    public static void main(String... args) throws Exception
+    {
+
+        CuratorWrapper curator = new CuratorWrapper();
+        if (curator.isEnabled())
+        {
+            // This is the new, "clusterable" code path
+            AcmConfigServerApplication.LOG.info("Running in clustered mode");
+            try
+            {
+                curator.run(AcmConfigServerApplication::run, args);
+            }
+            catch (Exception e)
+            {
+                AcmConfigServerApplication.LOG.error("Exception caught from the curator wrapper", e);
+            }
+        }
+        else
+        {
+            // This is the original code path, plus more logging :D
+            AcmConfigServerApplication.LOG.info("Running in standalone mode, starting the listener right away");
+            AcmConfigServerApplication.run(args);
+            AcmConfigServerApplication.LOG.info("Main loop launched");
+        }
     }
 }
