@@ -1,5 +1,3 @@
-package com.armedia.acm.configserver;
-
 /*-
  * #%L
  * acm-config-server
@@ -27,6 +25,9 @@ package com.armedia.acm.configserver;
  * #L%
  */
 
+package com.armedia.acm.configserver;
+
+import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicReference;
@@ -193,7 +194,8 @@ class CuratorWrapper
 
         final AtomicReference<Exception> thrown = new AtomicReference<>();
         this.log.trace("Initializing the Curator client");
-        CuratorFramework client = CuratorFrameworkFactory.newClient(this.zk, retryPolicy);
+        CuratorFramework client = CuratorFrameworkFactory.newClient(this.zk, (int) Duration.ofSeconds(1).toMillis(),
+                (int) Duration.ofSeconds(15).toMillis(), retryPolicy);
         try
         {
             this.log.info("Starting the Curator client");
