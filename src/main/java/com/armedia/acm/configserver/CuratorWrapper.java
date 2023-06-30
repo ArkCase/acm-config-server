@@ -194,8 +194,13 @@ class CuratorWrapper
 
         final AtomicReference<Exception> thrown = new AtomicReference<>();
         this.log.trace("Initializing the Curator client");
-        CuratorFramework client = CuratorFrameworkFactory.newClient(this.zk, (int) Duration.ofSeconds(1).toMillis(),
+        final CuratorFramework client = CuratorFrameworkFactory.newClient(this.zk, (int) Duration.ofSeconds(1).toMillis(),
                 (int) Duration.ofSeconds(15).toMillis(), retryPolicy);
+        final Thread shutdownHook = new Thread(() -> {
+            this.log.warn("Emergency closing of the curator client");
+            client.close();
+        }, "Curator-Shutdown");
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
         try
         {
             this.log.info("Starting the Curator client");
@@ -263,6 +268,7 @@ class CuratorWrapper
         {
             this.log.trace("Performing the final cleanup");
             client.close();
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
             Exception e = thrown.get();
             if (e != null)
