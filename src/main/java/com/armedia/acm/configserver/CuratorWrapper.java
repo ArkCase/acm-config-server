@@ -28,131 +28,60 @@
 package com.armedia.acm.configserver;
 
 import java.time.Duration;
-import java.util.UUID;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.retry.RetryForever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class CuratorWrapper
+class CuratorWrapper implements AutoCloseable
 {
     private static final int DEFAULT_RETRY_COUNT = 3;
-
     private static final int MIN_RETRY_DELAY = 100;
     private static final int DEFAULT_RETRY_DELAY = 1000;
 
+    private static final String BASE_PATH = "/arkcase/cloudconfig";
+    private static final String BASE_LEADER_PATH = String.format("%s/leader", CuratorWrapper.BASE_PATH);
+    private static final String BASE_MUTEX_PATH = String.format("%s/mutex", CuratorWrapper.BASE_PATH);
+
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private void waitUntilInterrupted()
-    {
-        final Object waiter = new Object();
-        synchronized (waiter)
-        {
-            while (true)
-            {
-                try
-                {
-                    // This is a simple means of waiting forever without consuming resources
-                    waiter.wait();
-                }
-                catch (InterruptedException e)
-                {
-                    // If we're interrupted, we simply return
-                    return;
-                }
-            }
-        }
-    }
-
-    private String sanitize(String value)
-    {
-        return (value != null ? value.trim() : value);
-    }
-
-    private String getClusterValue(String name)
-    {
-        String prop = null;
-        String v = null;
-
-        // Step one: is it set via a system property?
-        prop = String.format("arkcase.cluster.%s", name);
-        this.log.debug("Seeking system property [{}]", prop);
-        v = System.getProperty(prop);
-        if (v != null)
-        {
-            this.log.debug("Value found: [{}]", v);
-            return sanitize(v);
-        }
-
-        // Step two: is it set via environment variable?
-        prop = String.format("ARKCASE_CLUSTER_%s", name.toUpperCase());
-        this.log.debug("Seeking environment property [{}]", prop);
-        v = System.getenv(prop);
-        if (v != null)
-        {
-            this.log.debug("Value found: [{}]", v);
-            return sanitize(v);
-        }
-
-        // No matches? Return null...
-        this.log.debug("No values found for property '{}'", name);
-        return null;
-    }
-
     private final String zk;
+    private final RetryPolicy retryPolicy;
+    private final CuratorFramework client;
+    private final Thread cleanup;
+    private final AtomicInteger selectorCounter = new AtomicInteger(0);
+    private final Map<Integer, LeaderSelector> selectors = Collections.synchronizedMap(new TreeMap<>());
 
-    CuratorWrapper()
+    CuratorWrapper() throws InterruptedException
     {
-        this.zk = getClusterValue("zookeeper");
-    }
-
-    boolean isEnabled()
-    {
-        return (this.zk != null);
-    }
-
-    void run(final Consumer<String[]> run, String... args) throws Exception
-    {
-        if (!isEnabled())
-        {
-            throw new IllegalStateException("Clustering is not enabled");
-        }
-
+        this.zk = ClusterConfig.get("zookeeper");
         this.log.info("ZooKeeper connection string: [{}]", this.zk);
-        String uuidStr = getClusterValue("clusterId");
-        if (uuidStr == null)
-        {
-            throw new RuntimeException("ERROR: The Zookeeper UUID was not provided, cannot continue in clustered mode");
-        }
 
-        UUID uuid = null;
-        try
+        if (this.zk == null)
         {
-            uuid = UUID.fromString(uuidStr);
+            this.retryPolicy = null;
+            this.client = null;
+            this.cleanup = null;
+            return;
         }
-        catch (IllegalArgumentException e)
-        {
-            throw new RuntimeException(
-                    String.format("The UUID [%s] is not a valid UUID valie, cannot continue%n", uuidStr), e);
-        }
-
-        this.log.info("Cluster mode enabled with UUID = [{}]", uuid);
-
-        final String path = String.format("/arkcase/cloudconfig/%s/node-", uuid);
-        this.log.debug("ZooKeeper node path: [{}]", path);
 
         int retryCount = CuratorWrapper.DEFAULT_RETRY_COUNT;
-        String retryCountStr = getClusterValue("retries");
+        String retryCountStr = ClusterConfig.get("retry.count");
         if (retryCountStr != null)
         {
             try
@@ -167,7 +96,7 @@ class CuratorWrapper
         }
 
         int retryDelay = CuratorWrapper.DEFAULT_RETRY_DELAY;
-        String retryDelayStr = getClusterValue("retryDelay");
+        String retryDelayStr = ClusterConfig.get("retry.delay");
         if (retryDelayStr != null)
         {
             try
@@ -181,100 +110,207 @@ class CuratorWrapper
                 this.log.warn("Invalid retry delay value [{}] - will default to {}", retryDelayStr, retryDelay);
             }
         }
-
-        final RetryPolicy retryPolicy = (retryCount <= 0 ? new RetryForever(retryDelay)
-                : new ExponentialBackoffRetry(retryDelay, retryCount));
-
-        this.log.debug("Clustering retry policy is {}, with a delay of {}", retryPolicy.getClass().getSimpleName(),
+        this.retryPolicy = (retryCount <= 0 //
+                ? new RetryForever(retryDelay) //
+                : new ExponentialBackoffRetry(retryDelay, retryCount) //
+        );
+        this.log.debug("Clustering retry policy is {}, with a delay of {}", this.retryPolicy.getClass().getSimpleName(),
                 retryDelay);
         if (retryCount > 0)
         {
             this.log.debug("Clustering retry count is {}", retryCount);
         }
 
-        final AtomicReference<Exception> thrown = new AtomicReference<>();
         this.log.trace("Initializing the Curator client");
-        final CuratorFramework client = CuratorFrameworkFactory.newClient(this.zk, (int) Duration.ofSeconds(1).toMillis(),
-                (int) Duration.ofSeconds(15).toMillis(), retryPolicy);
-        final Thread shutdownHook = new Thread(() -> {
-            this.log.warn("Emergency closing of the curator client");
-            client.close();
-        }, "Curator-Shutdown");
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
-        try
+        this.client = CuratorFrameworkFactory.newClient(this.zk, (int) Duration.ofSeconds(1).toMillis(),
+                (int) Duration.ofSeconds(15).toMillis(), this.retryPolicy);
+        this.log.info("Starting the Curator client");
+        this.client.start();
+        this.client.blockUntilConnected();
+        this.cleanup = new Thread(this::cleanup, "CuratorWrapper-Cleanup");
+        this.cleanup.setDaemon(false);
+        Runtime.getRuntime().addShutdownHook(this.cleanup);
+    }
+
+    private void cleanup()
+    {
+        for (Integer i : this.selectors.keySet())
         {
-            this.log.info("Starting the Curator client");
-            client.start();
-
-            // This will help us make the main thread sit idly until the background thread is
-            // done with its leadership selection work ...
-            final CyclicBarrier barrier = new CyclicBarrier(2);
-
-            final LeaderSelectorListener listener = new LeaderSelectorListenerAdapter()
+            LeaderSelector l = this.selectors.get(i);
+            this.log.warn("Emergency cleanup: closing out leadership selector # {}", i);
+            try
             {
-                @Override
-                public void takeLeadership(CuratorFramework client) throws Exception
-                {
-                    try
-                    {
-                        CuratorWrapper.this.log.info("Leadership role acquired, starting the listener");
-                        run.accept(args);
-                        CuratorWrapper.this.log.info("Main loop launched");
-                        waitUntilInterrupted();
-                    }
-                    catch (final Exception e)
-                    {
-                        thrown.set(e);
-                    }
-                    finally
-                    {
-                        CuratorWrapper.this.log.trace("Awaiting on the barrier");
-                        try
-                        {
-                            barrier.await();
-                        }
-                        finally
-                        {
-                            CuratorWrapper.this.log.trace("The barrier wait is finished");
-                        }
-                    }
-                }
-            };
-
-            this.log.trace("Creating the leadership selector");
-            try (LeaderSelector selector = new LeaderSelector(client, path, listener))
+                l.close();
+            }
+            catch (Exception e)
             {
+                this.log.warn("Exception caught during cleanup of leadership selector # {}", i, e);
+            }
+        }
 
-                this.log.trace("Enabling auto-requeue");
-                selector.autoRequeue();
+        if (this.client.getState() != CuratorFrameworkState.STOPPED)
+        {
+            try
+            {
+                this.client.close();
+            }
+            catch (Exception e)
+            {
+                this.log.warn("Exception caught while closing the main client", e);
+            }
+        }
+    }
 
-                this.log.trace("Starting the leadership selector");
-                selector.start();
+    private boolean isEmpty(String str)
+    {
+        return ((str == null) || (str.length() == 0));
+    }
 
-                // Now that we're listening and waiting to become leaders, we simply wait
-                // until the main code block exits...
-                this.log.trace("Awaiting on the barrier");
+    public boolean isEnabled()
+    {
+        return (this.client != null);
+    }
+
+    public AutoCloseable acquireMutex() throws Exception
+    {
+        return acquireMutex(null, null);
+    }
+
+    public AutoCloseable acquireMutex(Duration maxWait) throws Exception
+    {
+        return acquireMutex(null, maxWait);
+    }
+
+    public AutoCloseable acquireMutex(String mutexName) throws Exception
+    {
+        return acquireMutex(mutexName, null);
+    }
+
+    public AutoCloseable acquireMutex(String mutexName, Duration maxWait) throws Exception
+    {
+        if (!isEnabled())
+        {
+            throw new IllegalStateException("Clustering is not enabled");
+        }
+        final String mutexPath = (mutexName != null ? String.format("%s/%s", CuratorWrapper.BASE_MUTEX_PATH, mutexName)
+                : CuratorWrapper.BASE_MUTEX_PATH);
+        final InterProcessMutex lock = new InterProcessMutex(this.client, mutexPath);
+        if ((maxWait != null) && !maxWait.isNegative() && !maxWait.isZero())
+        {
+            if (!lock.acquire(maxWait.toMillis(), TimeUnit.MILLISECONDS))
+            {
+                throw new IllegalStateException(String.format("Timed out acquiring the lock [%s] (timeout = %s)", mutexName, maxWait));
+            }
+        }
+        else
+        {
+            lock.acquire();
+        }
+
+        this.log.trace("Acquired the lock [{}]", mutexName);
+        return () -> {
+            this.log.trace("Releasing the lock [{}]", mutexName);
+            lock.release();
+        };
+    }
+
+    public AutoCloseable acquireLeadership() throws InterruptedException
+    {
+        return acquireLeadership(null);
+    }
+
+    public AutoCloseable acquireLeadership(String leadershipName) throws InterruptedException
+    {
+        if (!isEnabled())
+        {
+            throw new IllegalStateException("Clustering is not enabled");
+        }
+
+        final String path = (isEmpty(leadershipName) //
+                ? CuratorWrapper.BASE_LEADER_PATH //
+                : String.format("%s/%s", CuratorWrapper.BASE_LEADER_PATH, leadershipName) //
+        );
+        this.log.debug("Leadership node path: [{}]", path);
+
+        final CountDownLatch awaitLeadership = new CountDownLatch(1);
+        final CountDownLatch awaitCompletion = new CountDownLatch(1);
+        final int selectorKey = this.selectorCounter.getAndIncrement();
+        final LeaderSelectorListener listener = new LeaderSelectorListenerAdapter()
+        {
+            @Override
+            public void takeLeadership(CuratorFramework client)
+            {
+                CuratorWrapper.this.log.info("Assuming Leadership (# {})", selectorKey);
+                awaitLeadership.countDown();
                 try
                 {
-                    barrier.await();
+                    CuratorWrapper.this.log.info("Signalled the start of the execution, awaiting completion (# {})", selectorKey);
+                    awaitCompletion.await();
+                    CuratorWrapper.this.log.info("Execution completed; the latch returned normally (# {})", selectorKey);
+                }
+                catch (InterruptedException e)
+                {
+                    Thread.interrupted();
+                    CuratorWrapper.this.log.error("Interrupted waiting for execution to complete (# {})", selectorKey);
                 }
                 finally
                 {
-                    this.log.trace("The barrier wait is finished");
+                    CuratorWrapper.this.log.trace("Relinquishing leadership (# {})", selectorKey);
                 }
             }
+        };
+
+        this.log.trace("Creating a new leadership selector");
+        final LeaderSelector selector = new LeaderSelector(this.client, path, listener);
+        this.log.trace("Starting the leadership selector (# {})", selectorKey);
+        selector.start();
+        this.selectors.put(selectorKey, selector);
+
+        // We will block in this await() invocation until leadership is acquired.
+        this.log.trace("Waiting for leadership to be attained (# {})", selectorKey);
+        try
+        {
+            awaitLeadership.await();
+        }
+        catch (final InterruptedException e)
+        {
+            this.log.warn("Leadership wait interrupted (# {})!", selectorKey, e);
+            Thread.interrupted();
+            throw e;
         }
         finally
         {
-            this.log.trace("Performing the final cleanup");
-            client.close();
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            this.log.trace("The leadership wait is finished (# {})", selectorKey);
+        }
 
-            Exception e = thrown.get();
-            if (e != null)
+        return () -> {
+            this.log.info("Processing completed, relinquishing leadership (selector # {})", selectorKey);
+            awaitCompletion.countDown();
+            try
             {
-                throw new Exception("Exception caught from the main execution loop", e);
+                selector.close();
             }
+            catch (Exception e)
+            {
+                this.log.warn("Exception caught closing down leadership selector # {}", selectorKey, e);
+            }
+            finally
+            {
+                this.selectors.remove(selectorKey);
+            }
+        };
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            cleanup();
+        }
+        finally
+        {
+            Runtime.getRuntime().removeShutdownHook(this.cleanup);
         }
     }
 }

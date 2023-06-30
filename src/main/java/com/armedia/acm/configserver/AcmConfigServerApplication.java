@@ -46,32 +46,55 @@ public class AcmConfigServerApplication
 
     private static void run(String... args)
     {
+        // Launch the spring boot application
+        AcmConfigServerApplication.LOG.info("Launching the main workload");
         SpringApplication.run(AcmConfigServerApplication.class, args);
+
+        // In this mode of operation we have to wait until we're interrupted b/c
+        // the Spring Boot app runs in the background
+        final Object waiter = new Object();
+        synchronized (waiter)
+        {
+            while (true)
+            {
+                try
+                {
+                    // This is a simple means of waiting forever without consuming resources
+                    AcmConfigServerApplication.LOG.info("Waiting until interrupted");
+                    waiter.wait();
+                }
+                catch (InterruptedException e)
+                {
+                    // If we're interrupted, we simply return
+                    return;
+                }
+            }
+        }
     }
 
     public static void main(String... args) throws Exception
     {
-
-        CuratorWrapper curator = new CuratorWrapper();
-        if (curator.isEnabled())
+        try (CuratorWrapper curator = new CuratorWrapper())
         {
-            // This is the new, "clusterable" code path
-            AcmConfigServerApplication.LOG.info("Running in clustered mode");
-            try
+            if (curator.isEnabled())
             {
-                curator.run(AcmConfigServerApplication::run, args);
+                // This is the new, "clusterable" code path
+                AcmConfigServerApplication.LOG.info("Running in clustered mode");
+                try (AutoCloseable leadership = curator.acquireLeadership())
+                {
+                    AcmConfigServerApplication.run(args);
+                }
+                catch (Exception e)
+                {
+                    AcmConfigServerApplication.LOG.error("Exception caught from the curator wrapper", e);
+                }
             }
-            catch (Exception e)
+            else
             {
-                AcmConfigServerApplication.LOG.error("Exception caught from the curator wrapper", e);
+                // This is the original code path, plus more logging :D
+                AcmConfigServerApplication.LOG.info("Running in standalone mode");
+                AcmConfigServerApplication.run(args);
             }
-        }
-        else
-        {
-            // This is the original code path, plus more logging :D
-            AcmConfigServerApplication.LOG.info("Running in standalone mode, starting the listener right away");
-            AcmConfigServerApplication.run(args);
-            AcmConfigServerApplication.LOG.info("Main loop launched");
         }
     }
 }
