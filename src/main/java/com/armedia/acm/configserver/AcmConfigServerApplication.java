@@ -36,7 +36,7 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.armedia.acm.curator.Session;
-import com.armedia.acm.curator.module.Leader;
+import com.armedia.acm.curator.recipe.Leader;
 
 @EnableConfigServer
 @SpringBootApplication
