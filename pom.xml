@@ -49,6 +49,28 @@
         <tag>HEAD</tag>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>arkcase</id>
+            <name>ArkCase Repository</name>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>https://project.armedia.com/nexus/content/repositories/arkcase/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>arkcase</id>
+            <name>ArkCase Repository</name>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>https://project.armedia.com/nexus/content/repositories/arkcase/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <distributionManagement>
         <snapshotRepository>
             <id>${snapshot-repository.id}</id>
@@ -145,13 +167,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>arkcase-local-repo</id>
-            <url>file://${basedir}/arkcase-lib</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>
