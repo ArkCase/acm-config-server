@@ -35,6 +35,9 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import com.armedia.acm.curator.Session;
+import com.armedia.acm.curator.module.Leader;
+
 @EnableConfigServer
 @SpringBootApplication
 @EnableJms
@@ -74,13 +77,14 @@ public class AcmConfigServerApplication
 
     public static void main(String... args) throws Exception
     {
-        try (CuratorWrapper curator = new CuratorWrapper())
+        try (Session session = ClusterConfig.newSessionBuilder().build())
         {
-            if (curator.isEnabled())
+            if (session.isEnabled())
             {
                 // This is the new, "clusterable" code path
                 AcmConfigServerApplication.LOG.info("Running in clustered mode");
-                try (AutoCloseable leadership = curator.acquireLeadership())
+                Leader leader = new Leader.Builder().name("cloudconfig").build(session);
+                try (AutoCloseable leadership = leader.awaitLeadership())
                 {
                     AcmConfigServerApplication.run(args);
                 }
