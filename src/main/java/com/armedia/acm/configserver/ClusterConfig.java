@@ -1,5 +1,3 @@
-package com.armedia.acm.configserver;
-
 /*-
  * #%L
  * acm-config-server
@@ -26,6 +24,7 @@ package com.armedia.acm.configserver;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
