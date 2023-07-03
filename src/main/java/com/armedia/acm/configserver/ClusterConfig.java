@@ -39,10 +39,10 @@ public class ClusterConfig
 
     public static Session.Builder newSessionBuilder()
     {
-        Integer sessionTimeout = Tools.coalesce(ClusterConfig.getInteger("sessionTimeout"), ClusterConfig.INT_ZERO);
-        Integer connectionTimeout = Tools.coalesce(ClusterConfig.getInteger("connectionTimeout"), ClusterConfig.INT_ZERO);
-        Integer retryCount = Tools.coalesce(ClusterConfig.getInteger("retryCount"), ClusterConfig.INT_ZERO);
-        Integer retryDelay = Tools.coalesce(ClusterConfig.getInteger("retryDelay"), ClusterConfig.INT_ZERO);
+        Integer sessionTimeout = Tools.coalesce(ClusterConfig.getInteger("session.timeout"), ClusterConfig.INT_ZERO);
+        Integer connectionTimeout = Tools.coalesce(ClusterConfig.getInteger("connection.timeout"), ClusterConfig.INT_ZERO);
+        Integer retryCount = Tools.coalesce(ClusterConfig.getInteger("retry.count"), ClusterConfig.INT_ZERO);
+        Integer retryDelay = Tools.coalesce(ClusterConfig.getInteger("retry.delay"), ClusterConfig.INT_ZERO);
         return new Session.Builder() //
                 .sessionTimeout(sessionTimeout) //
                 .connectionTimeout(connectionTimeout) //
