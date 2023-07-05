@@ -83,6 +83,10 @@ public class AcmConfigServerApplication
             {
                 // This is the new, "clusterable" code path
                 AcmConfigServerApplication.LOG.info("Running in clustered mode");
+                // TODO: Should we instead make this listen on a different port
+                // to signal readiness? I.e. port 6666? It would just
+                // listen on that address and instantly close the connections,
+                // thus only being useful for TCP connectivity checks
                 try (AutoCloseable leadership = new Leader(session, "cloudconfig").awaitLeadership())
                 {
                     AcmConfigServerApplication.run(args);
