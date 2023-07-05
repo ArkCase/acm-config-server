@@ -83,8 +83,7 @@ public class AcmConfigServerApplication
             {
                 // This is the new, "clusterable" code path
                 AcmConfigServerApplication.LOG.info("Running in clustered mode");
-                Leader leader = new Leader(session, "cloudconfig");
-                try (AutoCloseable leadership = leader.awaitLeadership())
+                try (AutoCloseable leadership = new Leader(session, "cloudconfig").awaitLeadership())
                 {
                     AcmConfigServerApplication.run(args);
                 }
