@@ -1,5 +1,10 @@
 package com.armedia.acm.configserver.api;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /*-
  * #%L
  * acm-config-server
@@ -35,11 +40,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 @RestController
 @RequestMapping("/config")
 public class ModulesListAPIController
@@ -66,11 +66,11 @@ public class ModulesListAPIController
     /**
      * Return list of modules configuration
      *
-     * @return
+     * @return the list of module names
      */
     public List<String> getModulesNames()
     {
-        File modulesDir = new File(labelsFolderPath);
+        File modulesDir = new File(this.labelsFolderPath);
 
         File[] files = modulesDir.listFiles(file -> {
             if (file.isFile() && !file.getName().toLowerCase().contains("-runtime"))
@@ -84,7 +84,7 @@ public class ModulesListAPIController
 
         for (File labelResource : files)
         {
-            for (String lang : langs)
+            for (String lang : this.langs)
             {
                 String fileName = labelResource.getName();
                 if (fileName.contains(lang))
@@ -99,7 +99,7 @@ public class ModulesListAPIController
             }
         }
 
-        logger.info("Returns modules names. [{}]", modules.toArray());
+        ModulesListAPIController.logger.info("Returns modules names. [{}]", modules.toArray());
         return modules;
     }
 }
