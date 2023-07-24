@@ -27,15 +27,17 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.jms.DeliveryMode;
 import java.io.File;
 import java.io.InputStream;
 
@@ -44,17 +46,18 @@ import java.io.InputStream;
 public class FileConfigurationService {
 
     private final String configServerRepo;
-
-    private final ConfigurationChangeProducer configurationChangeProducer;
-
     private static final Logger logger = LoggerFactory.getLogger(FileConfigurationService.class);
+
+    private final JmsTemplate jmsTemplate;
+
+    public static final String VIRTUAL_TOPIC_CONFIG_FILE_UPDATED = "VirtualTopic.ConfigFileUpdated";
 
 
     public FileConfigurationService(@Value("${properties.folder.path}") String configRepo,
-            ConfigurationChangeProducer configurationChangeProducer)
+            JmsTemplate jmsTemplate)
     {
         this.configServerRepo = configRepo;
-        this.configurationChangeProducer = configurationChangeProducer;
+        this.jmsTemplate = jmsTemplate;
     }
 
     public void moveFileToConfiguration(MultipartFile file, String fileName) throws Exception {
@@ -71,7 +74,7 @@ public class FileConfigurationService {
 
             logger.info("File is with name {} created on the config server", fileName);
 
-            sendNotification(originalFileName);
+            sendNotification(originalFileName, VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
 
         }
         catch (Exception e)
@@ -95,9 +98,12 @@ public class FileConfigurationService {
         return new StringBuilder(fileName).insert(fileName.indexOf("."), "-" + "runtime").toString();
     }
 
-    public void sendNotification(String message)
+    public void sendNotification(String message, String destination)
     {
-        configurationChangeProducer.sendConfigurationFileCreatedMessage(message);
+        ActiveMQTopic topic = new ActiveMQTopic(destination);
+
+        jmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
+        jmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
 
         logger.debug("File with name {} is updated and success message is sent for updating", message);
 

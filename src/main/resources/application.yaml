@@ -4,15 +4,8 @@ spring:
   cloud:
     config.server:
       native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/form,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/menu,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/query
-    bus:
-      env:
-        enabled: true
-  kafka:
-    bootstrap-servers: acm-arkcase:9092
-    producer:
-      retries: 1
-      bootstrap-servers:
-      - acm-arkcase:9092
+  jms:
+    pub-sub-domain: true
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
 #spring.cloud.config.server.git.clone-on-start: true
 #spring.security.user.name: root
@@ -32,59 +25,28 @@ logging:
     org.springframework.cloud.config: debug
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
+jms.message.buffer.window: 1
+acm.activemq:
+  broker-url: ssl://acm-arkcase:61616
+  keystore: ${user.home}/.arkcase/acm/private/arkcase.ks
+  keystore-password: AcMd3v$
+  truststore: ${user.home}/.arkcase/acm/private/arkcase.ts
+  truststore-password: password
+  user: "guest"
+  password: "guest"
+  timeout: 10 #seconds
+  messageBufferWindow: 1
+  default-destination: configuration.changed
+  destinations:
+    labels-destination: labels.changed
+    ldap-destination: ldap.changed
+    lookups-destination: lookups.changed
+    rules-destination: rules.changed
+    forms-destination: forms.changed
+    menus-destination: menus.changed
+    permissions-destination: permissions.changed
 arkcase:
   languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
-  kafka:
-    messageBufferWindow: 1
-    bootstrapAddress: 
-      - acm-arkcase:9092
-    security-protocol: PLAINTEXT
-    configuration-changed-topic: ark-config-event-configuration
-    configuration-changed-topic-replicas: 1
-    configuration-changed-topic-partitions: 1
-    labels-changed-topic: ark-config-event-labels
-    labels-changed-topic-replicas: 1
-    labels-changed-topic-partitions: 1
-    ldap-changed-topic: ark-config-event-ldap
-    ldap-changed-topic-replicas: 1
-    ldap-changed-topic-partitions: 1
-    permissions-changed-topic: ark-config-event-permissions
-    permissions-changed-topic-replicas: 1
-    permissions-changed-topic-partitions: 1
-    lookups-changed-topic: ark-config-event-lookups
-    lookups-changed-topic-replicas: 1
-    lookups-changed-topic-partitions: 1
-    rules-changed-topic: ark-config-event-rules
-    rules-changed-topic-replicas: 1
-    rules-changed-topic-partitions: 1
-    forms-changed-topic: ark-config-event-forms
-    forms-changed-topic-replicas: 1
-    forms-changed-topic-partitions: 1
-    menu-changed-topic: ark-config-event-menu
-    menu-changed-topic-replicas: 1
-    menu-changed-topic-partitions: 1
-    query-changed-topic: ark-config-event-query
-    query-changed-topic-replicas: 1
-    query-changed-topic-partitions: 1
-    configuration-file-created-topic: ark-config-event-configuration-file
-    configuration-file-created-topic-replicas: 1
-    configuration-file-created-topic-partitions: 1
-    form-schema-file-topic: ark-event-form-schema
-    form-schema-file-topic-replicas: 1
-    form-schema-file-topic-partitions: 1
-    menu-schema-file-topic: ark-event-menu-schema
-    menu-schema-file-topic-replicas: 1
-    menu-schema-file-topic-partitions: 1
-    query-schema-file-topic: ark-event-query-schema
-    query-schema-file-topic-replicas: 1
-    query-schema-file-topic-partitions: 1
-    avro-schema-file-topic: ark-event-avro-schema
-    avro-schema-file-topic-replicas: 1
-    avro-schema-file-topic-partitions: 1
-    process-file-topic: ark-event-process
-    process-file-topic-replicas: 1
-    process-file-topic-partitions: 1
-    retention-ms: "86400000"
 management:
   endpoints:
     web:
