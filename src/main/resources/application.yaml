@@ -42,8 +42,6 @@ acm.activemq:
     ldap-destination: ldap.changed
     lookups-destination: lookups.changed
     rules-destination: rules.changed
-    forms-destination: forms.changed
-    menus-destination: menus.changed
     permissions-destination: permissions.changed
 arkcase:
   languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"

@@ -41,11 +41,6 @@ public class ActiveMQDestinationConfiguration
     private String lookupsDestination;
 
     private String rulesDestination;
-
-    private String formsDestination;
-
-    private String menusDestination;
-
     private String permissionsDestination;
 
 
@@ -87,26 +82,6 @@ public class ActiveMQDestinationConfiguration
     public void setRulesDestination(String rulesDestination)
     {
         this.rulesDestination = rulesDestination;
-    }
-
-    public String getFormsDestination()
-    {
-        return formsDestination;
-    }
-
-    public void setFormsDestination(String formsDestination)
-    {
-        this.formsDestination = formsDestination;
-    }
-
-    public String getMenusDestination()
-    {
-        return menusDestination;
-    }
-
-    public void setMenusDestination(String menusDestination)
-    {
-        this.menusDestination = menusDestination;
     }
 
     public String getPermissionsDestination()

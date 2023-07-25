@@ -173,16 +173,6 @@ public class FileWatchService
                     configurationChangeMessageProducer.sendTextMessage(activeMQDestinationConfiguration.getRulesDestination(),
                             filePath.toString());
                 }
-                else if (parentDirectory.contains("form"))
-                {
-                    configurationChangeMessageProducer.sendTextMessage(activeMQDestinationConfiguration.getFormsDestination(),
-                            filePath.toString());
-                }
-                else if (parentDirectory.contains("menu"))
-                {
-                    configurationChangeMessageProducer.sendTextMessage(activeMQDestinationConfiguration.getMenusDestination(),
-                            filePath.toString());
-                }
                 else if (parentDirectory.contains("permissions"))
                 {
                     configurationChangeMessageProducer.sendTextMessage(activeMQDestinationConfiguration.getPermissionsDestination(),
