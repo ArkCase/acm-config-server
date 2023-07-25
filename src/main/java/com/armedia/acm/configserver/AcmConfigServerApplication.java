@@ -30,11 +30,13 @@ package com.armedia.acm.configserver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableConfigServer
 @SpringBootApplication
 @EnableAsync
+@EnableJms
 public class AcmConfigServerApplication
 {
 

@@ -28,12 +28,6 @@ package com.armedia.acm.configserver.service;
  */
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
-import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
-
-import org.apache.commons.io.FileUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,10 +37,8 @@ import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.annotation.PostConstruct;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -57,6 +49,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.armedia.acm.configserver.service.FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED;
+
 @Service
 @Qualifier(value = "fileSystemConfigurationService")
 public class FileSystemConfigurationService implements ConfigurationService
@@ -65,42 +59,18 @@ public class FileSystemConfigurationService implements ConfigurationService
     private static final Logger logger = LoggerFactory.getLogger(FileSystemConfigurationService.class);
 
     private static final String RUNTIME = "-runtime";
-    private static final String MENU_DIRECTORY = "menu";
-    public static final String FORM_DIRECTORY = "form";
-    private static final String QUERY_DIRECTORY = "query";
-    private static final String AVRO_DIRECTORY = "avro";
     private final String propertiesFolderPath;
     private final String brandingFilesFolder;
-    private final String avroSchemaFilesFolder;
-    private final String schemaFilesFolder;
-    private final String processFilesFolder;
     private final FileConfigurationService fileConfigurationService;
-    private final ConfigurationChangeProducer configurationChangeProducer;
 
 
     public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
             @Value("${branding.files.folder.path}") String brandingFilesFolder,
-            @Value("${avro.schema.files.folder.path}") String avroSchemaFilesFolder,
-            @Value("${schema.files.folder.path}") String schemaFilesFolder,
-            @Value("${process.files.folder.path}") String processFilesFolder,
-            FileConfigurationService fileConfigurationService,
-            ConfigurationChangeProducer configurationChangeProducer)
+            FileConfigurationService fileConfigurationService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.brandingFilesFolder = brandingFilesFolder;
-        this.avroSchemaFilesFolder = avroSchemaFilesFolder;
-        this.schemaFilesFolder = schemaFilesFolder;
-        this.processFilesFolder = processFilesFolder;
         this.fileConfigurationService = fileConfigurationService;
-        this.configurationChangeProducer = configurationChangeProducer;
-    }
-
-    @PostConstruct
-    private void initSchemasAndProcessesFiles() throws IOException, ParseException
-    {
-        listAllSchemaYAMLFilesInFolderStructureAndPostMessage(schemaFilesFolder);
-        listAllSchemaJsonFilesInFolderStructureAndPostMessage(avroSchemaFilesFolder);
-        listAllProcessFilesInFolderStructureAndPostMessage(processFilesFolder);
     }
 
     @Override
@@ -225,7 +195,7 @@ public class FileSystemConfigurationService implements ConfigurationService
                     logger.info("Reset file [{}] to default version.", file.getName());
                     String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
 
-                    fileConfigurationService.sendNotification(originalFileName);
+                    fileConfigurationService.sendNotification(originalFileName, VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
 
                 }
                 else
@@ -253,149 +223,6 @@ public class FileSystemConfigurationService implements ConfigurationService
             }
         }
     }
-
-    public void sendMessageAfterUpdatingTheAvroSchema(String filePath) throws IOException, ParseException
-    {
-        File file = new File(filePath);
-        String message = null;
-        if (file.exists())
-        {
-            JSONParser parser = new JSONParser();
-            Object schemaJsonObject = parser.parse(new FileReader(filePath));
-
-            message = createKafkaMessageObject((JSONObject) schemaJsonObject, file.getParentFile().getName()).toString();
-        }
-
-        configurationChangeProducer.sendAvroSchemasFileMessage(message, file.getName());
-
-    }
-
-    public void sendMessageAfterUpdatingTheProcess(String filePath) throws IOException, ParseException
-    {
-        File file = new File(filePath);
-        String processXml = null;
-        if (file.exists())
-        {
-            processXml = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-        }
-        configurationChangeProducer.sendProcessesFileMessage(processXml, file.getName());
-    }
-
-    private List<File> listAllSchemaJsonFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
-    {
-        File directory = new File(directoryName);
-        JSONParser parser = new JSONParser();
-        List<File> resultList = new ArrayList<>();
-        File[] filePathList = directory.listFiles();
-
-        if (filePathList != null)
-        {
-            for (File filePath : filePathList)
-            {
-                if (filePath.isFile())
-                {
-                    Object schemaJsonObject = parser.parse(new FileReader(filePath));
-                    JSONObject kafkaMessageObject = createKafkaMessageObject((JSONObject) schemaJsonObject,
-                            filePath.getParentFile().getName());
-
-                    configurationChangeProducer.sendAvroSchemasFileMessage(kafkaMessageObject.toString(), filePath.getName());
-
-                }
-                else if (filePath.isDirectory())
-                {
-                    resultList.addAll(listAllSchemaJsonFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
-                }
-            }
-        }
-        return resultList;
-    }
-
-    private List<File> listAllSchemaYAMLFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
-    {
-        File directory = new File(directoryName);
-        List<File> resultList = new ArrayList<>();
-        File[] filePathList = directory.listFiles();
-
-        if (filePathList != null)
-        {
-            for (File filePath : filePathList)
-            {
-                if (filePath.getParentFile().getName().equals(AVRO_DIRECTORY))
-                {
-                    continue;
-                }
-                if (filePath.isFile())
-                {
-                    String schemaJsonObject = FileUtils.readFileToString(filePath, StandardCharsets.UTF_8);
-                    JSONObject kafkaMessageObject = createKafkaMessageObject(schemaJsonObject,
-                            filePath.getParentFile().getName());
-
-                    if (filePath.getParentFile().getName().equals(FORM_DIRECTORY))
-                    {
-                        configurationChangeProducer.sendFormSchemasFileMessage(filePath.getName(), kafkaMessageObject.toString());
-                    }
-                    else if(filePath.getParentFile().getName().equals(MENU_DIRECTORY))
-                    {
-                        configurationChangeProducer.sendMenuSchemasFileMessage(filePath.getName(), kafkaMessageObject.toString());
-                    }
-                    else if(filePath.getParentFile().getName().equals(QUERY_DIRECTORY))
-                    {
-                        configurationChangeProducer.sendQuerySchemasFileMessage(filePath.getName(), kafkaMessageObject.toString());
-                    }
-                }
-                else if (filePath.isDirectory())
-                {
-                    resultList.addAll(listAllSchemaYAMLFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
-                }
-            }
-        }
-        return resultList;
-    }
-
-    private List<File> listAllProcessFilesInFolderStructureAndPostMessage(String directoryName) throws IOException, ParseException
-    {
-        File directory = new File(directoryName);
-        List<File> resultList = new ArrayList<>();
-        File[] filePathList = directory.listFiles();
-
-        if (filePathList != null)
-        {
-            for (File filePath : filePathList)
-            {
-                if (filePath.isFile())
-                {
-                    String processXml = FileUtils.readFileToString(filePath, StandardCharsets.UTF_8);
-                    configurationChangeProducer.sendProcessesFileMessage(processXml, filePath.getName());
-                }
-                else if (filePath.isDirectory())
-                {
-                    resultList.addAll(listAllProcessFilesInFolderStructureAndPostMessage(filePath.getAbsolutePath()));
-                }
-            }
-        }
-        return resultList;
-    }
-
-    @SuppressWarnings("unchecked")
-    private JSONObject createKafkaMessageObject(JSONObject schemaJsonObject, String schemaDirName)
-    {
-        JSONObject kafkaMessageObject = new JSONObject();
-        kafkaMessageObject.put("schemaType", schemaDirName);
-        kafkaMessageObject.put("schemaJsonObject", schemaJsonObject.toString());
-
-        return kafkaMessageObject;
-    }
-
-    @SuppressWarnings("unchecked")
-    private JSONObject createKafkaMessageObject(String schemaJsonObject, String schemaDirName)
-    {
-        JSONObject kafkaMessageObject = new JSONObject();
-        kafkaMessageObject.put("schemaType", schemaDirName);
-        kafkaMessageObject.put("schemaJsonObject", schemaJsonObject);
-
-        return kafkaMessageObject;
-    }
-
     private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName)
     {
         File directory = new File(directoryName);

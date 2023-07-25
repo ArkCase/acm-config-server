@@ -27,14 +27,13 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import com.armedia.acm.configserver.config.KafkaTopicsProperties;
-import com.armedia.acm.configserver.kafka.ConfigurationChangeProducer;
-import org.json.simple.parser.ParseException;
+import com.armedia.acm.configserver.jms.ActiveMQDestinationConfiguration;
+import com.armedia.acm.configserver.jms.ActiveMqConfiguration;
+import com.armedia.acm.configserver.jms.ConfigurationChangeMessageProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.bus.endpoint.RefreshBusEndpoint;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -62,25 +61,29 @@ public class FileWatchService
 {
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
     private final String propertiesFolderPath;
-    private final RefreshBusEndpoint refreshBusEndpoint;
-    private final ConfigurationChangeProducer configurationChangeProducer;
-    private final KafkaTopicsProperties kafkaTopicsProperties;
+    @Autowired
+    private final ActiveMQDestinationConfiguration activeMQDestinationConfiguration;
+
+    private final ActiveMqConfiguration activeMqConfiguration;
     private final ScheduledExecutorService executorService;
+
+    private final int messageBufferWindow;
+
+    private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
     private Map<String, LocalDateTime> filesLastSendTime = new HashMap<>();
-    private FileSystemConfigurationService fileSystemConfigurationService;
 
     public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
-            RefreshBusEndpoint refreshBusEndpoint,
-            ConfigurationChangeProducer configurationChangeProducer,
-            KafkaTopicsProperties kafkaTopicsProperties, ScheduledExecutorService executorService,
-            @Qualifier(value = "fileSystemConfigurationService") FileSystemConfigurationService fileSystemConfigurationService)
+                            @Value("${acm.activemq.messageBufferWindow}") int messageBufferWindow,
+                            ActiveMQDestinationConfiguration activeMQDestinationConfiguration, ActiveMqConfiguration activeMqConfiguration,
+                            ScheduledExecutorService executorService,
+                            ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
-        this.refreshBusEndpoint = refreshBusEndpoint;
-        this.configurationChangeProducer = configurationChangeProducer;
-        this.kafkaTopicsProperties = kafkaTopicsProperties;
+        this.activeMQDestinationConfiguration = activeMQDestinationConfiguration;
+        this.messageBufferWindow = messageBufferWindow;
+        this.activeMqConfiguration = activeMqConfiguration;
         this.executorService = executorService;
-        this.fileSystemConfigurationService = fileSystemConfigurationService;
+        this.configurationChangeMessageProducer = configurationChangeMessageProducer;
 
         logger.debug("Initializing FileWatchService");
     }
@@ -91,10 +94,8 @@ public class FileWatchService
         try
         {
             WatchService watchService = FileSystems.getDefault().newWatchService();
-
             Path path = Paths.get(propertiesFolderPath);
             registerConfigDirIncludingTheSubFolders(path, watchService);
-
             WatchKey key;
             while (true)
             {
@@ -147,86 +148,42 @@ public class FileWatchService
 
         logger.debug("Last configuration change topic message send in [{}]", lastSendTime);
 
-        if (now.isAfter(lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow())))
+        if (now.isAfter(lastSendTime.plusSeconds(messageBufferWindow)))
         {
             lastSendTime = now;
             filesLastSendTime.put(filePath, lastSendTime);
             logger.debug("Schedule configuration changed message in [{}] seconds",
-                    lastSendTime.plusSeconds(kafkaTopicsProperties.getMessageBufferWindow()));
+                    lastSendTime.plusSeconds(messageBufferWindow));
             executorService.schedule(() -> {
                 // Send message to ArkCase to update its configuration
                 if (parentDirectory.contains("ldap"))
                 {
-                    configurationChangeProducer.sendLdapChangedMessage();
+                    configurationChangeMessageProducer.sendMessage(activeMQDestinationConfiguration.getLdapDestination());
                 }
                 else if (parentDirectory.contains("labels"))
                 {
-                    configurationChangeProducer.sendLabelsChangedMessage();
-                }
-                else if (parentDirectory.contains("rules"))
-                {
-                    configurationChangeProducer.sendRulesChangedMessage(filePath);
+                    configurationChangeMessageProducer.sendMessage(activeMQDestinationConfiguration.getLabelsDestination());
                 }
                 else if (parentDirectory.contains("lookups"))
                 {
-                    configurationChangeProducer.sendLookupsChangedMessage();
+                    configurationChangeMessageProducer.sendMessage(activeMQDestinationConfiguration.getLookupsDestination());
                 }
-                else if (parentDirectory.contains("form"))
+                else if (parentDirectory.contains("rules"))
                 {
-                    String fileName = getOriginalFileNameFromFilePath(filePath);
-                    configurationChangeProducer.sendFormsChangedMessage(fileName);
-                }
-                else if (parentDirectory.contains("menu"))
-                {
-                    String fileName = getOriginalFileNameFromFilePath(filePath);
-                    configurationChangeProducer.sendMenuChangedMessage(fileName);
-                }
-                else if (parentDirectory.contains("query"))
-                {
-                    String fileName = getOriginalFileNameFromFilePath(filePath);
-                    configurationChangeProducer.sendQueryChangedMessage(fileName);
+                    configurationChangeMessageProducer.sendTextMessage(activeMQDestinationConfiguration.getRulesDestination(),
+                            filePath.toString());
                 }
                 else if (parentDirectory.contains("permissions"))
                 {
-                    String fileName = getOriginalFileNameFromFilePath(filePath);
-                    configurationChangeProducer.sendPermissionChangeMessage(fileName);
-                }
-                // Send message to Schema Service to update form/avro schema
-                else if (parentDirectory.contains("avro"))
-                {
-                    try
-                    {
-                        fileSystemConfigurationService.sendMessageAfterUpdatingTheAvroSchema(filePath);
-                        // Need to stop the execution here. We don't need this change on spring cloud config bus.
-                        return;
-                    }
-                    catch (IOException | ParseException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                // Send message to Process Service to update bpmn process
-                else if (parentDirectory.contains("processes"))
-                {
-                    try
-                    {
-                        fileSystemConfigurationService.sendMessageAfterUpdatingTheProcess(filePath);
-                        // Need to stop the execution here. We don't need this change on spring cloud config bus.
-                        return;
-                    }
-                    catch (IOException | ParseException e)
-                    {
-                        e.printStackTrace();
-                    }
+                    configurationChangeMessageProducer.sendTextMessage(activeMQDestinationConfiguration.getPermissionsDestination(),
+                            filePath.toString());
                 }
                 else
                 {
-                    configurationChangeProducer.sendConfigurationChangedMessage();
+                    configurationChangeMessageProducer.sendMessage(activeMqConfiguration.getDefaultDestination());
                 }
 
-                // Send message to all subscribed nodes (mServices) in spring cloud bus to update their configuration
-                refreshBusEndpoint.busRefresh();
-            }, kafkaTopicsProperties.getMessageBufferWindow(), TimeUnit.SECONDS);
+            }, messageBufferWindow, TimeUnit.SECONDS);
         }
     }
 
@@ -244,10 +201,4 @@ public class FileWatchService
             }
         });
     }
-
-    private String getOriginalFileNameFromFilePath(String filePath)
-    {
-        return filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.lastIndexOf("."));
-    }
-
 }
