@@ -27,6 +27,10 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -51,6 +55,8 @@ public class FileConfigurationService {
     private final JmsTemplate jmsTemplate;
 
     public static final String VIRTUAL_TOPIC_CONFIG_FILE_UPDATED = "VirtualTopic.ConfigFileUpdated";
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
 
     public FileConfigurationService(@Value("${properties.folder.path}") String configRepo,
@@ -107,6 +113,29 @@ public class FileConfigurationService {
 
         logger.debug("File with name {} is updated and success message is sent for updating", message);
 
+    }
+
+    public JsonNode getResourceDetails(String path)
+    {
+        File directoryPath = new File(configServerRepo.concat("/" + path));
+        File[] listOfFiles = directoryPath.listFiles();
+        ArrayNode result = objectMapper.createArrayNode();
+        for (File file : listOfFiles)
+        {
+            ObjectNode fileNode = objectMapper.createObjectNode();
+            if(file.isFile())
+            {
+                fileNode.put("fileName", file.getName());
+                fileNode.put("isFile", true);
+            }
+            else
+            {
+                fileNode.put("fileName", file.getName());
+                fileNode.put("isFile", false);
+            }
+            result.add(fileNode);
+        }
+        return result;
     }
 
 }

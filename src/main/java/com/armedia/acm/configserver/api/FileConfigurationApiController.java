@@ -28,14 +28,12 @@ package com.armedia.acm.configserver.api;
  */
 
 import com.armedia.acm.configserver.service.FileConfigurationService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -60,6 +58,14 @@ public class FileConfigurationApiController {
         logger.info("file is moved to config server!");
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/path")
+    public JsonNode getResourceDetails(@RequestParam("path") String path)
+    {
+        logger.info("resource details to be fetched from " + path);
+
+        return fileConfigurationService.getResourceDetails(path);
     }
 
 }
