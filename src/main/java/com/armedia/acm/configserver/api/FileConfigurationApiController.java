@@ -35,11 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping({"/file", "/files"})
 public class FileConfigurationApiController {
 
     @Autowired
@@ -60,9 +63,11 @@ public class FileConfigurationApiController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/path")
-    public JsonNode getResourceDetails(@RequestParam("path") String path)
+    @GetMapping(value = "/**/*")
+    public JsonNode getResourceDetails(HttpServletRequest request)
     {
+        String fullPath = request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString();
+        String path = StringUtils.substringAfter(fullPath, fullPath.contains("files") ? "files" : "file");
         logger.info("resource details to be fetched from " + path);
 
         return fileConfigurationService.getResourceDetails(path);

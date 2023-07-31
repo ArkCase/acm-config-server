@@ -117,7 +117,7 @@ public class FileConfigurationService {
 
     public JsonNode getResourceDetails(String path)
     {
-        File directoryPath = new File(configServerRepo.concat("/" + path));
+        File directoryPath = new File(configServerRepo.concat(path));
         File[] listOfFiles = directoryPath.listFiles();
         ArrayNode result = objectMapper.createArrayNode();
         for (File file : listOfFiles)
