@@ -123,16 +123,8 @@ public class FileConfigurationService {
         for (File file : listOfFiles)
         {
             ObjectNode fileNode = objectMapper.createObjectNode();
-            if(file.isFile())
-            {
-                fileNode.put("fileName", file.getName());
-                fileNode.put("isFile", true);
-            }
-            else
-            {
-                fileNode.put("fileName", file.getName());
-                fileNode.put("isFile", false);
-            }
+            fileNode.put("fileName", file.getName());
+            fileNode.put("isFile", file.isFile());
             result.add(fileNode);
         }
         return result;
