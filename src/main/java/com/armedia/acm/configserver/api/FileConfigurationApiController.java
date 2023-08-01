@@ -28,20 +28,21 @@ package com.armedia.acm.configserver.api;
  */
 
 import com.armedia.acm.configserver.service.FileConfigurationService;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping({"/file", "/files"})
 public class FileConfigurationApiController {
 
     @Autowired
@@ -60,6 +61,16 @@ public class FileConfigurationApiController {
         logger.info("file is moved to config server!");
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/**/*")
+    public JsonNode getResourceDetails(HttpServletRequest request)
+    {
+        String fullPath = request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString();
+        String path = StringUtils.substringAfter(fullPath, fullPath.contains("files") ? "files" : "file");
+        logger.info("resource details to be fetched from " + path);
+
+        return fileConfigurationService.getResourceDetails(path);
     }
 
 }
