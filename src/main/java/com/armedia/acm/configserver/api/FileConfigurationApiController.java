@@ -27,6 +27,7 @@ package com.armedia.acm.configserver.api;
  * #L%
  */
 
+import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.service.FileConfigurationService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
@@ -39,6 +40,9 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.FileNotFoundException;
+import java.nio.file.NoSuchFileException;
 
 
 @RestController
@@ -64,7 +68,7 @@ public class FileConfigurationApiController {
     }
 
     @GetMapping(value = "/**/*")
-    public JsonNode getResourceDetails(HttpServletRequest request)
+    public ResponseEntity getResourceDetails(HttpServletRequest request) throws FileNotFoundException
     {
         String fullPath = request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString();
         String path = StringUtils.substringAfter(fullPath, fullPath.contains("files") ? "files" : "file");
@@ -73,4 +77,14 @@ public class FileConfigurationApiController {
         return fileConfigurationService.getResourceDetails(path);
     }
 
+    @DeleteMapping(value = "/**/*")
+    public void removeFileFromConfiguration(HttpServletRequest request) throws NoSuchFileException, ConfigurationException
+    {
+        String fullPath = request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString();
+        String filePath = StringUtils.substringAfter(fullPath, fullPath.contains("files") ? "files" : "file");
+
+        logger.info("file with path " + filePath + " to be removed from config server");
+
+        fileConfigurationService.removeFileFromConfiguration(filePath);
+    }
 }

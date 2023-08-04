@@ -27,7 +27,7 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -37,13 +37,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.jms.DeliveryMode;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
 
 @Service
 @Qualifier(value = "fileConfigurationService")
@@ -115,10 +120,47 @@ public class FileConfigurationService {
 
     }
 
-    public JsonNode getResourceDetails(String path)
+    public ResponseEntity getResourceDetails(String path) throws FileNotFoundException
     {
-        File directoryPath = new File(configServerRepo.concat(path));
-        File[] listOfFiles = directoryPath.listFiles();
+        File resourcePath = new File(configServerRepo.concat(path));
+        if(resourcePath.exists())
+        {
+            if (resourcePath.isDirectory())
+            {
+                return retrieveResourceDetails(resourcePath);
+            }
+            else
+            {
+                return downloadFileResource(path);
+            }
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource with path " + path + " not found on config server.");
+        }
+    }
+
+    public void removeFileFromConfiguration(String filePath) throws NoSuchFileException, ConfigurationException
+    {
+        File fileToBeRemoved = new File(configServerRepo.concat(filePath));
+
+        if(!fileToBeRemoved.exists())
+        {
+            logger.error("File with path " + filePath + " doesn't exists.");
+            throw new NoSuchFileException("File with path " + filePath + " doesn't exist.");
+        }
+
+        logger.info("Deleting file with path " + filePath);
+        if (!fileToBeRemoved.delete())
+        {
+            throw new ConfigurationException("File with path " +filePath + " could not be deleted");
+        }
+
+    }
+
+    private ResponseEntity retrieveResourceDetails(File resource)
+    {
+        File[] listOfFiles = resource.listFiles();
         ArrayNode result = objectMapper.createArrayNode();
         for (File file : listOfFiles)
         {
@@ -127,7 +169,29 @@ public class FileConfigurationService {
             fileNode.put("isFile", file.isFile());
             result.add(fileNode);
         }
-        return result;
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+    private ResponseEntity downloadFileResource(String resourcePath) throws FileNotFoundException
+    {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        try
+        {
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(new File(resourcePath)));
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(resourcePath.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        }
+        catch (FileNotFoundException e)
+        {
+            logger.error("File with path " + resourcePath + " not found on config server.");
+            throw new FileNotFoundException("File with path " + resourcePath + " not found on config server.");
+        }
+    }
+
 
 }
