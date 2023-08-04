@@ -6,6 +6,9 @@ spring:
       native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/form,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/menu,file:${user.home}/.arkcase/acm/acm-config-server-repo/schemas/query
   jms:
     pub-sub-domain: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
 #spring.cloud.config.server.git.clone-on-start: true
 #spring.security.user.name: root
