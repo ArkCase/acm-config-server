@@ -27,11 +27,16 @@ package com.armedia.acm.configserver;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
+
+import com.armedia.acm.curator.Session;
+import com.armedia.acm.curator.recipe.Leader;
 
 @EnableConfigServer
 @SpringBootApplication
@@ -40,8 +45,63 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class AcmConfigServerApplication
 {
 
-    public static void main(String[] args)
+    private static final Logger LOG = LoggerFactory.getLogger(AcmConfigServerApplication.class);
+
+    private static void run(String... args)
     {
+        // Launch the spring boot application
+        AcmConfigServerApplication.LOG.info("Launching the main workload");
         SpringApplication.run(AcmConfigServerApplication.class, args);
+
+        // In this mode of operation we have to wait until we're interrupted b/c
+        // the Spring Boot app runs in the background
+        final Object waiter = new Object();
+        synchronized (waiter)
+        {
+            while (true)
+            {
+                try
+                {
+                    // This is a simple means of waiting forever without consuming resources
+                    AcmConfigServerApplication.LOG.info("Waiting until interrupted");
+                    waiter.wait();
+                }
+                catch (InterruptedException e)
+                {
+                    // If we're interrupted, we simply return
+                    return;
+                }
+            }
+        }
+    }
+
+    public static void main(String... args) throws Exception
+    {
+        try (Session session = ClusterConfig.newSessionBuilder().build())
+        {
+            if (session.isEnabled())
+            {
+                // This is the new, "clusterable" code path
+                AcmConfigServerApplication.LOG.info("Running in clustered mode");
+                // TODO: Should we instead make this listen on a different port
+                // to signal readiness? I.e. port 6666? It would just
+                // listen on that address and instantly close the connections,
+                // thus only being useful for TCP connectivity checks
+                try (AutoCloseable leadership = new Leader(session, "cloudconfig").awaitLeadership())
+                {
+                    AcmConfigServerApplication.run(args);
+                }
+                catch (Exception e)
+                {
+                    AcmConfigServerApplication.LOG.error("Exception caught from the curator wrapper", e);
+                }
+            }
+            else
+            {
+                // This is the original code path, plus more logging :D
+                AcmConfigServerApplication.LOG.info("Running in standalone mode");
+                AcmConfigServerApplication.run(args);
+            }
+        }
     }
 }
