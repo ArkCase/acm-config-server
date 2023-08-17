@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.12.RELEASE</version>
+        <version>2.6.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -51,12 +51,19 @@
 
     <properties>
         <revision>2022.02-SNAPSHOT</revision>
-        <gitflow-maven-plugin.version>1.12.0</gitflow-maven-plugin.version>
-        <java.version>1.8</java.version>
+        <gitflow-maven-plugin.version>1.14.0</gitflow-maven-plugin.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+        <spring-cloud.version>2021.0.8</spring-cloud.version>
         <log4j2.version>2.17.1</log4j2.version>
+        <byte-buddy.version>1.12.17</byte-buddy.version>
+        <snakeyaml.version>1.29</snakeyaml.version>
+        <log4j-slf4j.version>2.20.0</log4j-slf4j.version>
+        <commons-io.version>2.13.0</commons-io.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <guava.version>32.1.2-jre</guava.version>
+        <spock-bom.version>2.3-groovy-4.0</spock-bom.version>
     </properties>
 
     <dependencies>
@@ -92,43 +99,52 @@
             <scope>test</scope>
         </dependency>
         <dependency> <!-- use a specific Groovy version rather than the one specified by spock-core -->
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.4.7</version>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>4.0.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-junit4</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
-            <version>1.0-groovy-2.4</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>3.2.10</version>
+        <dependency> <!-- enables mocking of classes (in addition to interfaces) -->
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${byte-buddy.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.11.2</version>
+            <version>${log4j-slf4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.29</version>
+            <version>${snakeyaml.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>${commons-io.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 
@@ -138,6 +154,13 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-bom</artifactId>
+                <version>${spock-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -157,9 +180,6 @@
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
                 <version>${gitflow-maven-plugin.version}</version>
-                <configuration>
-
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -171,7 +191,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>1.16</version>
+                <version>2.0.0</version>
                 <configuration>
                     <licenseName>arkcase_license</licenseName>
                     <licenseResolver>classpath://arkcase</licenseResolver>
