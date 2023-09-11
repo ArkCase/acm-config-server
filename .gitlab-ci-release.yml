@@ -64,7 +64,7 @@ release_candidate_X:
     git push origin "HEAD:refs/tags/${RC_VERSION}"
     mvn -Drevision="${RC_VERSION}" -DskipTests -T 4 -B deploy
     # Deploy the file for consumption by the Installer (this needs phasing out)
-    sftp -b - "${SFTP_TARGET}" <<< $"put target/*.jar ${SFTP_FOLDER}/config-server-${RC_VERSION}.jar"
+    scp -s target/config-server-*.jar "${SFTP_TARGET}:${SFTP_FOLDER/config-server-${RC_VERSION}.jar"
     # Deploy on test servers
 
 release:
@@ -84,7 +84,7 @@ release:
     git checkout "master"
     mvn -Drevision="${RELEASE_VERSION}" -DskipITs -T 4 -B deploy
     # Deploy the file for consumption by the Installer (this needs phasing out)
-    sftp -b - "${SFTP_TARGET}" <<< $"put target/*.jar ${SFTP_FOLDER}/config-server-${RELEASE_VERSION}.jar"
+    scp -s target/config-server-*.jar "${SFTP_TARGET}:${SFTP_FOLDER/config-server-${RELEASE_VERSION}.jar"
 
 start_support_branch:
   stage: release
@@ -123,5 +123,5 @@ release_hotfix:
     mvn -B gitflow:hotfix-finish -DpushRemote=true -DhotfixVersion="support/${HOTFIX_SUPPORT_VERSION}/${RELEASE_VERSION}" -DskipTestProject=true -DskipMergeDevBranch=true
     mvn -Drevision="${RELEASE_VERSION}" -DskipITs -T 4 -B deploy
     # Deploy the file for consumption by the Installer (this needs phasing out)
-    sftp -b - "${SFTP_TARGET}" <<< $"put target/*.jar ${SFTP_FOLDER}/config-server-${RELEASE_VERSION}.jar"
+    scp -s target/config-server-*.jar "${SFTP_TARGET}:${SFTP_FOLDER/config-server-${RELEASE_VERSION}.jar"
     # Deploy on test servers

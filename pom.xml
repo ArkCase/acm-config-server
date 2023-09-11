@@ -5,7 +5,7 @@
 
     <groupId>com.armedia.acm</groupId>
     <artifactId>config-server</artifactId>
-    <version>2022.04-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <name>acm-config-server</name>
@@ -50,7 +50,7 @@
     </distributionManagement>
 
     <properties>
-        <revision>2022.02-SNAPSHOT</revision>
+        <revision>2022.04-SNAPSHOT</revision>
         <gitflow-maven-plugin.version>1.14.0</gitflow-maven-plugin.version>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
