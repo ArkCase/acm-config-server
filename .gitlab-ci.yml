@@ -16,8 +16,8 @@ stages:
 
 build_snapshot:
   stage: build
-  script: |
-    mvn clean deploy
-    sftp -b - "${SFTP_TARGET}" <<< $"put target/*.jar ${SFTP_FOLDER}/config-server.jar"
   rules:
     - if: $CI_COMMIT_REF_NAME == $BRANCH_NAME
+  script: |
+    mvn clean deploy
+    scp -s target/config-server-*.jar "${SFTP_TARGET}:${SFTP_FOLDER}/config-server.jar"
