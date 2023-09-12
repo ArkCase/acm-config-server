@@ -1,11 +1,10 @@
-FROM maven:3.6-jdk-8 as build
+FROM maven:3.8-adoptopenjdk-11 as build
 
 WORKDIR /build
 COPY . .
 RUN mvn clean install
 
-
-FROM openjdk:8-jdk
+FROM openjdk:11.0.16
 
 WORKDIR /app
 RUN useradd --create-home --user-group arkcase \
