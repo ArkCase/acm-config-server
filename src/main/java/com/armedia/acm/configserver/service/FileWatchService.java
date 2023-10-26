@@ -59,6 +59,8 @@ public class FileWatchService
 
     private final String configurationChangedDestination;
 
+    private final String permissionsChangedDestination;
+
     private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
@@ -69,6 +71,7 @@ public class FileWatchService
                             @Value("${acm.activemq.lookups-destination}") String lookupsDestination,
                             @Value("${acm.activemq.rules-destination}") String rulesDestination,
                             @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
+                            @Value("${acm.activemq.permissions-destination}") String permissionsChangedDestination,
                             ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
@@ -77,6 +80,7 @@ public class FileWatchService
         this.lookupsDestination = lookupsDestination;
         this.rulesDestination = rulesDestination;
         this.configurationChangedDestination = configurationChangedDestination;
+        this.permissionsChangedDestination = permissionsChangedDestination;
         this.configurationChangeMessageProducer = configurationChangeMessageProducer;
         logger.debug("Initializing FileWatchService");
     }
@@ -134,6 +138,10 @@ public class FileWatchService
                             else if (parentDirectory.contains("lookups"))
                             {
                                 configurationChangeMessageProducer.sendMessage(lookupsDestination);
+                            }
+                            else if (parentDirectory.contains("permissions"))
+                            {
+                                configurationChangeMessageProducer.sendMessage(permissionsChangedDestination);
                             }
                             else
                             {
