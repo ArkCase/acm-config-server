@@ -106,6 +106,9 @@ public class FileWatchService
             Path rulesPath = Paths.get(propertiesFolderPath + "/rules");
             rulesPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
+            Path permissionsPath = Paths.get(propertiesFolderPath + "/permissions");
+            permissionsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
             WatchKey key;
             while (true)
             {
@@ -141,7 +144,7 @@ public class FileWatchService
                             }
                             else if (parentDirectory.contains("permissions"))
                             {
-                                configurationChangeMessageProducer.sendMessage(permissionsChangedDestination);
+                                configurationChangeMessageProducer.sendTextMessage(permissionsChangedDestination, filePath.toString());
                             }
                             else
                             {
