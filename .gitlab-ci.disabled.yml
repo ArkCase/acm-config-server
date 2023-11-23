@@ -1,0 +1,46 @@
+include:
+  - local: '.gitlab-ci-release.yml'
+
+variables:
+  # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
+  # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  # As of Maven 3.3.0 instead of this you may define these options in `.mvn/maven.config` so the same config is used
+  # when running from the command line.
+  # `installAtEnd` and `deployAtEnd` are only effective with recent version of the corresponding plugins.
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  GIT_SSL_NO_VERIFY: "true"
+  GIT_STRATEGY: clone
+
+
+cache:
+  paths:
+    - .m2/repository
+
+image: arkcase-gitlab-ci:1.0.2
+
+stages:
+  - build
+  - release
+
+build_snapshot:
+  stage: build
+  except:
+    changes:
+      #- .gitlab-ci.yaml
+  script:
+    - echo '<settings>' > /root/.m2/settings.xml
+    - echo '  <servers>' >> /root/.m2/settings.xml
+    - echo '    <server>' >> /root/.m2/settings.xml
+    - echo '      <id>arkcase.snapshot</id>' >> /root/.m2/settings.xml
+    - echo '      <username>admin</username>' >> /root/.m2/settings.xml
+    - echo "      <password>$MVN_PASSWORD</password>" >> /root/.m2/settings.xml
+    - echo '    </server>' >> /root/.m2/settings.xml
+    - echo '  </servers>' >> /root/.m2/settings.xml
+    - echo '</settings>' >> /root/.m2/settings.xml
+    - 'mvn $MAVEN_CLI_OPTS clean deploy "-DaltDeploymentRepository=arkcase.snapshot::default::$NEXUS_URL/repository/arkcase.snapshot/" -Dmaven.wagon.http.ssl.insecure=true'
+    - apt-get update
+    - apt-get install -y sshpass
+    - sshpass -e sftp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $SFTP_USER@$SFTP_SERVER <<< $'put target/*.jar /from-arkcase/config-server.jar' 
+  only:
+    - develop
