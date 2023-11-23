@@ -50,7 +50,7 @@
     </distributionManagement>
 
     <properties>
-        <revision>2024.01.01-SNAPSHOT</revision>
+        <revision>2022.04-SNAPSHOT</revision>
         <gitflow-maven-plugin.version>1.14.0</gitflow-maven-plugin.version>
         <java.version>11</java.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
