@@ -18,10 +18,12 @@
     </parent>
 
     <inceptionYear>2019</inceptionYear>
+
     <organization>
         <name>ArkCase LLC</name>
         <url>https://www.arkcase.com</url>
     </organization>
+
     <licenses>
         <license>
             <name>GNU Lesser General Public License</name>
@@ -35,7 +37,13 @@
         <url>${git.repository}</url>
         <tag>HEAD</tag>
     </scm>
+
     <distributionManagement>
+        <snapshotRepository>
+            <id>${snapshot-repository.id}</id>
+            <name>${snapshot-repository.name}</name>
+            <url>${snapshot-repository.url}</url>
+        </snapshotRepository>
         <repository>
             <id>${release-repository.id}</id>
             <name>${release-repository.name}</name>
