@@ -52,7 +52,7 @@
     </distributionManagement>
 
     <properties>
-        <revision>2023.02.01</revision>
+        <revision>2023.02.02-SNAPSHOT</revision>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
