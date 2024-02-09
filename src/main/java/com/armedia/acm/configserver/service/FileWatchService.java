@@ -1,5 +1,24 @@
 package com.armedia.acm.configserver.service;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
 /*-
  * #%L
  * acm-config-server
@@ -28,143 +47,118 @@ package com.armedia.acm.configserver.service;
  */
 
 import com.armedia.acm.configserver.jms.ConfigurationChangeMessageProducer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 
 @Service
 public class FileWatchService
 {
     private final String propertiesFolderPath;
 
-    private final String labelsDestination;
+    private final Map<String, Consumer<Path>> handlers;
 
-    private final String ldapDestination;
-
-    private final String lookupsDestination;
-
-    private final String rulesDestination;
-
-    private final String configurationChangedDestination;
-
-    private final String permissionsChangedDestination;
-
-    private final ConfigurationChangeMessageProducer configurationChangeMessageProducer;
+    private final Consumer<Path> defaultHandler;
 
     private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
-    public FileWatchService(@Value("${properties.folder.path}") String propertiesFolderPath,
-                            @Value("${acm.activemq.labels-destination}") String labelsDestination,
-                            @Value("${acm.activemq.ldap-destination}") String ldapDestination,
-                            @Value("${acm.activemq.lookups-destination}") String lookupsDestination,
-                            @Value("${acm.activemq.rules-destination}") String rulesDestination,
-                            @Value("${acm.activemq.default-destination}") String configurationChangedDestination,
-                            @Value("${acm.activemq.permissions-destination}") String permissionsChangedDestination,
-                            ConfigurationChangeMessageProducer configurationChangeMessageProducer)
+    public FileWatchService(@Value("${properties.folder.path}") final String propertiesFolderPath,
+            @Value("${acm.activemq.labels-destination}") final String labelsDestination,
+            @Value("${acm.activemq.ldap-destination}") final String ldapDestination,
+            @Value("${acm.activemq.lookups-destination}") final String lookupsDestination,
+            @Value("${acm.activemq.rules-destination}") final String rulesDestination,
+            @Value("${acm.activemq.default-destination}") final String configurationChangedDestination,
+            @Value("${acm.activemq.permissions-destination}") final String permissionsChangedDestination,
+            final ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
-        this.labelsDestination = labelsDestination;
-        this.ldapDestination = ldapDestination;
-        this.lookupsDestination = lookupsDestination;
-        this.rulesDestination = rulesDestination;
-        this.configurationChangedDestination = configurationChangedDestination;
-        this.permissionsChangedDestination = permissionsChangedDestination;
-        this.configurationChangeMessageProducer = configurationChangeMessageProducer;
-        logger.debug("Initializing FileWatchService");
+        FileWatchService.logger.debug("Initializing FileWatchService");
+
+        // Define the handlers we want ...
+        this.handlers = Collections.unmodifiableMap(new HashMap<String, Consumer<Path>>()
+        {
+            private static final long serialVersionUID = 1L;
+
+            {
+                put("ldap", (filePath) -> configurationChangeMessageProducer
+                        .sendMessage(ldapDestination));
+
+                put("labels", (filePath) -> configurationChangeMessageProducer
+                        .sendMessage(labelsDestination));
+
+                put("rules",
+                        (filePath) -> configurationChangeMessageProducer.sendTextMessage(
+                                rulesDestination,
+                                filePath.toString()));
+
+                put("lookups", (filePath) -> configurationChangeMessageProducer
+                        .sendMessage(lookupsDestination));
+
+                put("permissions",
+                        (filePath) -> configurationChangeMessageProducer.sendTextMessage(
+                                permissionsChangedDestination,
+                                filePath.toString()));
+            }
+        });
+
+        // If none of the above match, we need a default handler...
+        this.defaultHandler = (filePath) -> configurationChangeMessageProducer
+                .sendMessage(configurationChangedDestination);
     }
 
     @Async
     public void monitor()
     {
-        try
+        // Use try-with-resources with the watch service...
+        try (WatchService watchService = FileSystems.getDefault().newWatchService())
         {
-            WatchService watchService = FileSystems.getDefault().newWatchService();
-            Path path = Paths.get(propertiesFolderPath);
-            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            Path path = Paths.get(this.propertiesFolderPath);
+            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
+                    StandardWatchEventKinds.ENTRY_DELETE);
 
-            Path labelsPath = Paths.get(propertiesFolderPath + "/labels");
-            labelsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            // Register the handlers' watchers
+            for (String k : this.handlers.keySet())
+            {
+                Path watchedPath = Paths.get(this.propertiesFolderPath, k);
+                FileWatchService.logger.info("Registering the watcher for [{}]", watchedPath);
+                watchedPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
+                        StandardWatchEventKinds.ENTRY_DELETE);
+            }
 
-            Path ldapPath = Paths.get(propertiesFolderPath + "/ldap");
-            ldapPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            Path lookupsPath = Paths.get(propertiesFolderPath + "/lookups");
-            lookupsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            Path rulesPath = Paths.get(propertiesFolderPath + "/rules");
-            rulesPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            Path permissionsPath = Paths.get(propertiesFolderPath + "/permissions");
-            permissionsPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-            WatchKey key;
             while (true)
             {
                 try
                 {
-                    logger.debug("Waiting for file change on path [{}]", path.toString());
-                    if ((key = watchService.take()) != null)
+                    FileWatchService.logger.debug("Waiting for file change on path [{}]", path.toString());
+                    WatchKey key = watchService.take();
+                    if (key == null)
                     {
-                        logger.debug("Watch key event present...");
-                        for (WatchEvent<?> event : key.pollEvents())
-                        {
-                            Path filePath = (Path) event.context();
-                            File modifiedFile = filePath.toFile();
-                            logger.info("Configuration file [{}] in folder [{}] has been updated!", modifiedFile, propertiesFolderPath);
-                            String parentDirectory = key.watchable().toString();
-
-                            if (parentDirectory.contains("ldap"))
-                            {
-                                configurationChangeMessageProducer.sendMessage(ldapDestination);
-                            }
-                            else if (parentDirectory.contains("labels"))
-                            {
-                                configurationChangeMessageProducer.sendMessage(labelsDestination);
-                            }
-                            else if (parentDirectory.contains("rules"))
-                            {
-                                configurationChangeMessageProducer.sendTextMessage(rulesDestination,
-                                        filePath.toString());
-                            }
-                            else if (parentDirectory.contains("lookups"))
-                            {
-                                configurationChangeMessageProducer.sendMessage(lookupsDestination);
-                            }
-                            else if (parentDirectory.contains("permissions"))
-                            {
-                                configurationChangeMessageProducer.sendTextMessage(permissionsChangedDestination, filePath.toString());
-                            }
-                            else
-                            {
-                                configurationChangeMessageProducer.sendMessage(configurationChangedDestination);
-                            }
-                        }
-                        key.reset();
-                        logger.debug("Reset watch key...");
+                        // Nothing to process, wait some more...
+                        continue;
                     }
+
+                    FileWatchService.logger.debug("Watch key event present...");
+                    for (WatchEvent<?> event : key.pollEvents())
+                    {
+                        Path filePath = (Path) event.context();
+                        String watchedPath = key.watchable().toString();
+                        FileWatchService.logger.info("Configuration file [{}] in folder [{}] has been updated!", filePath,
+                                watchedPath);
+                        String parentDirectoryName = Paths.get(watchedPath).getFileName().toString();
+
+                        FileWatchService.logger.debug("Launching the handler for [{}]", parentDirectoryName);
+                        this.handlers.getOrDefault(parentDirectoryName, this.defaultHandler).accept(filePath);
+                    }
+                    key.reset();
+                    FileWatchService.logger.debug("Reset watch key...");
                 }
                 catch (Exception e)
                 {
-                    logger.error("Monitoring folder [{}] failed. {}", propertiesFolderPath, e.getMessage());
-                    logger.trace("Cause: ", e);
+                    FileWatchService.logger.error("Monitoring folder [{}] failed. {}", this.propertiesFolderPath, e.getMessage());
+                    FileWatchService.logger.trace("Cause: ", e);
                 }
             }
         }
         catch (IOException e)
         {
-            logger.error("Error trying to find folder path [{}]. {}", propertiesFolderPath, e.getMessage());
+            FileWatchService.logger.error("Error trying to find folder path [{}]. {}", this.propertiesFolderPath, e.getMessage());
         }
     }
 }
