@@ -26,3 +26,7 @@ logs
 /dist/
 /nbdist/
 /.nb-gradle/
+
+.flattened-pom.xml
+**/.*.sw?
+**/.sw?
