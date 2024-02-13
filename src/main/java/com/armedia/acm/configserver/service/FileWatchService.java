@@ -3,6 +3,8 @@ package com.armedia.acm.configserver.service;
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
@@ -52,13 +54,13 @@ import com.armedia.acm.configserver.jms.ConfigurationChangeMessageProducer;
 @Service
 public class FileWatchService
 {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final String propertiesFolderPath;
 
     private final Map<String, Consumer<Path>> handlers;
 
     private final Consumer<Path> defaultHandler;
-
-    private static final Logger logger = LoggerFactory.getLogger(FileWatchService.class);
 
     public FileWatchService(@Value("${properties.folder.path}") final String propertiesFolderPath,
             @Value("${acm.activemq.labels-destination}") final String labelsDestination,
@@ -70,7 +72,7 @@ public class FileWatchService
             final ConfigurationChangeMessageProducer configurationChangeMessageProducer)
     {
         this.propertiesFolderPath = propertiesFolderPath;
-        FileWatchService.logger.debug("Initializing FileWatchService");
+        this.logger.debug("Initializing FileWatchService");
 
         // Define the handlers we want ...
         this.handlers = Collections.unmodifiableMap(new HashMap<String, Consumer<Path>>()
@@ -104,38 +106,56 @@ public class FileWatchService
                 .sendMessage(configurationChangedDestination);
     }
 
+    private Path ensureDirectoryExists(Path dir, LinkOption... options) throws IOException
+    {
+        // Create it if it doesn't exist...
+        if (!Files.exists(dir, options))
+        {
+            Files.createDirectories(dir);
+        }
+
+        // It must exist by here, so check to see if it's a directory
+        if (!Files.isDirectory(dir, options))
+        {
+            throw new IOException(String.format("The path [%s] is not a directory", dir));
+        }
+
+        // Return the directory
+        return dir;
+    }
+
     @Async
     public void monitor()
     {
         // Use try-with-resources with the watch service...
         try (WatchService watchService = FileSystems.getDefault().newWatchService())
         {
-            Path path = Paths.get(this.propertiesFolderPath);
+            final Path basePath = ensureDirectoryExists(Paths.get(this.propertiesFolderPath));
 
             try
             {
-                path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
+                basePath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
                         StandardWatchEventKinds.ENTRY_DELETE);
 
                 // Register the handlers' watchers
                 for (String k : this.handlers.keySet())
                 {
-                    Path watchedPath = Paths.get(this.propertiesFolderPath, k);
-                    FileWatchService.logger.info("Registering the watcher for [{}]", watchedPath);
+                    final Path watchedPath = ensureDirectoryExists(Paths.get(this.propertiesFolderPath, k));
+                    this.logger.info("Registering the watcher for [{}]", watchedPath);
                     watchedPath.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
                             StandardWatchEventKinds.ENTRY_DELETE);
                 }
             }
             catch (IOException e)
             {
-                FileWatchService.logger.error("Failed to register the watchers in folder path [{}]", this.propertiesFolderPath, e);
-                // If we have no watchers, we can't continue
+                this.logger.error("Failed to register the watchers in folder path [{}]", this.propertiesFolderPath, e);
+                // If we had issues registering the watchers, we can't continue safely
                 return;
             }
 
             while (true)
             {
-                FileWatchService.logger.debug("Waiting for file change on path [{}]", path);
+                this.logger.debug("Waiting for file change on path [{}]", basePath);
                 WatchKey key;
                 try
                 {
@@ -145,7 +165,7 @@ public class FileWatchService
                 {
                     // If this take() failed, we can't recover ...
                     // We don't need to enable trace mode to show errors. This should be the default behavior
-                    FileWatchService.logger.error("Failed to get the next monitor event on folder [{}].", this.propertiesFolderPath, e);
+                    this.logger.error("Failed to get the next monitor event on folder [{}].", this.propertiesFolderPath, e);
                     return;
                 }
 
@@ -155,16 +175,16 @@ public class FileWatchService
                     continue;
                 }
 
-                FileWatchService.logger.debug("Watch key event present...");
+                this.logger.debug("Watch key event present...");
                 for (WatchEvent<?> event : key.pollEvents())
                 {
                     Path filePath = (Path) event.context();
                     String watchedPath = key.watchable().toString();
-                    FileWatchService.logger.info("Configuration file [{}] in folder [{}] has been updated!", filePath,
+                    this.logger.info("Configuration file [{}] in folder [{}] has been updated!", filePath,
                             watchedPath);
                     String parentDirectoryName = Paths.get(watchedPath).getFileName().toString();
 
-                    FileWatchService.logger.debug("Launching the handler for [{}]", parentDirectoryName);
+                    this.logger.debug("Launching the handler for [{}]", parentDirectoryName);
                     try
                     {
                         this.handlers.getOrDefault(parentDirectoryName, this.defaultHandler).accept(filePath);
@@ -173,17 +193,17 @@ public class FileWatchService
                     {
                         // We do it like this b/c the error may only be for this event, and other events may
                         // process correctly.
-                        FileWatchService.logger.error("Error detected while handling an update to [{}] in [{}]", filePath, watchedPath,
+                        this.logger.error("Error detected while handling an update to [{}] in [{}]", filePath, watchedPath,
                                 e);
                     }
                 }
                 key.reset();
-                FileWatchService.logger.debug("Reset watch key...");
+                this.logger.debug("Reset watch key...");
             }
         }
         catch (IOException e)
         {
-            FileWatchService.logger.error("Exception raised by the watch service", e);
+            this.logger.error("Exception raised by the watch service", e);
         }
     }
 }
