@@ -74,7 +74,14 @@ public class FileWatchService
         this.propertiesFolderPath = propertiesFolderPath;
         this.logger.debug("Initializing FileWatchService");
 
-        // Define the handlers we want ...
+        // Define the handlers we want ... if you want more handlers, this is where
+        // they go. Each key (i.e. "ldap", "labels", etc...) should match a subdirectory
+        // directly within ${properties.folder.path} (i.e. do NOT use subpaths like
+        // "ldap/special" or "labels/foia" or whatnot!).
+        //
+        // The value is, then, a consumer of some sort that will accept the filePath of
+        // the file that was updated, and do "whatever" with it. If in doubt, follow
+        // the patterns below.
         this.handlers = Collections.unmodifiableMap(new HashMap<String, Consumer<Path>>()
         {
             private static final long serialVersionUID = 1L;
