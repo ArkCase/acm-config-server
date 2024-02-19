@@ -27,8 +27,8 @@ package com.armedia.acm.configserver.jms;
  * #L%
  */
 
+import com.google.common.base.MoreObjects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.style.ToStringCreator;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -146,11 +146,11 @@ public class ActiveMqConfiguration
     @Override
     public String toString()
     {
-        return new ToStringCreator(this)
-                .append("brokerUrl", brokerUrl)
-                .append("user", user)
-                .append("defaultDestination", defaultDestination)
-                .append("timeout", timeout)
+        return MoreObjects.toStringHelper(this)
+                .add("brokerUrl", brokerUrl)
+                .add("user", user)
+                .add("defaultDestination", defaultDestination)
+                .add("timeout", timeout)
                 .toString();
     }
 }

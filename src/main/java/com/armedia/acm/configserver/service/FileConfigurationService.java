@@ -27,7 +27,7 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import org.apache.activemq.ConfigurationException;
+import com.armedia.acm.configserver.api.ConfigurationAPIController;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.jms.DeliveryMode;
+import javax.jms.TextMessage;
 import java.io.File;
 import java.io.InputStream;
 
@@ -81,7 +82,7 @@ public class FileConfigurationService {
         }
         catch (Exception e)
         {
-            throw new ConfigurationException("Can't update logo file");
+            throw new Exception("Can't update logo file");
         }
     }
 
@@ -108,5 +109,7 @@ public class FileConfigurationService {
         acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
 
         logger.debug("File with name {} is updated and success message is sent for updating", message);
+
     }
+
 }

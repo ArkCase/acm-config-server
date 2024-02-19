@@ -35,6 +35,8 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.jms.Session;
+
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -85,8 +87,8 @@ public class ConfigurationChangeMessageProducer
                         logger.info("Sending configuration change topic message...");
                         try
                         {
-                            // acmJmsTemplate.send(new ActiveMQTopic(destination), Session::createMessage);
-                            logger.debug("Message successfully sent on destination {}", destination);
+                            acmJmsTemplate.send(new ActiveMQTopic(destination), Session::createMessage);
+                            logger.debug("Message successfully sent");
                         }
                         catch (JmsException e)
                         {

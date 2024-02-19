@@ -27,15 +27,17 @@ package com.armedia.acm.configserver.api;
  * #L%
  */
 
-import com.armedia.acm.configserver.service.FileSystemConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -43,23 +45,61 @@ import java.util.List;
 public class ModulesListAPIController
 {
     private static final Logger logger = LoggerFactory.getLogger(ModulesListAPIController.class);
-    private final FileSystemConfigurationService fileSystemConfigurationService;
 
-    public ModulesListAPIController(FileSystemConfigurationService fileSystemConfigurationService)
+    private final List<String> langs;
+
+    private final String labelsFolderPath;
+
+    public ModulesListAPIController(@Value("${properties.folder.path}") String propertiesFolderPath,
+            @Value("${arkcase.languages}") String arkcaseLanguages)
     {
-        this.fileSystemConfigurationService = fileSystemConfigurationService;
+        this.labelsFolderPath = propertiesFolderPath + "/labels";
+        this.langs = Arrays.asList(arkcaseLanguages.split(","));
     }
 
     @GetMapping(value = "/modules", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<String>> getModules()
+    public List<String> getModules()
     {
-        try {
-            List<String> result = fileSystemConfigurationService.getModulesNames();
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            logger.debug("Failed to list modules. {}", e.getMessage());
-            logger.trace("Cause: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        return getModulesNames();
+    }
+
+    /**
+     * Return list of modules configuration
+     *
+     * @return
+     */
+    public List<String> getModulesNames()
+    {
+        File modulesDir = new File(labelsFolderPath);
+
+        File[] files = modulesDir.listFiles(file -> {
+            if (file.isFile() && !file.getName().toLowerCase().contains("-runtime"))
+            {
+                return true;
+            }
+            return false;
+        });
+
+        List<String> modules = new ArrayList<>();
+
+        for (File labelResource : files)
+        {
+            for (String lang : langs)
+            {
+                String fileName = labelResource.getName();
+                if (fileName.contains(lang))
+                {
+                    int sepPos = fileName.indexOf(lang);
+                    String moduleName = fileName.substring(0, sepPos);
+                    if (!modules.stream().anyMatch(module -> module.equals(moduleName)))
+                    {
+                        modules.add(moduleName);
+                    }
+                }
+            }
         }
+
+        logger.info("Returns modules names. [{}]", modules.toArray());
+        return modules;
     }
 }

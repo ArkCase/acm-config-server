@@ -30,7 +30,7 @@ package com.armedia.acm.configserver.api;
 import com.armedia.acm.configserver.service.FileConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,34 +38,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
+
 @RestController
 @RequestMapping("/file")
 public class FileConfigurationApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileConfigurationApiController.class);
-    private final FileConfigurationService fileConfigurationService;
+    @Autowired
+    FileConfigurationService fileConfigurationService;
 
-    public FileConfigurationApiController(final FileConfigurationService fileConfigurationService) {
-        this.fileConfigurationService = fileConfigurationService;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(FileConfigurationApiController.class);
 
     @PostMapping()
-    public ResponseEntity<Void> moveFileToConfiguration(@RequestParam("file") MultipartFile file,
-                                                  @RequestParam("fileName") String fileName) {
+    public ResponseEntity moveFileToConfiguration(@RequestParam("file") MultipartFile file,
+                                                  @RequestParam("fileName") String fileName) throws Exception {
 
         logger.info("branding file is received on config server! [{}]", fileName);
 
-        try {
-            fileConfigurationService.moveFileToConfiguration(file, fileName);
+        fileConfigurationService.moveFileToConfiguration(file, fileName);
 
-            logger.info("file [{}] is moved to config server!", fileName);
+        logger.info("file is moved to config server!");
 
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception e) {
-            logger.debug("Moving {} to config server failed. {}", fileName, e.getMessage());
-            logger.trace("Cause: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.ok().build();
     }
+
 }

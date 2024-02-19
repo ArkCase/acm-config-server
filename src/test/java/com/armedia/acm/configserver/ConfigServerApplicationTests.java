@@ -6,42 +6,40 @@ package com.armedia.acm.configserver;
  * %%
  * Copyright (C) 2019 ArkCase LLC
  * %%
- * This file is part of the ArkCase software.
- *
- * If the software was purchased under a paid ArkCase license, the terms of
- * the paid license agreement will prevail.  Otherwise, the software is
+ * This file is part of the ArkCase software. 
+ * 
+ * If the software was purchased under a paid ArkCase license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
  * provided under the following open source license terms:
- *
+ * 
  * ArkCase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * ArkCase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.config.server.EnableConfigServer;
-import org.springframework.jms.annotation.EnableJms;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@EnableConfigServer
-@SpringBootApplication
-@EnableJms
-@EnableAsync
-public class AcmConfigServerApplication
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ConfigServerApplicationTests
 {
 
-    public static void main(String[] args)
+    @Test
+    public void contextLoads()
     {
-        SpringApplication.run(AcmConfigServerApplication.class, args);
     }
+
 }
