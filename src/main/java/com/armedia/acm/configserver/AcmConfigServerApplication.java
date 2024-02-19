@@ -39,7 +39,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class AcmConfigServerApplication
 {
-
     public static void main(String[] args)
     {
         SpringApplication.run(AcmConfigServerApplication.class, args);
