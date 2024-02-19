@@ -42,14 +42,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Qualifier(value = "fileSystemConfigurationService")
@@ -61,16 +59,22 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private final String brandingFilesFolder;
 
+    private final List<String> languages;
+
+
     private FileConfigurationService fileConfigurationService;
 
     private static final String RUNTIME = "-runtime";
 
     public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
-            @Value("${branding.files.folder.path}") String brandingFilesFolder, FileConfigurationService fileConfigurationService)
+                                          @Value("${branding.files.folder.path}") String brandingFilesFolder,
+                                          @Value("${arkcase.languages}") List<String> arkcaseLanguages,
+                                          FileConfigurationService fileConfigurationService)
     {
         this.propertiesFolderPath = propertiesFolderPath;
         this.brandingFilesFolder = brandingFilesFolder;
         this.fileConfigurationService = fileConfigurationService;
+        this.languages = arkcaseLanguages;
     }
 
     @Override
@@ -91,10 +95,7 @@ public class FileSystemConfigurationService implements ConfigurationService
                 configMap = new LinkedHashMap<>();
             }
 
-            for (Map.Entry<String, Object> entry : properties.entrySet())
-            {
-                configMap.put(entry.getKey(), entry.getValue());
-            }
+            configMap.putAll(properties);
 
             try (FileWriter fw = new FileWriter(yamlResource.getFile()))
             {
@@ -127,10 +128,7 @@ public class FileSystemConfigurationService implements ConfigurationService
                 configMap = new LinkedHashMap<>();
             }
 
-            for (String property : properties)
-            {
-                configMap.remove(property);
-            }
+            properties.forEach(configMap::remove);
 
             try (FileWriter fw = new FileWriter(yamlResource.getFile()))
             {
@@ -190,17 +188,14 @@ public class FileSystemConfigurationService implements ConfigurationService
         {
             if (file.getName().contains(FileSystemConfigurationService.RUNTIME))
             {
-                if (file.delete())
-                {
-                    logger.info("Reset file [{}] to default version.", file.getName());
-                    String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
-                    fileConfigurationService.sendNotification(originalFileName, FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
-
-                }
-                else
+                if (!file.delete())
                 {
                     throw new ConfigurationException(String.format("File %s could not be fetched", file.getName()));
                 }
+
+                logger.info("Reset file [{}] to default version.", file.getName());
+                String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
+                fileConfigurationService.sendNotification(originalFileName, FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
             }
         }
 
@@ -221,6 +216,40 @@ public class FileSystemConfigurationService implements ConfigurationService
                 }
             }
         }
+    }
+
+    /**
+     * @return list of modules configuration
+     */
+    public List<String> getModulesNames()
+    {
+        File modulesDir = new File(propertiesFolderPath);
+
+        File[] files = Optional.ofNullable(modulesDir.listFiles(file -> file.isFile() && !file.getName().toLowerCase().contains("-runtime")))
+                .orElse(new File[0]);
+
+        List<String> modules = new ArrayList<>();
+
+        for (File labelResource : files)
+        {
+            for (String lang : languages)
+            {
+                String fileName = labelResource.getName();
+                if(!fileName.contains(lang)) {
+                    continue;
+                }
+
+                int sepPos = fileName.indexOf(lang);
+                String moduleName = fileName.substring(0, sepPos);
+                if (modules.stream().noneMatch(module -> module.equals(moduleName)))
+                {
+                    modules.add(moduleName);
+                }
+            }
+        }
+
+        logger.info("Returns modules names. [{}]", modules.toArray());
+        return modules;
     }
 
     private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName)
@@ -247,20 +276,23 @@ public class FileSystemConfigurationService implements ConfigurationService
     private FileSystemResource loadYamlSystemResource(String configurationFilePath) throws ConfigurationException
     {
         FileSystemResource yamlResource = new FileSystemResource(configurationFilePath);
-        if (!yamlResource.getFile().exists())
-        {
-            File file = new File(yamlResource.getPath());
-            try
-            {
-                file.createNewFile();
-            }
-            catch (IOException e)
-            {
-                logger.warn("Failed to create file to path [{}]", yamlResource.getPath());
-                throw new ConfigurationException(e);
-            }
+        if(yamlResource.getFile().exists()) {
+            return yamlResource;
         }
-        return yamlResource;
+
+        return createResource(yamlResource);
+    }
+
+    private FileSystemResource createResource(FileSystemResource yamlResource) throws ConfigurationException {
+        File file = new File(yamlResource.getPath());
+        try {
+            file.createNewFile();
+            return yamlResource;
+        }
+        catch (IOException e) {
+            logger.warn("Failed to create file to path [{}]", yamlResource.getPath());
+            throw new ConfigurationException(e);
+        }
     }
 
     private String getRuntimeConfigurationFilePath(String applicationName)

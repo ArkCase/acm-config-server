@@ -27,7 +27,10 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import com.armedia.acm.configserver.api.ConfigurationAPIController;
+import com.armedia.acm.configserver.exception.ConfigurationException;
+import java.io.File;
+import java.io.InputStream;
+import javax.jms.DeliveryMode;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -37,11 +40,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.jms.DeliveryMode;
-import javax.jms.TextMessage;
-import java.io.File;
-import java.io.InputStream;
 
 @Service
 @Qualifier(value = "fileConfigurationService")
@@ -62,7 +60,7 @@ public class FileConfigurationService {
         this.acmJmsTemplate = acmJmsTemplate;
     }
 
-    public void moveFileToConfiguration(MultipartFile file, String fileName) throws Exception {
+    public void moveFileToConfiguration(MultipartFile file, String fileName) throws ConfigurationException {
         try (InputStream logoStream = file.getInputStream())
         {
 
@@ -70,7 +68,7 @@ public class FileConfigurationService {
 
             String profileBasedFile = setProfileBasedResource(fileName);
 
-            File logoFile = new File(configServerRepo + "/" + profileBasedFile);
+            File logoFile = new File(String.format("%s/%s", configServerRepo, profileBasedFile));
 
             FileUtils.copyInputStreamToFile(logoStream, logoFile);
 
@@ -82,7 +80,7 @@ public class FileConfigurationService {
         }
         catch (Exception e)
         {
-            throw new Exception("Can't update logo file");
+            throw new ConfigurationException("Can't update logo file");
         }
     }
 
@@ -109,7 +107,5 @@ public class FileConfigurationService {
         acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
 
         logger.debug("File with name {} is updated and success message is sent for updating", message);
-
     }
-
 }

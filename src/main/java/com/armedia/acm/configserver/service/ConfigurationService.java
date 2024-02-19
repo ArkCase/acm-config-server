@@ -29,7 +29,6 @@ package com.armedia.acm.configserver.service;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 
-import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Map;

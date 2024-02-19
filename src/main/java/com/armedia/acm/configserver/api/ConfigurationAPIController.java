@@ -29,7 +29,10 @@ package com.armedia.acm.configserver.api;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.service.ConfigurationService;
-import com.armedia.acm.configserver.service.FileConfigurationService;
+import java.nio.file.NoSuchFileException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,13 +46,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.NoSuchFileException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/config")
+@RequestMapping(ConfigurationAPIController.Path.RESOURCE)
 public class ConfigurationAPIController
 {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationAPIController.class);
@@ -57,17 +55,17 @@ public class ConfigurationAPIController
     private final List<String> langs;
 
     private final ConfigurationService configServerService;
-    private final FileConfigurationService fileConfigurationService;
 
-    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService, @Value("${arkcase.languages}") String arkcaseLanguages, FileConfigurationService fileConfigurationService)
+    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService,
+                                      @Value("${arkcase.languages}") String arkcaseLanguages)
+
     {
         this.configServerService = configServerService;
         this.langs = Arrays.asList(arkcaseLanguages.split(","));
-        this.fileConfigurationService = fileConfigurationService;
     }
 
     @PostMapping("/{applicationName}")
-    public ResponseEntity updateProperties(@PathVariable String applicationName, @RequestBody Map<String, Object> properties)
+    public ResponseEntity<Void> updateProperties(@PathVariable String applicationName, @RequestBody Map<String, Object> properties)
     {
         logger.info("Update properties {}", properties.keySet());
         try
@@ -93,8 +91,8 @@ public class ConfigurationAPIController
         }
     }
 
-    @PostMapping("/remove/{applicationName}")
-    public ResponseEntity removeProperties(@PathVariable String applicationName, @RequestBody List<String> properties)
+    @PostMapping(Path.REMOVE)
+    public ResponseEntity<Void> removeProperties(@PathVariable String applicationName, @RequestBody List<String> properties)
     {
         logger.info("Remove properties {}", properties);
         try
@@ -110,10 +108,9 @@ public class ConfigurationAPIController
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-    @DeleteMapping("/reset")
-    public ResponseEntity resetPropertiesToDefault()
+    
+    @DeleteMapping(Path.RESET_ALL)
+    public ResponseEntity<Void> resetPropertiesToDefault()
     {
         logger.info("Resetting all properties");
         try
@@ -130,8 +127,8 @@ public class ConfigurationAPIController
         }
     }
 
-    @DeleteMapping("/reset/{applicationName}")
-    public ResponseEntity resetFilePropertiesToDefault(@PathVariable String applicationName)
+    @DeleteMapping(Path.RESET)
+    public ResponseEntity<Void> resetFilePropertiesToDefault(@PathVariable String applicationName)
     {
         logger.info("Resetting properties for: {}", applicationName);
         if(langs.parallelStream().anyMatch(applicationName::contains))
@@ -154,5 +151,12 @@ public class ConfigurationAPIController
             logger.trace("Cause: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    public static final class Path {
+        public static final String RESOURCE = "/config";
+        public static final String REMOVE = "/remove/{applicationName}";
+        public static final String RESET = "/reset/{applicationName}";
+        public static final String RESET_ALL =  "/reset";
     }
 }
