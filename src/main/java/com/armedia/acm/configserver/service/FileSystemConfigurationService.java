@@ -43,7 +43,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Qualifier(value = "fileSystemConfigurationService")
@@ -253,11 +257,14 @@ public class FileSystemConfigurationService implements ConfigurationService
         List<File> resultList = new ArrayList<>();
 
         File[] fList = directory.listFiles();
-        for (File file : fList) {
-            if (file.isFile() && file.getName().contains(FileSystemConfigurationService.RUNTIME)) {
+        for (File file : fList)
+        {
+            if (file.isFile() && file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            {
                 resultList.add(file);
             }
-            else if (file.isDirectory()) {
+            else if (file.isDirectory())
+            {
                 resultList.addAll(listAllRuntimeFilesInFolderAndSubfolders(file.getAbsolutePath()));
             }
         }

@@ -29,6 +29,10 @@ package com.armedia.acm.configserver.api;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.service.ConfigurationService;
+import java.nio.file.NoSuchFileException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,11 +46,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.NoSuchFileException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 @RestController
 @RequestMapping(ConfigurationAPIController.Path.RESOURCE)
 public class ConfigurationAPIController
@@ -59,6 +58,7 @@ public class ConfigurationAPIController
 
     public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService,
                                       @Value("${arkcase.languages}") String arkcaseLanguages)
+
     {
         this.configServerService = configServerService;
         this.langs = Arrays.asList(arkcaseLanguages.split(","));
@@ -91,7 +91,6 @@ public class ConfigurationAPIController
         }
     }
 
-    // TODO: How it's suppose to use this for labels? Sending appname admin-en is not working, labels/admin-en or encoded also not working
     @PostMapping(Path.REMOVE)
     public ResponseEntity<Void> removeProperties(@PathVariable String applicationName, @RequestBody List<String> properties)
     {
@@ -109,7 +108,6 @@ public class ConfigurationAPIController
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
     @DeleteMapping(Path.RESET_ALL)
     public ResponseEntity<Void> resetPropertiesToDefault()
@@ -155,7 +153,7 @@ public class ConfigurationAPIController
         }
     }
 
-    public static class Path {
+    public static final class Path {
         public static final String RESOURCE = "/config";
         public static final String REMOVE = "/remove/{applicationName}";
         public static final String RESET = "/reset/{applicationName}";
