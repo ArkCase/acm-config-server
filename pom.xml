@@ -53,13 +53,12 @@
 
     <properties>
         <revision>2.0.0-SNAPSHOT</revision>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-cloud.version>Finchley.SR2</spring-cloud.version>
         <log4j2.version>2.17.1</log4j2.version>
 
-        <gitflow-maven-plugin.version>1.12.0</gitflow-maven-plugin.version>
         <maven-jar-plugin.version>3.0.0</maven-jar-plugin.version>
         <maven-buildnumber-plugin.version>3.0.0</maven-buildnumber-plugin.version>
     </properties>
@@ -149,14 +148,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.amashchenko.maven.plugin</groupId>
-                <artifactId>gitflow-maven-plugin</artifactId>
-                <version>${gitflow-maven-plugin.version}</version>
-                <configuration>
-                    
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -166,7 +157,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifestEntries>

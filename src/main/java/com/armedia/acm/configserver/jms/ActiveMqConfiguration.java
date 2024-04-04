@@ -1,5 +1,8 @@
 package com.armedia.acm.configserver.jms;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
 /*-
  * #%L
  * acm-config-server
@@ -28,8 +31,6 @@ package com.armedia.acm.configserver.jms;
  */
 
 import com.google.common.base.MoreObjects;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "acm.activemq")
@@ -55,7 +56,7 @@ public class ActiveMqConfiguration
 
     public String getBrokerUrl()
     {
-        return brokerUrl;
+        return this.brokerUrl;
     }
 
     public void setBrokerUrl(String brokerUrl)
@@ -65,7 +66,7 @@ public class ActiveMqConfiguration
 
     public String getUser()
     {
-        return user;
+        return this.user;
     }
 
     public void setUser(String user)
@@ -75,7 +76,7 @@ public class ActiveMqConfiguration
 
     public String getPassword()
     {
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password)
@@ -85,7 +86,7 @@ public class ActiveMqConfiguration
 
     public String getKeystore()
     {
-        return keystore;
+        return this.keystore;
     }
 
     public void setKeystore(String keystore)
@@ -95,7 +96,7 @@ public class ActiveMqConfiguration
 
     public String getKeystorePassword()
     {
-        return keystorePassword;
+        return this.keystorePassword;
     }
 
     public void setKeystorePassword(String keystorePassword)
@@ -105,7 +106,7 @@ public class ActiveMqConfiguration
 
     public String getTruststore()
     {
-        return truststore;
+        return this.truststore;
     }
 
     public void setTruststore(String truststore)
@@ -115,7 +116,7 @@ public class ActiveMqConfiguration
 
     public String getTruststorePassword()
     {
-        return truststorePassword;
+        return this.truststorePassword;
     }
 
     public void setTruststorePassword(String truststorePassword)
@@ -125,7 +126,7 @@ public class ActiveMqConfiguration
 
     public String getDefaultDestination()
     {
-        return defaultDestination;
+        return this.defaultDestination;
     }
 
     public void setDefaultDestination(String defaultDestination)
@@ -135,7 +136,7 @@ public class ActiveMqConfiguration
 
     public int getTimeout()
     {
-        return timeout;
+        return this.timeout;
     }
 
     public void setTimeout(int timeout)
@@ -147,10 +148,10 @@ public class ActiveMqConfiguration
     public String toString()
     {
         return MoreObjects.toStringHelper(this)
-                .add("brokerUrl", brokerUrl)
-                .add("user", user)
-                .add("defaultDestination", defaultDestination)
-                .add("timeout", timeout)
+                .add("brokerUrl", this.brokerUrl)
+                .add("user", this.user)
+                .add("defaultDestination", this.defaultDestination)
+                .add("timeout", this.timeout)
                 .toString();
     }
 }

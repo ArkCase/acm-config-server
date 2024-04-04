@@ -1,5 +1,11 @@
 package com.armedia.acm.configserver.jms;
 
+import java.time.LocalDateTime;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.jms.Session;
+
 /*-
  * #%L
  * acm-config-server
@@ -35,12 +41,6 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.jms.Session;
-
-import java.time.LocalDateTime;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 @Component
 public class ConfigurationChangeMessageProducer
 {
@@ -51,7 +51,7 @@ public class ConfigurationChangeMessageProducer
     private LocalDateTime lastSendTime;
 
     private LocalDateTime lastTextSendTime;
-    
+
     private String lastText;
 
     private final ScheduledExecutorService executorService;
@@ -59,69 +59,72 @@ public class ConfigurationChangeMessageProducer
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationChangeMessageProducer.class);
 
     public ConfigurationChangeMessageProducer(@Value("${jms.message.buffer.window}") int delayInSeconds,
-                                              JmsTemplate acmJmsTemplate,
-                                              ScheduledExecutorService executorService)
+            JmsTemplate acmJmsTemplate,
+            ScheduledExecutorService executorService)
     {
         this.acmJmsTemplate = acmJmsTemplate;
         this.delayInSeconds = delayInSeconds;
         this.executorService = executorService;
-        lastSendTime = LocalDateTime.MIN;
-        lastTextSendTime = LocalDateTime.MIN;
-        lastText = null;
-        logger.debug("Init ConfigurationChangeMessageProducer");
+        this.lastSendTime = LocalDateTime.MIN;
+        this.lastTextSendTime = LocalDateTime.MIN;
+        this.lastText = null;
+        ConfigurationChangeMessageProducer.logger.debug("Init ConfigurationChangeMessageProducer");
     }
 
     /**
      * Sends JMS message to the destination topic
-     * @param destination - It can be null if it is send to the default destination
+     *
+     * @param destination
+     *            - It can be null if it is send to the default destination
      */
     public void sendMessage(String destination)
     {
         LocalDateTime now = LocalDateTime.now();
-        logger.debug("Last configuration change topic message send in [{}]", lastSendTime);
-        if (now.isAfter(lastSendTime.plusSeconds(delayInSeconds)))
+        ConfigurationChangeMessageProducer.logger.debug("Last configuration change topic message send in [{}]", this.lastSendTime);
+        if (now.isAfter(this.lastSendTime.plusSeconds(this.delayInSeconds)))
         {
-            lastSendTime = now;
-            logger.debug("Schedule configuration changed message in [{}] seconds", delayInSeconds);
-            executorService.schedule(() -> {
-                        logger.info("Sending configuration change topic message...");
-                        try
-                        {
-                            acmJmsTemplate.send(new ActiveMQTopic(destination), Session::createMessage);
-                            logger.debug("Message successfully sent");
-                        }
-                        catch (JmsException e)
-                        {
-                            logger.warn("Message not sent. [{}]", e.getMessage(), e);
-                        }
-                    },
-                    delayInSeconds, TimeUnit.SECONDS);
+            this.lastSendTime = now;
+            ConfigurationChangeMessageProducer.logger.debug("Schedule configuration changed message in [{}] seconds", this.delayInSeconds);
+            this.executorService.schedule(() -> {
+                ConfigurationChangeMessageProducer.logger.info("Sending configuration change topic message...");
+                try
+                {
+                    this.acmJmsTemplate.send(new ActiveMQTopic(destination), Session::createMessage);
+                    ConfigurationChangeMessageProducer.logger.debug("Message successfully sent");
+                }
+                catch (JmsException e)
+                {
+                    ConfigurationChangeMessageProducer.logger.warn("Message not sent. [{}]", e.getMessage(), e);
+                }
+            },
+                    this.delayInSeconds, TimeUnit.SECONDS);
         }
     }
 
     public void sendTextMessage(String destination, String text)
     {
         LocalDateTime now = LocalDateTime.now();
-        logger.debug("Last configuration change topic text ['{}'] message send in [{}]", lastText, lastTextSendTime);
-        if (now.isAfter(lastTextSendTime.plusSeconds(delayInSeconds)) || text != null && !text.equals(lastText))
+        ConfigurationChangeMessageProducer.logger.debug("Last configuration change topic text ['{}'] message send in [{}]", this.lastText,
+                this.lastTextSendTime);
+        if (now.isAfter(this.lastTextSendTime.plusSeconds(this.delayInSeconds)) || ((text != null) && !text.equals(this.lastText)))
         {
-            lastTextSendTime = now;
-            lastText = text;
-            logger.debug("Schedule configuration changed message in [{}] seconds", delayInSeconds);
-            executorService.schedule(() -> {
-                        logger.info("Sending configuration change topic text ['{}'] message...", text);
-                        try
-                        {
-                            acmJmsTemplate.send(new ActiveMQTopic(destination),
-                                    inJmsSession -> inJmsSession.createTextMessage(text));
-                            logger.debug("Message successfully sent");
-                        }
-                        catch (JmsException e)
-                        {
-                            logger.warn("Message not sent. [{}]", e.getMessage(), e);
-                        }
-                    },
-                    delayInSeconds, TimeUnit.SECONDS);
+            this.lastTextSendTime = now;
+            this.lastText = text;
+            ConfigurationChangeMessageProducer.logger.debug("Schedule configuration changed message in [{}] seconds", this.delayInSeconds);
+            this.executorService.schedule(() -> {
+                ConfigurationChangeMessageProducer.logger.info("Sending configuration change topic text ['{}'] message...", text);
+                try
+                {
+                    this.acmJmsTemplate.send(new ActiveMQTopic(destination),
+                            inJmsSession -> inJmsSession.createTextMessage(text));
+                    ConfigurationChangeMessageProducer.logger.debug("Message successfully sent");
+                }
+                catch (JmsException e)
+                {
+                    ConfigurationChangeMessageProducer.logger.warn("Message not sent. [{}]", e.getMessage(), e);
+                }
+            },
+                    this.delayInSeconds, TimeUnit.SECONDS);
         }
     }
 }
