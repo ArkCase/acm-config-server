@@ -4,33 +4,27 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.config.environment.Environment;
 import org.springframework.cloud.config.environment.PropertySource;
 import org.springframework.cloud.config.server.environment.NativeEnvironmentRepository;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import com.armedia.acm.configserver.environment.mapper.EnvironmentMapper;
+
 public class NativeCloudEnvironmentRepository extends NativeEnvironmentRepository
 {
+    @Autowired
+    private EnvironmentMapper mapper;
+
     public NativeCloudEnvironmentRepository(ConfigurableEnvironment environment, NativeCloudEnvironmentProperties properties)
     {
         super(environment, properties);
     }
 
-    /**
-     * <p>
-     * Map the given value into its new, final value. If the returned value is {@code null}, it
-     * means that the value should be removed. Otherwise, the new value should be used instead. If no mapping has
-     * occurred, the exact same old value reference will be returned.
-     * </p>
-     *
-     * @param key
-     * @param value
-     * @return the mapped value, or the original value
-     */
     protected String mapValue(String key, String value)
     {
-        // Does this match our syntax?
-        return value;
+        return (this.mapper != null ? this.mapper.map(key, value) : value);
     }
 
     @Override
