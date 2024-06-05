@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +32,7 @@ import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.util.Config;
+import io.kubernetes.client.util.Yaml;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
@@ -46,14 +46,12 @@ public class CloudMapper
     private abstract class ResourceWrapper<ApiType extends KubernetesObject>
             implements ResourceEventHandler<ApiType>
     {
-        private final String type;
+        protected final String type;
         private final ConcurrentMap<String, ApiType> cache = new ConcurrentHashMap<>();
-        private final BiConsumer<Logger, ApiType> debugOutput;
 
-        private ResourceWrapper(String type, BiConsumer<Logger, ApiType> debugOutput)
+        private ResourceWrapper(String type)
         {
             this.type = type;
-            this.debugOutput = Objects.requireNonNullElse(debugOutput, this::noDebug);
             CloudMapper.this.masterCache.put(type, this);
         }
 
@@ -70,9 +68,16 @@ public class CloudMapper
             this.cache.clear();
         }
 
-        private final void noDebug(Logger log, ApiType obj)
+        @Override
+        public final void onAdd(ApiType obj)
         {
-            // Do nothing...
+            onUpdate(null, obj);
+        }
+
+        @Override
+        public final void onDelete(ApiType obj, boolean deletedFinalStateUnknown)
+        {
+            onUpdate(obj, null);
         }
 
         @Override
@@ -106,20 +111,8 @@ public class CloudMapper
             this.cache.put(meta.getName(), newObj);
             if (CloudMapper.this.log.isDebugEnabled())
             {
-                this.debugOutput.accept(CloudMapper.this.log, newObj);
+                CloudMapper.this.log.debug("New object:\n{}", Yaml.dump(newObj));
             }
-        }
-
-        @Override
-        public final void onAdd(ApiType obj)
-        {
-            onUpdate(null, obj);
-        }
-
-        @Override
-        public final void onDelete(ApiType obj, boolean deletedFinalStateUnknown)
-        {
-            onUpdate(obj, null);
         }
 
         public String getValue(String name, String key)
@@ -129,19 +122,11 @@ public class CloudMapper
                 return null;
             }
 
-            return extractValue(this.cache.get(name), key);
+            return getValue(this.cache.get(name), key);
         }
 
-        protected abstract String extractValue(ApiType obj, String key);
+        protected abstract String getValue(ApiType obj, String key);
     }
-
-    private static final BiConsumer<Logger, V1ConfigMap> DEBUG_CONFIGMAP = (log, cm) -> {
-        // TODO: Output the configMap's data
-    };
-
-    private static final BiConsumer<Logger, V1Secret> DEBUG_SECRET = (log, s) -> {
-        // TODO: Output the secrets's data
-    };
 
     @SuppressWarnings("serial")
     private static final class ValueMissing extends RuntimeException
@@ -165,25 +150,39 @@ public class CloudMapper
 
     private final BiFunction<String, String, String> mapper;
 
-    private final ResourceWrapper<V1ConfigMap> configMapHandler = new ResourceWrapper<>("config", CloudMapper.DEBUG_CONFIGMAP)
+    private final ResourceWrapper<V1ConfigMap> configMapHandler = new ResourceWrapper<>("config")
     {
         @Override
-        protected String extractValue(V1ConfigMap obj, String key)
+        protected String getValue(V1ConfigMap obj, String key)
         {
             Map<String, String> data = obj.getData();
             if (data.containsKey(key))
             {
-                return data.get(key);
+                String value = data.get(key);
+                if (CloudMapper.this.log.isTraceEnabled())
+                {
+                    CloudMapper.this.log.trace("Resolved configMap {} textual value {} as [{}]", obj.getMetadata().getName(), key, value);
+                }
+                return value;
             }
 
-            // Uhm ... not textual data ...
+            // Uhm ... not textual data ... return a B64 representation
             Map<String, byte[]> bin = obj.getBinaryData();
             if (bin.containsKey(key))
             {
-                return Base64.getEncoder().encodeToString(bin.get(key));
+                String value = Base64.getEncoder().encodeToString(bin.get(key));
+                if (CloudMapper.this.log.isTraceEnabled())
+                {
+                    CloudMapper.this.log.trace("Resolved configMap {} binary value {} as [{}]", obj.getMetadata().getName(), key, value);
+                }
+                return value;
             }
 
             // Nothing?
+            if (CloudMapper.this.log.isTraceEnabled())
+            {
+                CloudMapper.this.log.trace("No configMap value {} found on {}", key, obj.getMetadata().getName());
+            }
             return null;
         }
 
@@ -194,21 +193,30 @@ public class CloudMapper
         }
     };
 
-    private final ResourceWrapper<V1Secret> secretHandler = new ResourceWrapper<>("secret", CloudMapper.DEBUG_SECRET)
+    private final ResourceWrapper<V1Secret> secretHandler = new ResourceWrapper<>("secret")
     {
 
         @Override
-        protected String extractValue(V1Secret obj, String key)
+        protected String getValue(V1Secret obj, String key)
         {
-            // Uhm ... not textual data ...
-            Map<String, byte[]> bin = obj.getData();
-            if (bin.containsKey(key))
+            // Secrets are always stored as binary streams
+            Map<String, byte[]> data = obj.getData();
+            if (data.containsKey(key))
             {
-                // Assume strings are UTF-8 ... is this correct?
-                return new String(bin.get(key), StandardCharsets.UTF_8);
+                // The binary value was created by encoding the source string using UTF-8,
+                // so we use the same encoding when converting the bytes back to a string
+                String value = new String(data.get(key), StandardCharsets.UTF_8);
+                if (CloudMapper.this.log.isTraceEnabled())
+                {
+                    CloudMapper.this.log.trace("Resolved secret {} value {} as [{}]", obj.getMetadata().getName(), key, value);
+                }
+                return value;
             }
 
-            // Nothing?KubernetesListObject
+            if (CloudMapper.this.log.isTraceEnabled())
+            {
+                CloudMapper.this.log.trace("No secret value {} found on {}", key, obj.getMetadata().getName());
+            }
             return null;
         }
 
