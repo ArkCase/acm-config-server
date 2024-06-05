@@ -70,6 +70,18 @@ public class CloudMapper
 
     private static final Pattern PARSER = Pattern.compile("^([^:]+):([^:]+):(.+)$");
 
+    private static ApiClient buildDefaultClient()
+    {
+        try
+        {
+            return Config.defaultClient();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to construct the default Kubernetes client", e);
+        }
+    }
+
     private abstract class ResourceWrapper<ApiType extends KubernetesObject>
             implements ResourceEventHandler<ApiType>
     {
@@ -168,10 +180,12 @@ public class CloudMapper
         throw new RuntimeException(String.format("Invalid cloud value spec [%s]", v));
     };
 
-    private final ApiClient client = Config.defaultClient();
-    private final CoreV1Api api = new CoreV1Api(this.client);
-    private final SharedInformerFactory informerFactory;
+    // TODO: Should we do this differently? i.e. allow client configurability?
+    private final ApiClient client;
+    private final CoreV1Api api;
     private final String namespace;
+    private final CloudMapperProperties properties;
+    private SharedInformerFactory informerFactory = null;
 
     private final ConcurrentMap<String, ResourceWrapper<? extends KubernetesObject>> masterCache = new ConcurrentHashMap<>();
 
@@ -257,12 +271,30 @@ public class CloudMapper
 
     public CloudMapper() throws IOException, ApiException
     {
-        this(null);
+        this(null, null);
+    }
+
+    public CloudMapper(ApiClient client) throws IOException, ApiException
+    {
+        this(client, null);
     }
 
     public CloudMapper(@Autowired CloudMapperProperties properties) throws IOException, ApiException
     {
-        if (!properties.isEnabled())
+        this(null, properties);
+    }
+
+    public CloudMapper(ApiClient client, @Autowired CloudMapperProperties properties) throws IOException, ApiException
+    {
+        this.client = Objects.requireNonNullElseGet(client, CloudMapper::buildDefaultClient);
+
+        // Apparently, the informers need this
+        this.client.setReadTimeout(0);
+
+        this.api = new CoreV1Api(this.client);
+        this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
+
+        if (!this.properties.isEnabled())
         {
             this.log.debug("The CloudMapper is disabled");
             this.mapper = (k, v) -> v;
@@ -271,11 +303,11 @@ public class CloudMapper
             return;
         }
 
-        this.namespace = properties.getNamespace();
+        this.namespace = this.properties.getNamespace();
         this.log.debug("The CloudMapper is enabled (namespace = {})", this.namespace);
 
         final StringSubstitutor substitutor;
-        if (properties.isDisableInterpolator())
+        if (this.properties.isDisableInterpolator())
         {
             this.log.debug("CloudMapper's Interpolator is disabled, using a strict lookup");
             substitutor = new StringSubstitutor(CloudMapper.ERROR_LOOKUP);
@@ -327,15 +359,25 @@ public class CloudMapper
             this.log.trace("Value resolved for [{}:{}:{}] = [{}] (null == {})", resourceType, resourceName, resourceKey, result,
                     Objects.isNull(result));
 
-            // If we're not accepting missing values, explode if the value is missing
-            if ((result == null) && properties.isFailIfMissing())
+            if (result != null)
+            {
+                return result;
+            }
+
+            // If we're not accepting missing values, explode!
+            if (this.properties.isFailIfMissing())
             {
                 throw new ValueMissing(key);
             }
 
-            // If we didn't explode b/c we didn't get a value, then
-            // we simply return the empty string if there's no value
-            return StringUtils.defaultString(result);
+            // If we're returning empty strings for missing values...
+            if (this.properties.isMissingAsEmpty())
+            {
+                return StringUtils.EMPTY;
+            }
+
+            // No hit ... so just return a null
+            return null;
         });
 
         this.mapper = (key, value) -> {
@@ -349,29 +391,6 @@ public class CloudMapper
                         v.getMessage(), key, value));
             }
         };
-
-        // Now, initialize the cloud access stuff... including the caching.
-        this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(properties.getThreads()));
-
-        this.informerFactory.sharedIndexInformerFor(
-                (params) -> this.api.listNamespacedSecret(this.namespace)
-                        .sendInitialEvents(true)
-                        .resourceVersion(params.resourceVersion)
-                        .watch(params.watch)
-                        .timeoutSeconds(params.timeoutSeconds)
-                        .buildCall(null),
-                V1Secret.class, V1SecretList.class)
-                .addEventHandler(this.secretHandler);
-
-        this.informerFactory.sharedIndexInformerFor(
-                (params) -> this.api.listNamespacedConfigMap(this.namespace)
-                        .sendInitialEvents(true)
-                        .resourceVersion(params.resourceVersion)
-                        .watch(params.watch)
-                        .timeoutSeconds(params.timeoutSeconds)
-                        .buildCall(null),
-                V1ConfigMap.class, V1ConfigMapList.class)
-                .addEventHandler(this.configMapHandler);
     }
 
     @PostConstruct
@@ -383,6 +402,27 @@ public class CloudMapper
             w.initialize();
         }
 
+        // Now, initialize the cloud access stuff... including the caching.
+        this.log.info("Registering the informers...");
+        this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(this.properties.getThreads()));
+        this.informerFactory.sharedIndexInformerFor(
+                (params) -> this.api.listNamespacedSecret(this.namespace)
+                        .resourceVersion(params.resourceVersion)
+                        .watch(params.watch)
+                        .timeoutSeconds(params.timeoutSeconds)
+                        .buildCall(null),
+                V1Secret.class, V1SecretList.class)
+                .addEventHandler(this.secretHandler);
+
+        this.informerFactory.sharedIndexInformerFor(
+                (params) -> this.api.listNamespacedConfigMap(this.namespace)
+                        .resourceVersion(params.resourceVersion)
+                        .watch(params.watch)
+                        .timeoutSeconds(params.timeoutSeconds)
+                        .buildCall(null),
+                V1ConfigMap.class, V1ConfigMapList.class)
+                .addEventHandler(this.configMapHandler);
+
         this.log.info("Starting all {} registered informers", this.masterCache.size());
         this.informerFactory.startAllRegisteredInformers();
     }
@@ -390,9 +430,16 @@ public class CloudMapper
     @PreDestroy
     protected void preDestroy()
     {
-        this.log.info("Stopping all {} registered informers", this.masterCache.size());
-        this.informerFactory.stopAllRegisteredInformers(true);
-        this.masterCache.values().forEach(ResourceWrapper::clear);
+        try
+        {
+            this.log.info("Stopping all {} registered informers", this.masterCache.size());
+            this.informerFactory.stopAllRegisteredInformers(true);
+        }
+        finally
+        {
+            this.masterCache.values().forEach(ResourceWrapper::clear);
+            this.informerFactory = null;
+        }
     }
 
     /**

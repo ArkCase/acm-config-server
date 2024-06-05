@@ -26,23 +26,30 @@
  */
 package com.armedia.acm.configserver.environment.mapper;
 
+import java.util.Objects;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
-@Profile("native-cloud")
+import com.nimbusds.oauth2.sdk.util.StringUtils;
+
 @Configuration
 @ConfigurationProperties("cloud-mapper")
 public class CloudMapperProperties
 {
+    private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
+    private static final Boolean DEFAULT_FAIL_IF_MISSING = Boolean.FALSE;
+    private static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.TRUE;
+    private static final Boolean DEFAULT_DISABLE_INTERPOLATOR = Boolean.FALSE;
     private static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 8;
 
     private String namespace = null;
-    private Boolean enabled = false;
-    private Boolean failIfMissing = false;
-    private Boolean disableInterpolator = false;
-    private Integer threads = CloudMapperProperties.DEFAULT_THREADS;
+    private Boolean enabled = null;
+    private Boolean failIfMissing = null;
+    private Boolean missingAsEmpty = null;
+    private Boolean disableInterpolator = null;
+    private Integer threads = null;
 
     public String getNamespace()
     {
@@ -56,7 +63,7 @@ public class CloudMapperProperties
 
     public Boolean isEnabled()
     {
-        return this.enabled;
+        return Objects.requireNonNullElse(this.enabled, CloudMapperProperties.DEFAULT_ENABLED && StringUtils.isNotBlank(this.namespace));
     }
 
     public void setEnabled(Boolean enabled)
@@ -66,17 +73,27 @@ public class CloudMapperProperties
 
     public Boolean isFailIfMissing()
     {
-        return Boolean.TRUE.equals(this.failIfMissing);
+        return Objects.requireNonNullElse(this.failIfMissing, CloudMapperProperties.DEFAULT_FAIL_IF_MISSING);
     }
 
-    public void setFailIfMissing(Boolean FailIfMissing)
+    public void setFailIfMissing(Boolean failIfMissing)
     {
-        this.failIfMissing = FailIfMissing;
+        this.failIfMissing = failIfMissing;
+    }
+
+    public Boolean isMissingAsEmpty()
+    {
+        return Objects.requireNonNullElse(this.missingAsEmpty, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
+    }
+
+    public void setMissingAsEmpty(Boolean missingAsEmpty)
+    {
+        this.missingAsEmpty = missingAsEmpty;
     }
 
     public Boolean isDisableInterpolator()
     {
-        return this.disableInterpolator;
+        return Objects.requireNonNullElse(this.disableInterpolator, CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR);
     }
 
     public void setDisableInterpolator(Boolean disableInterpolator)
@@ -86,15 +103,20 @@ public class CloudMapperProperties
 
     public Integer getThreads()
     {
-        return this.threads;
+        return Objects.requireNonNullElse(this.threads, CloudMapperProperties.DEFAULT_THREADS);
     }
 
-    public void setThreads(int threads)
+    public void setThreads(Integer threads)
     {
-        if (threads <= 0)
+        if (threads == null)
         {
-            threads = CloudMapperProperties.DEFAULT_THREADS;
+            this.threads = null;
         }
-        this.threads = Math.min(threads, CloudMapperProperties.MAX_THREADS);
+        else
+        {
+            this.threads = (threads <= 0)
+                    ? CloudMapperProperties.DEFAULT_THREADS
+                    : Math.min(threads, CloudMapperProperties.MAX_THREADS);
+        }
     }
 }

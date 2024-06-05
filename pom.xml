@@ -60,6 +60,8 @@
         <kubernetes-client.version>20.0.1</kubernetes-client.version>
         <commons-text.version>1.12.0</commons-text.version>
         <log4j2.version>2.17.1</log4j2.version>
+        <wiremock.version>3.6.0</wiremock.version>
+        <okhttp3.version>4.12.0</okhttp3.version>
 
         <maven-jar-plugin.version>3.0.0</maven-jar-plugin.version>
         <maven-buildnumber-plugin.version>3.0.0</maven-buildnumber-plugin.version>
@@ -102,6 +104,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp3.version}</version>
+		</dependency>
         <dependency> <!-- use a specific Groovy version rather than the one specified by spock-core -->
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
@@ -125,6 +132,12 @@
             <artifactId>log4j-slf4j-impl</artifactId>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>${wiremock.version}</version>
+			<scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
