@@ -57,6 +57,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-cloud.version>Finchley.SR2</spring-cloud.version>
+        <kubernetes-client.version>20.0.1</kubernetes-client.version>
+        <commons-text.version>1.12.0</commons-text.version>
         <log4j2.version>2.17.1</log4j2.version>
 
         <maven-jar-plugin.version>3.0.0</maven-jar-plugin.version>
@@ -66,8 +68,8 @@
     <dependencies>
 		<dependency>
 			<groupId>io.kubernetes</groupId>
-			<artifactId>client-java</artifactId>
-			<version>20.0.1</version>
+			<artifactId>client-java-extended</artifactId>
+			<version>${kubernetes-client.version}</version>
 		</dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -90,6 +92,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
+        <dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>${commons-text.version}</version>
+		</dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
