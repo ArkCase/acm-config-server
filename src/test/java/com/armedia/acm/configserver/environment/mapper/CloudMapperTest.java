@@ -10,6 +10,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -21,9 +23,11 @@ import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.JSON;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
+import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1ConfigMapListBuilder;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Secret;
+import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1SecretListBuilder;
 
 public class CloudMapperTest
@@ -46,32 +50,29 @@ public class CloudMapperTest
             .options(WireMockConfiguration.options().port(CloudMapperTest.PORT))
             .build();
 
-    @AfterAll
-    public static void afterAll()
-    {
-        if (CloudMapperTest.SERVER != null)
-        {
-            CloudMapperTest.SERVER.shutdownServer();
-        }
-    }
+    private static final ApiClient CLIENT = new ApiClient();
 
-    @Test
-    public void testCloudMapper() throws Exception
-    {
-        ApiClient client = new ApiClient();
-        client.setBasePath("http://localhost:" + CloudMapperTest.SERVER.getPort());
-        Configuration.setDefaultApiClient(client);
+    private static final String NAMESPACE = UUID.randomUUID().toString();
 
-        String namespace = UUID.randomUUID().toString();
+    private static final Map<String, V1Secret> SECRETS = new TreeMap<>();
+    private static V1SecretList SECRET_LIST = null;
+
+    private static final Map<String, V1ConfigMap> CONFIG_MAPS = new TreeMap<>();
+    private static V1ConfigMapList CONFIG_MAP_LIST = null;
+
+    @BeforeAll
+    public static void beforeAll()
+    {
+        CloudMapperTest.CLIENT.setBasePath("http://localhost:" + CloudMapperTest.SERVER.getPort());
+        Configuration.setDefaultApiClient(CloudMapperTest.CLIENT);
 
         V1SecretListBuilder secretBuilder = new V1SecretListBuilder();
-        Map<String, V1Secret> secrets = new TreeMap<>();
         for (int s = 1; s <= 10; s++)
         {
             String secretName = String.format("secret-%02d", s);
 
             V1Secret secret = new V1Secret();
-            secret.metadata(new V1ObjectMeta().namespace(namespace).name(secretName).resourceVersion("1"));
+            secret.metadata(new V1ObjectMeta().namespace(CloudMapperTest.NAMESPACE).name(secretName).resourceVersion("1"));
 
             Map<String, byte[]> data = new TreeMap<>();
             for (int v = 1; v <= 5; v++)
@@ -82,26 +83,17 @@ public class CloudMapperTest
             secret.data(data);
 
             secretBuilder.addToItems(secret);
-            secrets.put(secretName, secret);
+            CloudMapperTest.SECRETS.put(secretName, secret);
         }
-        CloudMapperTest.SERVER.stubFor(
-                WireMock.get(WireMock.urlEqualTo("/api/v1/namespaces/" + namespace + "/secrets"))
-                        .willReturn(
-                                WireMock
-                                        .aResponse()
-                                        .withHeader("Content-Type", "application/json")
-                                        .withBody(JSON.serialize(secretBuilder.build())) //
-                        ) //
-        );
+        CloudMapperTest.SECRET_LIST = secretBuilder.build();
 
         V1ConfigMapListBuilder configMapBuilder = new V1ConfigMapListBuilder();
-        Map<String, V1ConfigMap> configMaps = new TreeMap<>();
         for (int c = 1; c <= 10; c++)
         {
             String configMapName = String.format("config-map-%02d", c);
 
             V1ConfigMap configMap = new V1ConfigMap();
-            configMap.metadata(new V1ObjectMeta().namespace(namespace).name(configMapName).resourceVersion("1"));
+            configMap.metadata(new V1ObjectMeta().namespace(CloudMapperTest.NAMESPACE).name(configMapName).resourceVersion("1"));
 
             Map<String, String> data = new TreeMap<>();
             for (int v = 1; v <= 5; v++)
@@ -120,26 +112,51 @@ public class CloudMapperTest
             configMap.binaryData(bin);
 
             configMapBuilder.addToItems(configMap);
-            configMaps.put(configMapName, configMap);
+            CloudMapperTest.CONFIG_MAPS.put(configMapName, configMap);
         }
+        CloudMapperTest.CONFIG_MAP_LIST = configMapBuilder.build();
+    }
 
+    @AfterAll
+    public static void afterAll()
+    {
+        CloudMapperTest.SERVER.shutdownServer();
+    }
+
+    @BeforeEach
+    public void beforeEach()
+    {
         CloudMapperTest.SERVER.stubFor(
-                WireMock.get(WireMock.urlEqualTo("/api/v1/namespaces/" + namespace + "/configmaps"))
+                WireMock.get(WireMock.urlEqualTo("/api/v1/namespaces/" + CloudMapperTest.NAMESPACE + "/secrets"))
                         .willReturn(
                                 WireMock
                                         .aResponse()
                                         .withHeader("Content-Type", "application/json")
-                                        .withBody(JSON.serialize(configMapBuilder.build())) //
+                                        .withBody(JSON.serialize(CloudMapperTest.SECRET_LIST)) //
+                        ) //
+        );
+        CloudMapperTest.SERVER.stubFor(
+                WireMock.get(WireMock.urlEqualTo("/api/v1/namespaces/" + CloudMapperTest.NAMESPACE + "/configmaps"))
+                        .willReturn(
+                                WireMock
+                                        .aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody(JSON.serialize(CloudMapperTest.CONFIG_MAP_LIST)) //
                         ) //
         );
 
+    }
+
+    @Test
+    public void testBasicExpansion() throws Exception
+    {
         CloudMapperProperties properties = new CloudMapperProperties();
-        properties.setNamespace(namespace);
-        CloudMapper cloudMapper = new CloudMapper(client, properties);
+        properties.setNamespace(CloudMapperTest.NAMESPACE);
+        CloudMapper cloudMapper = new CloudMapper(CloudMapperTest.CLIENT, properties);
         cloudMapper.postConstruct();
 
         // Now we test the expansion
-        for (final V1Secret secret : secrets.values())
+        for (final V1Secret secret : CloudMapperTest.SECRETS.values())
         {
             final String secretName = secret.getMetadata().getName();
             final Map<String, byte[]> data = secret.getData();
@@ -163,7 +180,7 @@ public class CloudMapperTest
                         nonExistentKey);
             }
         }
-        for (final V1ConfigMap configMap : configMaps.values())
+        for (final V1ConfigMap configMap : CloudMapperTest.CONFIG_MAPS.values())
         {
             final String configMapName = configMap.getMetadata().getName();
             final Map<String, String> data = configMap.getData();
