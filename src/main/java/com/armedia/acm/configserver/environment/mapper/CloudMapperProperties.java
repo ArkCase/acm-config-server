@@ -38,15 +38,13 @@ import com.nimbusds.oauth2.sdk.util.StringUtils;
 public class CloudMapperProperties implements Cloneable
 {
     private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
-    private static final Boolean DEFAULT_FAIL_IF_MISSING = Boolean.FALSE;
-    private static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.TRUE;
+    private static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
     private static final Boolean DEFAULT_DISABLE_INTERPOLATOR = Boolean.FALSE;
     private static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 8;
 
     private String namespace = null;
     private Boolean enabled = null;
-    private Boolean failIfMissing = null;
     private Boolean missingAsEmpty = null;
     private Boolean disableInterpolator = null;
     private Integer threads = null;
@@ -69,16 +67,6 @@ public class CloudMapperProperties implements Cloneable
     public void setEnabled(Boolean enabled)
     {
         this.enabled = enabled;
-    }
-
-    public Boolean isFailIfMissing()
-    {
-        return Objects.requireNonNullElse(this.failIfMissing, CloudMapperProperties.DEFAULT_FAIL_IF_MISSING);
-    }
-
-    public void setFailIfMissing(Boolean failIfMissing)
-    {
-        this.failIfMissing = failIfMissing;
     }
 
     public Boolean isMissingAsEmpty()

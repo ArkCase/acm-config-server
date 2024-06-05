@@ -167,19 +167,7 @@ public class CloudMapper
         protected abstract String getValue(ApiType obj, String key);
     }
 
-    public static final class ValueMissingException extends RuntimeException
-    {
-        private static final long serialVersionUID = 1L;
-
-        private ValueMissingException(String valueSpec)
-        {
-            super(valueSpec);
-        }
-    }
-
-    private static final StringLookup ERROR_LOOKUP = (v) -> {
-        throw new RuntimeException(String.format("Invalid cloud value spec [%s]", v));
-    };
+    private static final StringLookup NULL_LOOKUP = (v) -> null;
 
     // TODO: Should we do this differently? i.e. allow client configurability?
     private final ApiClient client;
@@ -318,7 +306,7 @@ public class CloudMapper
         if (this.properties.isDisableInterpolator())
         {
             this.log.debug("CloudMapper's Interpolator is disabled, using a strict lookup");
-            substitutor = new StringSubstitutor(CloudMapper.ERROR_LOOKUP);
+            substitutor = new StringSubstitutor(CloudMapper.NULL_LOOKUP);
         }
         else
         {
@@ -372,12 +360,6 @@ public class CloudMapper
                 return result;
             }
 
-            // If we're not accepting missing values, explode!
-            if (this.properties.isFailIfMissing())
-            {
-                throw new ValueMissingException(key);
-            }
-
             // If we're returning empty strings for missing values...
             if (this.properties.isMissingAsEmpty())
             {
@@ -388,18 +370,7 @@ public class CloudMapper
             return null;
         });
 
-        this.mapper = (key, value) -> {
-            try
-            {
-                return substitutor.replace(value);
-            }
-            catch (ValueMissingException v)
-            {
-                // We need to reformat the exception's message
-                throw new ValueMissingException(String.format("Failed to resolve the cloud variable spec [%s] (key = [%s], value = [%s]",
-                        v.getMessage(), key, value));
-            }
-        };
+        this.mapper = (key, value) -> substitutor.replace(value);
     }
 
     @PostConstruct
