@@ -167,10 +167,11 @@ public class CloudMapper
         protected abstract String getValue(ApiType obj, String key);
     }
 
-    @SuppressWarnings("serial")
-    private static final class ValueMissing extends RuntimeException
+    public static final class ValueMissingException extends RuntimeException
     {
-        ValueMissing(String valueSpec)
+        private static final long serialVersionUID = 1L;
+
+        private ValueMissingException(String valueSpec)
         {
             super(valueSpec);
         }
@@ -353,8 +354,8 @@ public class CloudMapper
             final String resourceKey = m.group(3);
             this.log.trace("Looking up the value for [{}:{}:{}]", resourceType, resourceName, resourceKey);
 
-            final ResourceWrapper<?> resource = this.masterCache.get(resourceType);
-            if (resource == null)
+            final ResourceWrapper<?> resourceWrapper = this.masterCache.get(resourceType);
+            if (resourceWrapper == null)
             {
                 this.log.trace("The key type [{}] is not one of ours ({}), will delegate the lookup", resourceType,
                         this.masterCache.keySet());
@@ -362,7 +363,7 @@ public class CloudMapper
             }
 
             // One of ours? Process it...
-            final String result = resource.getValue(resourceName, resourceKey);
+            final String result = resourceWrapper.getValue(resourceName, resourceKey);
             this.log.trace("Value resolved for [{}:{}:{}] = [{}] (null == {})", resourceType, resourceName, resourceKey, result,
                     Objects.isNull(result));
 
@@ -374,7 +375,7 @@ public class CloudMapper
             // If we're not accepting missing values, explode!
             if (this.properties.isFailIfMissing())
             {
-                throw new ValueMissing(key);
+                throw new ValueMissingException(key);
             }
 
             // If we're returning empty strings for missing values...
@@ -392,9 +393,10 @@ public class CloudMapper
             {
                 return substitutor.replace(value);
             }
-            catch (ValueMissing v)
+            catch (ValueMissingException v)
             {
-                throw new RuntimeException(String.format("Failed to resolve the cloud variable spec [%s] (key = [%s], value = [%s]",
+                // We need to reformat the exception's message
+                throw new ValueMissingException(String.format("Failed to resolve the cloud variable spec [%s] (key = [%s], value = [%s]",
                         v.getMessage(), key, value));
             }
         };
