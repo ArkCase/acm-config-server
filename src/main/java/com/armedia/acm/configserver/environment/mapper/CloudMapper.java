@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.informer.ResourceEventHandler;
-import io.kubernetes.client.informer.SharedIndexInformer;
 import io.kubernetes.client.informer.SharedInformerFactory;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
@@ -33,6 +32,8 @@ import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.util.Config;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 @Component
 public class CloudMapper
@@ -278,29 +279,37 @@ public class CloudMapper
         // Now, initialize the cloud access stuff... including the caching.
         this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(properties.getThreads()));
 
-        final String namespace = null;
-
-        SharedIndexInformer<V1Secret> secretInformer = this.informerFactory.sharedIndexInformerFor(
-                (params) -> this.api.listNamespacedSecret(namespace)
+        this.informerFactory.sharedIndexInformerFor(
+                (params) -> this.api.listNamespacedSecret(properties.getNamespace())
                         .sendInitialEvents(true)
                         .resourceVersion(params.resourceVersion)
                         .watch(params.watch)
                         .timeoutSeconds(params.timeoutSeconds)
                         .buildCall(null),
-                V1Secret.class, V1SecretList.class);
-        secretInformer.addEventHandler(this.secretHandler);
+                V1Secret.class, V1SecretList.class)
+                .addEventHandler(this.secretHandler);
 
-        SharedIndexInformer<V1ConfigMap> configMapInformer = this.informerFactory.sharedIndexInformerFor(
-                (params) -> this.api.listNamespacedConfigMap(namespace)
+        this.informerFactory.sharedIndexInformerFor(
+                (params) -> this.api.listNamespacedConfigMap(properties.getNamespace())
                         .sendInitialEvents(true)
                         .resourceVersion(params.resourceVersion)
                         .watch(params.watch)
                         .timeoutSeconds(params.timeoutSeconds)
                         .buildCall(null),
-                V1ConfigMap.class, V1ConfigMapList.class);
-        configMapInformer.addEventHandler(this.configMapHandler);
+                V1ConfigMap.class, V1ConfigMapList.class)
+                .addEventHandler(this.configMapHandler);
+    }
 
+    @PostConstruct
+    protected void postConstruct()
+    {
         this.informerFactory.startAllRegisteredInformers();
+    }
+
+    @PreDestroy
+    protected void preDestroy()
+    {
+        this.informerFactory.stopAllRegisteredInformers(true);
     }
 
     /**

@@ -12,10 +12,21 @@ public class CloudMapperProperties
     private static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
     private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 8;
 
+    private String namespace = null;
     private Boolean enabled = false;
     private Boolean failIfMissing = false;
     private Boolean disableInterpolator = false;
     private Integer threads = CloudMapperProperties.DEFAULT_THREADS;
+
+    public String getNamespace()
+    {
+        return this.namespace;
+    }
+
+    public void setNamespace(String namespace)
+    {
+        this.namespace = namespace;
+    }
 
     public Boolean isEnabled()
     {
