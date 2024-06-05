@@ -292,7 +292,14 @@ public class CloudMapper
         this.client.setReadTimeout(0);
 
         this.api = new CoreV1Api(this.client);
-        this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
+        try
+        {
+            this.properties = (properties != null ? properties.clone() : new CloudMapperProperties());
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new RuntimeException("Failed to clone the properties", e);
+        }
 
         if (!this.properties.isEnabled())
         {
@@ -396,6 +403,11 @@ public class CloudMapper
     @PostConstruct
     protected void postConstruct() throws ApiException
     {
+        if (!this.properties.isEnabled())
+        {
+            return;
+        }
+
         for (ResourceWrapper<?> w : this.masterCache.values())
         {
             this.log.info("Initializing resources of type [{}]", w.type);
@@ -430,6 +442,11 @@ public class CloudMapper
     @PreDestroy
     protected void preDestroy()
     {
+        if (!this.properties.isEnabled())
+        {
+            return;
+        }
+
         try
         {
             this.log.info("Stopping all {} registered informers", this.masterCache.size());
@@ -442,23 +459,6 @@ public class CloudMapper
         }
     }
 
-    /**
-     * <p>
-     * Map the given value into its new, final value. If the returned value is {@code null}, it
-     * means that the value should be removed. Otherwise, the new value should be used instead. If no mapping has
-     * occurred, the exact same old value reference will be returned.
-     * </p>
-     *
-     * //
-     * // The key is optional because we want to allow the key given
-     * //
-     * // @{config:name[:key]}
-     * // @{secret:name[:key]}
-     *
-     * @param key
-     * @param value
-     * @return the mapped value, or the original value
-     */
     public String map(final String key, final String value)
     {
         this.log.trace("Mapping the value [{}] -> [{}]", key, value);

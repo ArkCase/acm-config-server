@@ -35,7 +35,7 @@ import com.nimbusds.oauth2.sdk.util.StringUtils;
 
 @Configuration
 @ConfigurationProperties("cloud-mapper")
-public class CloudMapperProperties
+public class CloudMapperProperties implements Cloneable
 {
     private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
     private static final Boolean DEFAULT_FAIL_IF_MISSING = Boolean.FALSE;
@@ -118,5 +118,11 @@ public class CloudMapperProperties
                     ? CloudMapperProperties.DEFAULT_THREADS
                     : Math.min(threads, CloudMapperProperties.MAX_THREADS);
         }
+    }
+
+    @Override
+    protected CloudMapperProperties clone() throws CloneNotSupportedException
+    {
+        return CloudMapperProperties.class.cast(super.clone());
     }
 }
