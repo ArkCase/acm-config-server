@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,20 +43,36 @@ public class CloudMapper
 
     private static final Pattern PARSER = Pattern.compile("^([^:]+):([^:]+):(.+)$");
 
-    private abstract class ResourceWrapper<ApiType extends KubernetesObject> implements ResourceEventHandler<ApiType>
+    private abstract class ResourceWrapper<ApiType extends KubernetesObject>
+            implements ResourceEventHandler<ApiType>
     {
         private final String type;
         private final ConcurrentMap<String, ApiType> cache = new ConcurrentHashMap<>();
+        private final BiConsumer<Logger, ApiType> debugOutput;
 
-        private ResourceWrapper(String type)
+        private ResourceWrapper(String type, BiConsumer<Logger, ApiType> debugOutput)
         {
             this.type = type;
+            this.debugOutput = Objects.requireNonNullElse(debugOutput, this::noDebug);
             CloudMapper.this.masterCache.put(type, this);
         }
 
-        protected void debugContents(ApiType obj)
+        protected abstract Iterable<ApiType> loadAll() throws ApiException;
+
+        public final void initialize() throws ApiException
         {
-            // Do nothing by default...
+            this.cache.clear();
+            loadAll().forEach(this::onAdd);
+        }
+
+        public final void clear()
+        {
+            this.cache.clear();
+        }
+
+        private final void noDebug(Logger log, ApiType obj)
+        {
+            // Do nothing...
         }
 
         @Override
@@ -65,37 +82,31 @@ public class CloudMapper
             {
                 // This is a deletion
                 V1ObjectMeta meta = oldObj.getMetadata();
-                if (CloudMapper.this.log.isDebugEnabled())
-                {
-                    CloudMapper.this.log.debug("Deleting {} {}/{} v{}", this.type, meta.getNamespace(), meta.getName(),
-                            meta.getResourceVersion());
-                }
+                CloudMapper.this.log.info("Deleting {} {}/{} v{}", this.type, meta.getNamespace(), meta.getName(),
+                        meta.getResourceVersion());
                 this.cache.remove(meta.getName());
+                return;
+            }
+
+            // This is an addition or an update ... just replace the stored object
+            V1ObjectMeta meta = newObj.getMetadata();
+            if (oldObj == null)
+            {
+                CloudMapper.this.log.info("Adding {} {}/{} v{}", this.type,
+                        meta.getNamespace(), meta.getName(),
+                        meta.getResourceVersion());
             }
             else
             {
-                // This is an addition or an update ... just replace the stored object
-                V1ObjectMeta meta = newObj.getMetadata();
-                if (CloudMapper.this.log.isDebugEnabled())
-                {
-                    if (oldObj != null)
-                    {
-                        CloudMapper.this.log.debug("Updating {} {}/{} v{} (from v{})", this.type,
-                                meta.getNamespace(), meta.getName(),
-                                meta.getResourceVersion(), oldObj.getMetadata().getResourceVersion());
-                    }
-                    else
-                    {
-                        CloudMapper.this.log.debug("Adding {} {}/{} v{}", this.type,
-                                meta.getNamespace(), meta.getName(),
-                                meta.getResourceVersion());
-                    }
-                }
-                this.cache.put(meta.getName(), newObj);
-                if (CloudMapper.this.log.isDebugEnabled())
-                {
-                    debugContents(newObj);
-                }
+                CloudMapper.this.log.info("Updating {} {}/{} v{} (from v{})", this.type,
+                        meta.getNamespace(), meta.getName(),
+                        meta.getResourceVersion(), oldObj.getMetadata().getResourceVersion());
+            }
+
+            this.cache.put(meta.getName(), newObj);
+            if (CloudMapper.this.log.isDebugEnabled())
+            {
+                this.debugOutput.accept(CloudMapper.this.log, newObj);
             }
         }
 
@@ -124,6 +135,14 @@ public class CloudMapper
         protected abstract String extractValue(ApiType obj, String key);
     }
 
+    private static final BiConsumer<Logger, V1ConfigMap> DEBUG_CONFIGMAP = (log, cm) -> {
+        // TODO: Output the configMap's data
+    };
+
+    private static final BiConsumer<Logger, V1Secret> DEBUG_SECRET = (log, s) -> {
+        // TODO: Output the secrets's data
+    };
+
     @SuppressWarnings("serial")
     private static final class ValueMissing extends RuntimeException
     {
@@ -140,12 +159,13 @@ public class CloudMapper
     private final ApiClient client = Config.defaultClient();
     private final CoreV1Api api = new CoreV1Api(this.client);
     private final SharedInformerFactory informerFactory;
+    private final String namespace;
 
     private final ConcurrentMap<String, ResourceWrapper<? extends KubernetesObject>> masterCache = new ConcurrentHashMap<>();
 
     private final BiFunction<String, String, String> mapper;
 
-    private final ResourceWrapper<V1ConfigMap> configMapHandler = new ResourceWrapper<>("config")
+    private final ResourceWrapper<V1ConfigMap> configMapHandler = new ResourceWrapper<>("config", CloudMapper.DEBUG_CONFIGMAP)
     {
         @Override
         protected String extractValue(V1ConfigMap obj, String key)
@@ -166,9 +186,15 @@ public class CloudMapper
             // Nothing?
             return null;
         }
+
+        @Override
+        protected Iterable<V1ConfigMap> loadAll() throws ApiException
+        {
+            return CloudMapper.this.api.listNamespacedConfigMap(CloudMapper.this.namespace).execute().getItems();
+        }
     };
 
-    private final ResourceWrapper<V1Secret> secretHandler = new ResourceWrapper<>("secret")
+    private final ResourceWrapper<V1Secret> secretHandler = new ResourceWrapper<>("secret", CloudMapper.DEBUG_SECRET)
     {
 
         @Override
@@ -182,8 +208,14 @@ public class CloudMapper
                 return new String(bin.get(key), StandardCharsets.UTF_8);
             }
 
-            // Nothing?
+            // Nothing?KubernetesListObject
             return null;
+        }
+
+        @Override
+        protected Iterable<V1Secret> loadAll() throws ApiException
+        {
+            return CloudMapper.this.api.listNamespacedSecret(CloudMapper.this.namespace).execute().getItems();
         }
 
     };
@@ -195,10 +227,12 @@ public class CloudMapper
             this.log.debug("The CloudMapper is disabled");
             this.mapper = (k, v) -> v;
             this.informerFactory = null;
+            this.namespace = null;
             return;
         }
 
-        this.log.debug("The CloudMapper is enabled");
+        this.namespace = properties.getNamespace();
+        this.log.debug("The CloudMapper is enabled (namespace = {})", this.namespace);
 
         final StringSubstitutor substitutor;
         if (properties.isDisableInterpolator())
@@ -280,7 +314,7 @@ public class CloudMapper
         this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(properties.getThreads()));
 
         this.informerFactory.sharedIndexInformerFor(
-                (params) -> this.api.listNamespacedSecret(properties.getNamespace())
+                (params) -> this.api.listNamespacedSecret(this.namespace)
                         .sendInitialEvents(true)
                         .resourceVersion(params.resourceVersion)
                         .watch(params.watch)
@@ -290,7 +324,7 @@ public class CloudMapper
                 .addEventHandler(this.secretHandler);
 
         this.informerFactory.sharedIndexInformerFor(
-                (params) -> this.api.listNamespacedConfigMap(properties.getNamespace())
+                (params) -> this.api.listNamespacedConfigMap(this.namespace)
                         .sendInitialEvents(true)
                         .resourceVersion(params.resourceVersion)
                         .watch(params.watch)
@@ -301,15 +335,24 @@ public class CloudMapper
     }
 
     @PostConstruct
-    protected void postConstruct()
+    protected void postConstruct() throws ApiException
     {
+        for (ResourceWrapper<?> w : this.masterCache.values())
+        {
+            this.log.info("Initializing resources of type [{}]", w.type);
+            w.initialize();
+        }
+
+        this.log.info("Starting all {} registered informers", this.masterCache.size());
         this.informerFactory.startAllRegisteredInformers();
     }
 
     @PreDestroy
     protected void preDestroy()
     {
+        this.log.info("Stopping all {} registered informers", this.masterCache.size());
         this.informerFactory.stopAllRegisteredInformers(true);
+        this.masterCache.values().forEach(ResourceWrapper::clear);
     }
 
     /**
@@ -322,8 +365,8 @@ public class CloudMapper
      * //
      * // The key is optional because we want to allow the key given
      * //
-     * // @<config:name[:key]>
-     * // @<secret:name[:key]>
+     * // @{config:name[:key]}
+     * // @{secret:name[:key]}
      *
      * @param key
      * @param value
