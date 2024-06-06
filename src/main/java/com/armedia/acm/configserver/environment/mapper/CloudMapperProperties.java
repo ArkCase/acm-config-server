@@ -29,75 +29,44 @@ package com.armedia.acm.configserver.environment.mapper;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Configuration
-@ConfigurationProperties("cloud-mapper")
-public class CloudMapperProperties implements Cloneable
+@Component
+public class CloudMapperProperties
 {
-    private static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
-    private static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
-    private static final Boolean DEFAULT_DISABLE_INTERPOLATOR = Boolean.FALSE;
-    private static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
-    private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 8;
+    protected static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
+    protected static final Boolean DEFAULT_DISABLE_INTERPOLATOR = Boolean.FALSE;
+    protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
+    protected static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
+    protected static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 8;
 
-    private String namespace = null;
-    private Boolean enabled = null;
-    private Boolean missingAsEmpty = null;
-    private Boolean disableInterpolator = null;
-    private Integer threads = null;
+    public final String namespace;
+    public final boolean enabled;
+    public final boolean disableInterpolator;
+    public final boolean missingAsEmpty;
+    public final int threads;
 
-    public String getNamespace()
+    public CloudMapperProperties()
     {
-        return this.namespace;
+        this(null, CloudMapperProperties.DEFAULT_ENABLED, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY,
+                CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR, CloudMapperProperties.DEFAULT_THREADS);
     }
 
-    public void setNamespace(String namespace)
+    public CloudMapperProperties(
+            @Value("${cloud-mapper.namespace:#{null}}") String namespace,
+            @Value("${cloud-mapper.enabled:#{null}}") Boolean enabled,
+            @Value("${cloud-mapper.disableInterpolator:#{null}}") Boolean disableInterpolator,
+            @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty,
+            @Value("${cloud-mapper.threads:#{null}}") Integer threads)
     {
         this.namespace = namespace;
-    }
-
-    public Boolean isEnabled()
-    {
-        return Objects.requireNonNullElse(this.enabled, CloudMapperProperties.DEFAULT_ENABLED && StringUtils.isNotBlank(this.namespace));
-    }
-
-    public void setEnabled(Boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    public Boolean isMissingAsEmpty()
-    {
-        return Objects.requireNonNullElse(this.missingAsEmpty, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
-    }
-
-    public void setMissingAsEmpty(Boolean missingAsEmpty)
-    {
-        this.missingAsEmpty = missingAsEmpty;
-    }
-
-    public Boolean isDisableInterpolator()
-    {
-        return Objects.requireNonNullElse(this.disableInterpolator, CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR);
-    }
-
-    public void setDisableInterpolator(Boolean disableInterpolator)
-    {
-        this.disableInterpolator = disableInterpolator;
-    }
-
-    public Integer getThreads()
-    {
-        return Objects.requireNonNullElse(this.threads, CloudMapperProperties.DEFAULT_THREADS);
-    }
-
-    public void setThreads(Integer threads)
-    {
+        this.enabled = StringUtils.isNotBlank(this.namespace) && Objects.requireNonNullElse(enabled, CloudMapperProperties.DEFAULT_ENABLED);
+        this.disableInterpolator = Objects.requireNonNullElse(disableInterpolator, CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR);
+        this.missingAsEmpty = Objects.requireNonNullElse(missingAsEmpty, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
         if (threads == null)
         {
-            this.threads = null;
+            this.threads = CloudMapperProperties.DEFAULT_THREADS;
         }
         else
         {
@@ -105,11 +74,5 @@ public class CloudMapperProperties implements Cloneable
                     ? CloudMapperProperties.DEFAULT_THREADS
                     : Math.min(threads, CloudMapperProperties.MAX_THREADS);
         }
-    }
-
-    @Override
-    protected CloudMapperProperties clone() throws CloneNotSupportedException
-    {
-        return CloudMapperProperties.class.cast(super.clone());
     }
 }

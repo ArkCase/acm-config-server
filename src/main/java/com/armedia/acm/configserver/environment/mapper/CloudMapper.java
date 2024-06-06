@@ -282,29 +282,26 @@ public class CloudMapper
         this.client.setReadTimeout(0);
 
         this.api = new CoreV1Api(this.client);
-        try
-        {
-            this.properties = (properties != null ? properties.clone() : new CloudMapperProperties());
-        }
-        catch (CloneNotSupportedException e)
-        {
-            throw new RuntimeException("Failed to clone the properties", e);
-        }
+        this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
 
-        if (!this.properties.isEnabled())
+        if (!this.properties.enabled)
         {
             this.log.debug("The CloudMapper is disabled");
+            if (this.log.isDebugEnabled())
+            {
+                this.log.debug("Properties:\n{}", Yaml.dump(this.properties));
+            }
             this.mapper = CloudMapper.NULL_MAPPER;
             this.informerFactory = null;
             this.namespace = null;
             return;
         }
 
-        this.namespace = this.properties.getNamespace();
+        this.namespace = this.properties.namespace;
         this.log.debug("The CloudMapper is enabled (namespace = {})", this.namespace);
 
         final StringSubstitutor substitutor;
-        if (this.properties.isDisableInterpolator())
+        if (this.properties.disableInterpolator)
         {
             this.log.debug("CloudMapper's Interpolator is disabled, using a strict lookup");
             substitutor = new StringSubstitutor(CloudMapper.NULL_LOOKUP);
@@ -320,6 +317,9 @@ public class CloudMapper
                 .setVariablePrefix("@{") //
                 .setVariableSuffix("}") //
         ;
+
+        final String missing = (properties.missingAsEmpty ? StringUtils.EMPTY : null);
+        this.log.debug("CloudMapper missing-as-empty: {}", properties.missingAsEmpty);
 
         // This will either be the interpolator's delegate, or our error delegate
         // which will explode if a value we're meant to resolve isn't meant for us
@@ -355,20 +355,7 @@ public class CloudMapper
             final String result = resourceWrapper.getValue(resourceName, resourceKey);
             this.log.trace("Value resolved for [{}:{}:{}] = [{}] (null == {})", resourceType, resourceName, resourceKey, result,
                     Objects.isNull(result));
-
-            if (result != null)
-            {
-                return result;
-            }
-
-            // If we're returning empty strings for missing values...
-            if (this.properties.isMissingAsEmpty())
-            {
-                return StringUtils.EMPTY;
-            }
-
-            // No hit ... so just return a null
-            return null;
+            return (result != null ? result : missing);
         });
 
         this.mapper = (key, value) -> substitutor.replace(value);
@@ -377,7 +364,7 @@ public class CloudMapper
     @PostConstruct
     protected void postConstruct() throws ApiException
     {
-        if (!this.properties.isEnabled())
+        if (!this.properties.enabled)
         {
             return;
         }
@@ -390,7 +377,7 @@ public class CloudMapper
 
         // Now, initialize the cloud access stuff... including the caching.
         this.log.info("Registering the informers...");
-        this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(this.properties.getThreads()));
+        this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(this.properties.threads));
         this.informerFactory.sharedIndexInformerFor(
                 (params) -> this.api.listNamespacedSecret(this.namespace)
                         .resourceVersion(params.resourceVersion)
@@ -416,7 +403,7 @@ public class CloudMapper
     @PreDestroy
     protected void preDestroy()
     {
-        if (!this.properties.isEnabled())
+        if (!this.properties.enabled)
         {
             return;
         }
