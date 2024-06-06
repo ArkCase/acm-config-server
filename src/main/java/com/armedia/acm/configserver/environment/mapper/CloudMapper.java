@@ -46,8 +46,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.informer.ResourceEventHandler;
@@ -63,7 +61,6 @@ import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Yaml;
 
-@Component
 public class CloudMapper
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -175,8 +172,7 @@ public class CloudMapper
     private final CoreV1Api api;
     private final String namespace;
 
-    @Autowired
-    private CloudMapperProperties properties;
+    private final CloudMapperProperties properties;
 
     private SharedInformerFactory informerFactory = null;
 
@@ -267,6 +263,11 @@ public class CloudMapper
         this(null, null);
     }
 
+    protected CloudMapper(CloudMapperProperties properties) throws IOException, ApiException
+    {
+        this(properties, null);
+    }
+
     protected CloudMapper(CloudMapperProperties properties, ApiClient client) throws IOException, ApiException
     {
         this.client = Objects.requireNonNullElseGet(client, CloudMapper::buildDefaultClient);
@@ -275,15 +276,7 @@ public class CloudMapper
         this.client.setReadTimeout(0);
 
         this.api = new CoreV1Api(this.client);
-
-        if (this.properties == null)
-        {
-            this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
-        }
-        else if (properties != null)
-        {
-            this.properties = properties;
-        }
+        this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
 
         if (!this.properties.enabled)
         {

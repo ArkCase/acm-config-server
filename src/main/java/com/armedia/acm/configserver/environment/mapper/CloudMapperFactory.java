@@ -24,19 +24,24 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.environment;
+package com.armedia.acm.configserver.environment.mapper;
 
-import org.springframework.cloud.config.server.environment.NativeEnvironmentProperties;
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.kubernetes.client.openapi.ApiException;
+
 @Configuration
-public class NativeCloudRepositoryConfiguration
+public class CloudMapperFactory
 {
+
     @Bean
-    public NativeCloudEnvironmentRepository nativeCloudEnvironmentRepository(NativeCloudEnvironmentRepositoryFactory factory,
-            NativeEnvironmentProperties environmentProperties)
+    public CloudMapper cloudMapper(@Autowired CloudMapperProperties properties) throws IOException, ApiException
     {
-        return factory.build(environmentProperties);
+        return new CloudMapper(properties);
     }
+
 }

@@ -1,5 +1,3 @@
-package com.armedia.acm.configserver.environment.mapper;
-
 /*-
  * #%L
  * acm-config-server
@@ -26,6 +24,7 @@ package com.armedia.acm.configserver.environment.mapper;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.environment.mapper;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -236,7 +235,7 @@ public class CloudMapperTest
     @Test
     public void testMissingAsEmpty() throws Exception
     {
-        CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, true, null);
+        CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, null, true);
         CloudMapper cloudMapper = new CloudMapper(properties, CloudMapperTest.CLIENT);
         cloudMapper.postConstruct();
 
