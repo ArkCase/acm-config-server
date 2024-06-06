@@ -39,16 +39,13 @@ public class CloudMapperProperties
     protected static final Boolean DEFAULT_DISABLE_INTERPOLATOR = Boolean.FALSE;
     protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
 
+    public static CloudMapperProperties DEFAULT = new CloudMapperProperties(null, CloudMapperProperties.DEFAULT_ENABLED,
+            CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
+
     public final String namespace;
     public final boolean enabled;
     public final boolean disableInterpolator;
     public final boolean missingAsEmpty;
-
-    public CloudMapperProperties()
-    {
-        this(null, CloudMapperProperties.DEFAULT_ENABLED, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY,
-                CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR);
-    }
 
     public CloudMapperProperties(
             @Value("${cloud-mapper.namespace:#{null}}") String namespace,

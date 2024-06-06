@@ -276,15 +276,11 @@ public class CloudMapper
         this.client.setReadTimeout(0);
 
         this.api = new CoreV1Api(this.client);
-        this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
+        this.properties = Objects.requireNonNullElse(properties, CloudMapperProperties.DEFAULT);
 
         if (!this.properties.enabled)
         {
             this.log.debug("The CloudMapper is disabled");
-            if (this.log.isDebugEnabled())
-            {
-                this.log.debug("Properties:\n{}", Yaml.dump(this.properties));
-            }
             this.mapper = CloudMapper.NULL_MAPPER;
             this.informerFactory = null;
             this.namespace = null;

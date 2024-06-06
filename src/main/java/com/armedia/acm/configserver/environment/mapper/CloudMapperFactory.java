@@ -28,19 +28,27 @@ package com.armedia.acm.configserver.environment.mapper;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.kubernetes.client.openapi.ApiException;
+import io.kubernetes.client.util.Yaml;
 
 @Configuration
 public class CloudMapperFactory
 {
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Bean
     public CloudMapper cloudMapper(@Autowired CloudMapperProperties properties) throws IOException, ApiException
     {
+        if (this.log.isDebugEnabled())
+        {
+            this.log.debug("Properties:\n{}", Yaml.dump(properties));
+        }
         return new CloudMapper(properties);
     }
 

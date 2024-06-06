@@ -42,7 +42,7 @@ public class CloudMapperPropertiesTest
         Boolean disableInterpolator = null;
         Boolean missingAsEmpty = null;
 
-        props = new CloudMapperProperties();
+        props = CloudMapperProperties.DEFAULT;
         Assertions.assertNull(props.namespace);
         Assertions.assertFalse(props.enabled);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR, props.disableInterpolator);
