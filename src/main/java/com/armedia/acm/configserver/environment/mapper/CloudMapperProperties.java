@@ -28,10 +28,9 @@ package com.armedia.acm.configserver.environment.mapper;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-
-import com.nimbusds.oauth2.sdk.util.StringUtils;
 
 @Configuration
 @ConfigurationProperties("cloud-mapper")
