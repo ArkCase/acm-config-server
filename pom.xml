@@ -52,7 +52,7 @@
     </distributionManagement>
 
     <properties>
-        <revision>2.1.0-SNAPSHOT</revision>
+        <revision>3.0.0-SNAPSHOT</revision>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -60,7 +60,6 @@
         <kubernetes-client.version>20.0.1</kubernetes-client.version>
         <commons-text.version>1.12.0</commons-text.version>
         <log4j2.version>2.17.1</log4j2.version>
-        <snakeyaml.version>1.30</snakeyaml.version>
         <wiremock.version>3.6.0</wiremock.version>
         <okhttp3.version>4.12.0</okhttp3.version>
 
@@ -73,6 +72,11 @@
 			<groupId>io.kubernetes</groupId>
 			<artifactId>client-java-extended</artifactId>
 			<version>${kubernetes-client.version}</version>
+		</dependency>
+        <dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp3.version}</version>
 		</dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -101,15 +105,14 @@
 			<version>${commons-text.version}</version>
 		</dependency>
         <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>${okhttp3.version}</version>
-		</dependency>
         <dependency> <!-- use a specific Groovy version rather than the one specified by spock-core -->
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
@@ -139,11 +142,6 @@
 			<version>${wiremock.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>${snakeyaml.version}</version>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
