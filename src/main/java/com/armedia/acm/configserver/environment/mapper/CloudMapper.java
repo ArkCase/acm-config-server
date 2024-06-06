@@ -145,9 +145,9 @@ public class CloudMapper
             }
 
             this.cache.put(meta.getName(), newObj);
-            if (CloudMapper.this.log.isDebugEnabled())
+            if (CloudMapper.this.log.isTraceEnabled())
             {
-                CloudMapper.this.log.debug("New object:\n{}", Yaml.dump(newObj));
+                CloudMapper.this.log.trace("New object:\n{}", Yaml.dump(newObj));
             }
         }
 
@@ -280,7 +280,7 @@ public class CloudMapper
 
         if (!this.properties.enabled)
         {
-            this.log.debug("The CloudMapper is disabled");
+            this.log.info("The CloudMapper is disabled");
             this.mapper = CloudMapper.NULL_MAPPER;
             this.informerFactory = null;
             this.namespace = null;
@@ -288,17 +288,17 @@ public class CloudMapper
         }
 
         this.namespace = this.properties.namespace;
-        this.log.debug("The CloudMapper is enabled (namespace = {})", this.namespace);
+        this.log.info("The CloudMapper is enabled (namespace = {})", this.namespace);
 
         final StringSubstitutor substitutor;
         if (this.properties.disableInterpolator)
         {
-            this.log.debug("CloudMapper's Interpolator is disabled, using a strict lookup");
+            this.log.info("CloudMapper's Interpolator is disabled, using a strict lookup");
             substitutor = new StringSubstitutor(CloudMapper.NULL_LOOKUP);
         }
         else
         {
-            this.log.debug("CloudMapper's Interpolator is ensabled");
+            this.log.info("CloudMapper's Interpolator is ensabled");
             substitutor = StringSubstitutor.createInterpolator();
         }
 
@@ -309,7 +309,7 @@ public class CloudMapper
         ;
 
         final String missing = (properties.missingAsEmpty ? StringUtils.EMPTY : null);
-        this.log.debug("CloudMapper missing-as-empty: {}", properties.missingAsEmpty);
+        this.log.info("CloudMapper missing-as-empty: {}", properties.missingAsEmpty);
 
         // This will either be the interpolator's delegate, or our error delegate
         // which will explode if a value we're meant to resolve isn't meant for us
@@ -371,6 +371,7 @@ public class CloudMapper
         this.informerFactory.sharedIndexInformerFor(
                 (params) -> this.api.listNamespacedSecret(this.namespace)
                         .resourceVersion(params.resourceVersion)
+                        .sendInitialEvents(false)
                         .watch(params.watch)
                         .timeoutSeconds(params.timeoutSeconds)
                         .buildCall(null),
@@ -380,6 +381,7 @@ public class CloudMapper
         this.informerFactory.sharedIndexInformerFor(
                 (params) -> this.api.listNamespacedConfigMap(this.namespace)
                         .resourceVersion(params.resourceVersion)
+                        .sendInitialEvents(false)
                         .watch(params.watch)
                         .timeoutSeconds(params.timeoutSeconds)
                         .buildCall(null),
