@@ -371,7 +371,6 @@ public class CloudMapper
         this.informerFactory.sharedIndexInformerFor(
                 (params) -> this.api.listNamespacedSecret(this.namespace)
                         .resourceVersion(params.resourceVersion)
-                        .sendInitialEvents(false)
                         .watch(params.watch)
                         .timeoutSeconds(params.timeoutSeconds)
                         .buildCall(null),
@@ -381,7 +380,6 @@ public class CloudMapper
         this.informerFactory.sharedIndexInformerFor(
                 (params) -> this.api.listNamespacedConfigMap(this.namespace)
                         .resourceVersion(params.resourceVersion)
-                        .sendInitialEvents(false)
                         .watch(params.watch)
                         .timeoutSeconds(params.timeoutSeconds)
                         .buildCall(null),
