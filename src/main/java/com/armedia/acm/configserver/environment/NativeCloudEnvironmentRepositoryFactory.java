@@ -33,16 +33,21 @@ import org.springframework.cloud.config.server.environment.EnvironmentRepository
 import org.springframework.cloud.config.server.environment.NativeEnvironmentProperties;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-public class NativeCloudEnvironmentRepositoryFactory
+import com.armedia.acm.configserver.environment.mapper.CloudMapper;
+
+class NativeCloudEnvironmentRepositoryFactory
         implements EnvironmentRepositoryFactory<NativeCloudEnvironmentRepository, NativeEnvironmentProperties>
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private ConfigurableEnvironment environment;
-    private ConfigServerProperties properties;
+    private final CloudMapper cloudMapper;
+    private final ConfigurableEnvironment environment;
+    private final ConfigServerProperties properties;
 
-    public NativeCloudEnvironmentRepositoryFactory(ConfigurableEnvironment environment, ConfigServerProperties properties)
+    NativeCloudEnvironmentRepositoryFactory(CloudMapper cloudMapper, ConfigurableEnvironment environment,
+            ConfigServerProperties properties)
     {
+        this.cloudMapper = cloudMapper;
         this.environment = environment;
         this.properties = properties;
     }
@@ -51,8 +56,6 @@ public class NativeCloudEnvironmentRepositoryFactory
     public NativeCloudEnvironmentRepository build(NativeEnvironmentProperties environmentProperties)
     {
         this.log.info("Building a NativeCloudEnvironmentRepository for {}", this.properties.getDefaultLabel());
-        NativeCloudEnvironmentRepository repository = new NativeCloudEnvironmentRepository(this.environment, environmentProperties);
-        repository.setDefaultLabel(this.properties.getDefaultLabel());
-        return repository;
+        return new NativeCloudEnvironmentRepository(this.cloudMapper, this.environment, environmentProperties);
     }
 }

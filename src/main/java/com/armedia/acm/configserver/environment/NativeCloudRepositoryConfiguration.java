@@ -28,6 +28,7 @@ package com.armedia.acm.configserver.environment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.config.server.config.ConfigServerProperties;
 import org.springframework.cloud.config.server.environment.NativeEnvironmentProperties;
 import org.springframework.context.annotation.Bean;
@@ -36,17 +37,23 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import com.armedia.acm.configserver.environment.mapper.CloudMapper;
+
 @Configuration
 @Profile("native-cloud")
 public class NativeCloudRepositoryConfiguration
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private CloudMapper cloudMapper;
+
     @Bean
     @Lazy
     public NativeCloudEnvironmentRepository nativeCloudEnvironmentRepository(NativeCloudEnvironmentRepositoryFactory factory,
             NativeEnvironmentProperties environmentProperties)
     {
+        this.log.info("Creating a new NativeCloudEnvironmentRepository");
         return factory.build(environmentProperties);
     }
 
@@ -55,8 +62,7 @@ public class NativeCloudRepositoryConfiguration
     public NativeCloudEnvironmentRepositoryFactory nativeCloudEnvironmentRepositoryFactory(
             ConfigurableEnvironment environment, ConfigServerProperties properties)
     {
-        this.log.info("Creating a new NativeCloudEnvironmentRepositoryFactory");
-        return new NativeCloudEnvironmentRepositoryFactory(environment, properties);
+        return new NativeCloudEnvironmentRepositoryFactory(this.cloudMapper, environment, properties);
     }
 
 }

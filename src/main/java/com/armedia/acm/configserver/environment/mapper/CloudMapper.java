@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
-import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +46,9 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import io.kubernetes.client.common.KubernetesObject;
 import io.kubernetes.client.informer.ResourceEventHandler;
@@ -61,6 +64,8 @@ import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.Yaml;
 
+@Lazy
+@Component
 public class CloudMapper
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -165,7 +170,7 @@ public class CloudMapper
     }
 
     private static final StringLookup NULL_LOOKUP = (v) -> null;
-    private static final BiFunction<String, String, String> NULL_MAPPER = (k, v) -> v;
+    private static final UnaryOperator<String> NULL_RESOLVER = (v) -> null;
 
     // TODO: Should we do this differently? i.e. allow client configurability?
     private final ApiClient client;
@@ -178,7 +183,7 @@ public class CloudMapper
 
     private final ConcurrentMap<String, ResourceWrapper<? extends KubernetesObject>> masterCache = new ConcurrentHashMap<>();
 
-    private final BiFunction<String, String, String> mapper;
+    private final UnaryOperator<String> resolver;
 
     private final ResourceWrapper<V1ConfigMap> configMapHandler = new ResourceWrapper<>("config")
     {
@@ -258,18 +263,20 @@ public class CloudMapper
 
     };
 
-    public CloudMapper() throws IOException, ApiException
-    {
-        this(null, null);
-    }
-
-    protected CloudMapper(CloudMapperProperties properties) throws IOException, ApiException
+    @Autowired
+    public CloudMapper(CloudMapperProperties properties) throws IOException, ApiException
     {
         this(properties, null);
     }
 
     protected CloudMapper(CloudMapperProperties properties, ApiClient client) throws IOException, ApiException
     {
+        this.log.debug("Creating the CloudMapper");
+        if (this.log.isTraceEnabled())
+        {
+            this.log.trace("CloudMapperProperties:\n{}", Yaml.dump(properties));
+        }
+
         this.client = Objects.requireNonNullElseGet(client, CloudMapper::buildDefaultClient);
 
         // Apparently, the informers need this
@@ -281,7 +288,7 @@ public class CloudMapper
         if (!this.properties.enabled)
         {
             this.log.info("The CloudMapper is disabled");
-            this.mapper = CloudMapper.NULL_MAPPER;
+            this.resolver = CloudMapper.NULL_RESOLVER;
             this.informerFactory = null;
             this.namespace = null;
             return;
@@ -348,7 +355,7 @@ public class CloudMapper
             return (result != null ? result : missing);
         });
 
-        this.mapper = (key, value) -> substitutor.replace(value);
+        this.resolver = substitutor::replace;
     }
 
     @PostConstruct
@@ -413,6 +420,12 @@ public class CloudMapper
     public String map(final String key, final String value)
     {
         this.log.trace("Mapping the value [{}] -> [{}]", key, value);
-        return this.mapper.apply(key, value);
+        return resolve(value);
+    }
+
+    public String resolve(final String value)
+    {
+        this.log.trace("Resolving the value [{}]", value);
+        return this.resolver.apply(value);
     }
 }

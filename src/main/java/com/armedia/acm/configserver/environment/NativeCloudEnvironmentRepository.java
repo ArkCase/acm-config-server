@@ -1,5 +1,5 @@
 /*-
- * #%L
+* #%L
  * acm-config-server
  * %%
  * Copyright (C) 2019 - 2024 ArkCase LLC
@@ -32,69 +32,101 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.config.environment.Environment;
 import org.springframework.cloud.config.environment.PropertySource;
+import org.springframework.cloud.config.server.environment.EnvironmentRepository;
 import org.springframework.cloud.config.server.environment.NativeEnvironmentProperties;
 import org.springframework.cloud.config.server.environment.NativeEnvironmentRepository;
+import org.springframework.cloud.config.server.environment.SearchPathLocator;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 import com.armedia.acm.configserver.environment.mapper.CloudMapper;
 
-public class NativeCloudEnvironmentRepository extends NativeEnvironmentRepository
+class NativeCloudEnvironmentRepository implements EnvironmentRepository, SearchPathLocator, Ordered
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private CloudMapper cloudMapper;
+    private final CloudMapper cloudMapper;
 
-    public NativeCloudEnvironmentRepository(ConfigurableEnvironment environment, NativeEnvironmentProperties properties)
+    private final NativeEnvironmentRepository delegate;
+
+    NativeCloudEnvironmentRepository(CloudMapper cloudMapper, ConfigurableEnvironment environment, NativeEnvironmentProperties properties)
     {
-        super(environment, properties);
+        this.cloudMapper = cloudMapper;
+        this.delegate = new NativeEnvironmentRepository(environment, properties)
+        {
+            @Override
+            public Environment findOne(String config, String profile, String label, boolean includeOrigin)
+            {
+                Environment env = super.findOne(config, profile, label, includeOrigin);
+                NativeCloudEnvironmentRepository.this.log.info(
+                        "Applying cloud mappings for the environment {} ({}), version {}, with profiles {}", env.getName(),
+                        env.getLabel(), env.getVersion(), env.getProfiles());
+
+                // We call the superclass method first, so we can
+                // make sure we don't get hijacked...
+                Environment result = new Environment(env.getName(), env.getProfiles(), env.getLabel(), env.getVersion(), env.getState());
+                for (PropertySource source : env.getPropertySources())
+                {
+                    NativeCloudEnvironmentRepository.this.log.debug("Mapping for PropertySource [{}]", source.getName());
+
+                    Map<Object, Object> map = new LinkedHashMap<>(
+                            source.getSource());
+                    for (Map.Entry<Object, Object> entry : new LinkedHashSet<>(map.entrySet()))
+                    {
+                        Object key = entry.getKey();
+                        String name = key.toString();
+                        String value = entry.getValue().toString();
+
+                        NativeCloudEnvironmentRepository.this.log.trace("Mapping [{}]=[{}]", name, value);
+                        String newValue = NativeCloudEnvironmentRepository.this.cloudMapper.map(name, value);
+
+                        // If we're supposed to remove it, then we do so
+                        if (newValue == null)
+                        {
+                            map.remove(key);
+                            continue;
+                        }
+
+                        // It's ok to do a != comparison, since the exact
+                        // same reference will be returned if there is no
+                        // mapping to be performed, and thus no need to
+                        // operate on the map
+                        if (newValue != value)
+                        {
+                            map.put(key, newValue);
+                        }
+                    }
+                    result.add(new PropertySource(source.getName(), map));
+                }
+                return result;
+            }
+        };
+        this.delegate.setDefaultLabel("native-cloud-environment");
     }
 
     @Override
-    protected Environment clean(Environment environment)
+    public int getOrder()
     {
-        this.log.info("Applying cloud mappings for the environment {} ({}), version {}, with profiles {}", environment.getName(),
-                environment.getLabel(), environment.getVersion(), environment.getProfiles());
+        return this.delegate.getOrder();
+    }
 
-        // We call the superclass method first, so we can
-        // make sure we don't get hijacked...
-        Environment result = super.clean(environment);
-        for (PropertySource source : environment.getPropertySources())
-        {
-            this.log.debug("Mapping for PropertySource [{}]", source.getName());
+    @Override
+    public Locations getLocations(String application, String profile, String label)
+    {
+        return this.delegate.getLocations(application, profile, label);
+    }
 
-            Map<Object, Object> map = new LinkedHashMap<>(
-                    source.getSource());
-            for (Map.Entry<Object, Object> entry : new LinkedHashSet<>(map.entrySet()))
-            {
-                Object key = entry.getKey();
-                String name = key.toString();
-                String value = entry.getValue().toString();
+    @Override
+    public Environment findOne(String application, String profile, String label)
+    {
+        return this.delegate.findOne(application, profile, label);
+    }
 
-                this.log.trace("Mapping [{}]=[{}]", name, value);
-                String newValue = this.cloudMapper.map(name, value);
-
-                // If we're supposed to remove it, then we do so
-                if (newValue == null)
-                {
-                    map.remove(key);
-                    continue;
-                }
-
-                // It's ok to do a != comparison, since the exact
-                // same reference will be returned if there is no
-                // mapping to be performed, and thus no need to
-                // operate on the map
-                if (newValue != value)
-                {
-                    map.put(key, newValue);
-                }
-            }
-            result.add(new PropertySource(source.getName(), map));
-        }
-        return result;
+    @Override
+    public Environment findOne(String application, String profile, String label, boolean includeOrigin)
+    {
+        return this.delegate.findOne(application, profile, label, includeOrigin);
     }
 }
