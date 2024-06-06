@@ -168,6 +168,7 @@ public class CloudMapper
     }
 
     private static final StringLookup NULL_LOOKUP = (v) -> null;
+    private static final BiFunction<String, String, String> NULL_MAPPER = (k, v) -> v;
 
     // TODO: Should we do this differently? i.e. allow client configurability?
     private final ApiClient client;
@@ -293,7 +294,7 @@ public class CloudMapper
         if (!this.properties.isEnabled())
         {
             this.log.debug("The CloudMapper is disabled");
-            this.mapper = (k, v) -> v;
+            this.mapper = CloudMapper.NULL_MAPPER;
             this.informerFactory = null;
             this.namespace = null;
             return;

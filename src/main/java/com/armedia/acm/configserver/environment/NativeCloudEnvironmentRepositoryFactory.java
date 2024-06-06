@@ -30,7 +30,9 @@ import org.springframework.cloud.config.server.config.ConfigServerProperties;
 import org.springframework.cloud.config.server.environment.EnvironmentRepositoryFactory;
 import org.springframework.cloud.config.server.environment.NativeEnvironmentProperties;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NativeCloudEnvironmentRepositoryFactory
         implements EnvironmentRepositoryFactory<NativeCloudEnvironmentRepository, NativeEnvironmentProperties>
 {

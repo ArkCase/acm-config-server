@@ -29,8 +29,6 @@ package com.armedia.acm.configserver.environment;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiFunction;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.config.environment.Environment;
@@ -43,18 +41,12 @@ import com.armedia.acm.configserver.environment.mapper.CloudMapper;
 
 public class NativeCloudEnvironmentRepository extends NativeEnvironmentRepository
 {
-    private static final BiFunction<String, String, String> NO_MAP = (k, v) -> v;
-
-    @Autowired(required = false)
-    private Optional<CloudMapper> cloudMapper;
-
-    private final BiFunction<String, String, String> mapper;
+    @Autowired
+    private CloudMapper cloudMapper;
 
     public NativeCloudEnvironmentRepository(ConfigurableEnvironment environment, NativeEnvironmentProperties properties)
     {
         super(environment, properties);
-        this.mapper = this.cloudMapper.isPresent() ? this.cloudMapper.get()::map
-                : NativeCloudEnvironmentRepository.NO_MAP;
     }
 
     @Override
@@ -73,7 +65,7 @@ public class NativeCloudEnvironmentRepository extends NativeEnvironmentRepositor
                 String name = key.toString();
                 String value = entry.getValue().toString();
 
-                String newValue = this.mapper.apply(name, value);
+                String newValue = this.cloudMapper.map(name, value);
 
                 // If we're supposed to remove it, then we do so
                 if (newValue == null)
