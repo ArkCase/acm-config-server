@@ -178,7 +178,7 @@ public class CloudMapperTest
     public void testBasicExpansion() throws Exception
     {
         CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, null, null, null);
-        CloudMapper cloudMapper = new CloudMapper(CloudMapperTest.CLIENT, properties);
+        CloudMapper cloudMapper = new CloudMapper(properties, CloudMapperTest.CLIENT);
         cloudMapper.postConstruct();
 
         // Now we test the expansion
@@ -237,7 +237,7 @@ public class CloudMapperTest
     public void testMissingAsEmpty() throws Exception
     {
         CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, true, null, null);
-        CloudMapper cloudMapper = new CloudMapper(CloudMapperTest.CLIENT, properties);
+        CloudMapper cloudMapper = new CloudMapper(properties, CloudMapperTest.CLIENT);
         cloudMapper.postConstruct();
 
         // Now we test the expansion

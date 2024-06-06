@@ -264,17 +264,17 @@ public class CloudMapper
         this(null, null);
     }
 
-    public CloudMapper(ApiClient client) throws IOException, ApiException
-    {
-        this(client, null);
-    }
-
     public CloudMapper(@Autowired CloudMapperProperties properties) throws IOException, ApiException
     {
-        this(null, properties);
+        this(properties, null);
     }
 
-    public CloudMapper(ApiClient client, @Autowired CloudMapperProperties properties) throws IOException, ApiException
+    public CloudMapper(ApiClient client) throws IOException, ApiException
+    {
+        this(null, client);
+    }
+
+    public CloudMapper(@Autowired CloudMapperProperties properties, ApiClient client) throws IOException, ApiException
     {
         this.client = Objects.requireNonNullElseGet(client, CloudMapper::buildDefaultClient);
 
