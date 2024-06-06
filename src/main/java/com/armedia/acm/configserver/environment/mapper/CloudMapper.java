@@ -174,7 +174,10 @@ public class CloudMapper
     private final ApiClient client;
     private final CoreV1Api api;
     private final String namespace;
-    private final CloudMapperProperties properties;
+
+    @Autowired
+    private CloudMapperProperties properties;
+
     private SharedInformerFactory informerFactory = null;
 
     private final ConcurrentMap<String, ResourceWrapper<? extends KubernetesObject>> masterCache = new ConcurrentHashMap<>();
@@ -264,17 +267,7 @@ public class CloudMapper
         this(null, null);
     }
 
-    public CloudMapper(@Autowired CloudMapperProperties properties) throws IOException, ApiException
-    {
-        this(properties, null);
-    }
-
-    public CloudMapper(ApiClient client) throws IOException, ApiException
-    {
-        this(null, client);
-    }
-
-    public CloudMapper(@Autowired CloudMapperProperties properties, ApiClient client) throws IOException, ApiException
+    protected CloudMapper(CloudMapperProperties properties, ApiClient client) throws IOException, ApiException
     {
         this.client = Objects.requireNonNullElseGet(client, CloudMapper::buildDefaultClient);
 
@@ -282,7 +275,15 @@ public class CloudMapper
         this.client.setReadTimeout(0);
 
         this.api = new CoreV1Api(this.client);
-        this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
+
+        if (this.properties == null)
+        {
+            this.properties = Objects.requireNonNullElseGet(properties, CloudMapperProperties::new);
+        }
+        else if (properties != null)
+        {
+            this.properties = properties;
+        }
 
         if (!this.properties.enabled)
         {
@@ -377,7 +378,7 @@ public class CloudMapper
 
         // Now, initialize the cloud access stuff... including the caching.
         this.log.info("Registering the informers...");
-        this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(this.properties.threads));
+        this.informerFactory = new SharedInformerFactory(this.client, Executors.newFixedThreadPool(this.masterCache.size()));
         this.informerFactory.sharedIndexInformerFor(
                 (params) -> this.api.listNamespacedSecret(this.namespace)
                         .resourceVersion(params.resourceVersion)

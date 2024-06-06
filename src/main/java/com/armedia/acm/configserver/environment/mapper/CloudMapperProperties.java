@@ -38,41 +38,27 @@ public class CloudMapperProperties
     protected static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
     protected static final Boolean DEFAULT_DISABLE_INTERPOLATOR = Boolean.FALSE;
     protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
-    protected static final int DEFAULT_THREADS = Runtime.getRuntime().availableProcessors() * 2;
-    protected static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 8;
 
     public final String namespace;
     public final boolean enabled;
     public final boolean disableInterpolator;
     public final boolean missingAsEmpty;
-    public final int threads;
 
     public CloudMapperProperties()
     {
         this(null, CloudMapperProperties.DEFAULT_ENABLED, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY,
-                CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR, CloudMapperProperties.DEFAULT_THREADS);
+                CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR);
     }
 
     public CloudMapperProperties(
             @Value("${cloud-mapper.namespace:#{null}}") String namespace,
             @Value("${cloud-mapper.enabled:#{null}}") Boolean enabled,
             @Value("${cloud-mapper.disableInterpolator:#{null}}") Boolean disableInterpolator,
-            @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty,
-            @Value("${cloud-mapper.threads:#{null}}") Integer threads)
+            @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty)
     {
         this.namespace = namespace;
         this.enabled = StringUtils.isNotBlank(this.namespace) && Objects.requireNonNullElse(enabled, CloudMapperProperties.DEFAULT_ENABLED);
         this.disableInterpolator = Objects.requireNonNullElse(disableInterpolator, CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR);
         this.missingAsEmpty = Objects.requireNonNullElse(missingAsEmpty, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
-        if (threads == null)
-        {
-            this.threads = CloudMapperProperties.DEFAULT_THREADS;
-        }
-        else
-        {
-            this.threads = (threads <= 0)
-                    ? CloudMapperProperties.DEFAULT_THREADS
-                    : Math.min(threads, CloudMapperProperties.MAX_THREADS);
-        }
     }
 }

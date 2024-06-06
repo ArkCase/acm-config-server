@@ -177,7 +177,7 @@ public class CloudMapperTest
     @Test
     public void testBasicExpansion() throws Exception
     {
-        CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, null, null, null);
+        CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, null, null);
         CloudMapper cloudMapper = new CloudMapper(properties, CloudMapperTest.CLIENT);
         cloudMapper.postConstruct();
 
@@ -236,7 +236,7 @@ public class CloudMapperTest
     @Test
     public void testMissingAsEmpty() throws Exception
     {
-        CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, true, null, null);
+        CloudMapperProperties properties = new CloudMapperProperties(CloudMapperTest.NAMESPACE, true, true, null);
         CloudMapper cloudMapper = new CloudMapper(properties, CloudMapperTest.CLIENT);
         cloudMapper.postConstruct();
 
