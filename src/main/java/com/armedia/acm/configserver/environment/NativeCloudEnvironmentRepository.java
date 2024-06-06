@@ -30,6 +30,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.config.environment.Environment;
 import org.springframework.cloud.config.environment.PropertySource;
@@ -41,6 +43,8 @@ import com.armedia.acm.configserver.environment.mapper.CloudMapper;
 
 public class NativeCloudEnvironmentRepository extends NativeEnvironmentRepository
 {
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private CloudMapper cloudMapper;
 
@@ -52,11 +56,16 @@ public class NativeCloudEnvironmentRepository extends NativeEnvironmentRepositor
     @Override
     protected Environment clean(Environment environment)
     {
+        this.log.info("Applying cloud mappings for the environment {} ({}), version {}, with profiles {}", environment.getName(),
+                environment.getLabel(), environment.getVersion(), environment.getProfiles());
+
         // We call the superclass method first, so we can
         // make sure we don't get hijacked...
         Environment result = super.clean(environment);
         for (PropertySource source : environment.getPropertySources())
         {
+            this.log.debug("Mapping for PropertySource [{}]", source.getName());
+
             Map<Object, Object> map = new LinkedHashMap<>(
                     source.getSource());
             for (Map.Entry<Object, Object> entry : new LinkedHashSet<>(map.entrySet()))
@@ -65,6 +74,7 @@ public class NativeCloudEnvironmentRepository extends NativeEnvironmentRepositor
                 String name = key.toString();
                 String value = entry.getValue().toString();
 
+                this.log.trace("Mapping [{}]=[{}]", name, value);
                 String newValue = this.cloudMapper.map(name, value);
 
                 // If we're supposed to remove it, then we do so
