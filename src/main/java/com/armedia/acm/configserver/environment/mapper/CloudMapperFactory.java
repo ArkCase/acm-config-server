@@ -45,9 +45,10 @@ public class CloudMapperFactory
     @Bean
     public CloudMapper cloudMapper(@Autowired CloudMapperProperties properties) throws IOException, ApiException
     {
-        if (this.log.isDebugEnabled())
+        this.log.debug("Creating the CloudMapper");
+        if (this.log.isTraceEnabled())
         {
-            this.log.debug("Properties:\n{}", Yaml.dump(properties));
+            this.log.trace("CloudMapperProperties:\n{}", Yaml.dump(properties));
         }
         return new CloudMapper(properties);
     }
