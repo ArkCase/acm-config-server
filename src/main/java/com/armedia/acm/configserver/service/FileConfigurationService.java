@@ -4,7 +4,7 @@ package com.armedia.acm.configserver.service;
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 - 2020 ArkCase LLC
+ * Copyright (C) 2019 - 2024 ArkCase LLC
  * %%
  * This file is part of the ArkCase software. 
  * 
@@ -27,7 +27,11 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import com.armedia.acm.configserver.api.ConfigurationAPIController;
+import java.io.File;
+import java.io.InputStream;
+
+import javax.jms.DeliveryMode;
+
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -38,14 +42,10 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.jms.DeliveryMode;
-import javax.jms.TextMessage;
-import java.io.File;
-import java.io.InputStream;
-
 @Service
 @Qualifier(value = "fileConfigurationService")
-public class FileConfigurationService {
+public class FileConfigurationService
+{
 
     private final String configServerRepo;
 
@@ -55,14 +55,14 @@ public class FileConfigurationService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileConfigurationService.class);
 
-
     public FileConfigurationService(@Value("${properties.folder.path}") String configRepo, JmsTemplate acmJmsTemplate)
     {
         this.configServerRepo = configRepo;
         this.acmJmsTemplate = acmJmsTemplate;
     }
 
-    public void moveFileToConfiguration(MultipartFile file, String fileName) throws Exception {
+    public void moveFileToConfiguration(MultipartFile file, String fileName) throws Exception
+    {
         try (InputStream logoStream = file.getInputStream())
         {
 
@@ -70,14 +70,14 @@ public class FileConfigurationService {
 
             String profileBasedFile = setProfileBasedResource(fileName);
 
-            File logoFile = new File(configServerRepo + "/" + profileBasedFile);
+            File logoFile = new File(this.configServerRepo + "/" + profileBasedFile);
 
             FileUtils.copyInputStreamToFile(logoStream, logoFile);
 
-            logger.info("File is with name {} created on the config server", fileName);
+            FileConfigurationService.logger.info("File is with name {} created on the config server", fileName);
 
             sendNotification(originalFileName,
-                    VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+                    FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
 
         }
         catch (Exception e)
@@ -91,7 +91,7 @@ public class FileConfigurationService {
         String[] splitedFilePath = filePath.split("/");
         String originalFileName = splitedFilePath[splitedFilePath.length - 1];
 
-        logger.debug("Original file name from path {} is {}", filePath, originalFileName);
+        FileConfigurationService.logger.debug("Original file name from path {} is {}", filePath, originalFileName);
 
         return originalFileName;
     }
@@ -105,10 +105,10 @@ public class FileConfigurationService {
     {
         ActiveMQTopic topic = new ActiveMQTopic(destination);
 
-        acmJmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
-        acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
+        this.acmJmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
+        this.acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
 
-        logger.debug("File with name {} is updated and success message is sent for updating", message);
+        FileConfigurationService.logger.debug("File with name {} is updated and success message is sent for updating", message);
 
     }
 

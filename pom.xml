@@ -52,13 +52,15 @@
     </distributionManagement>
 
     <properties>
-	<revision>2023.02.01</revision>
-        <gitflow-maven-plugin.version>1.12.0</gitflow-maven-plugin.version>
-        <java.version>1.8</java.version>
+        <revision>2.0.0-SNAPSHOT</revision>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-cloud.version>Finchley.SR2</spring-cloud.version>
         <log4j2.version>2.17.1</log4j2.version>
+
+        <maven-jar-plugin.version>3.0.0</maven-jar-plugin.version>
+        <maven-buildnumber-plugin.version>3.0.0</maven-buildnumber-plugin.version>
     </properties>
 
     <dependencies>
@@ -146,19 +148,59 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.amashchenko.maven.plugin</groupId>
-                <artifactId>gitflow-maven-plugin</artifactId>
-                <version>${gitflow-maven-plugin.version}</version>
-                <configuration>
-                    
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <executable>true</executable>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <SCM-Branch>${scmBranch}</SCM-Branch>
+                            <SCM-Revision>${commitHash}</SCM-Revision>
+                            <SCM-Build-Time>${buildTimestamp}</SCM-Build-Time>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>${maven-buildnumber-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>create-commitHash</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                        <configuration>
+                            <doCheck>false</doCheck>
+                            <doUpdate>false</doUpdate>
+                            <shortRevisionLength>40</shortRevisionLength>
+                            <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                            <revisionOnScmFailure>unknown</revisionOnScmFailure>
+                            <buildNumberPropertyName>commitHash</buildNumberPropertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-buildTimestamp</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>create-timestamp</goal>
+                        </goals>
+                        <configuration>
+                            <timestampPropertyName>buildTimestamp</timestampPropertyName>
+                            <timestampFormat>yyyy-MM-dd'T'HH:mm:ssZZ</timestampFormat>
+                            <timezone>UTC</timezone>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
