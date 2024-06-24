@@ -28,6 +28,7 @@ package com.armedia.acm.configserver.service;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.jms.DeliveryMode;
@@ -61,28 +62,31 @@ public class FileConfigurationService
         this.acmJmsTemplate = acmJmsTemplate;
     }
 
-    public void moveFileToConfiguration(MultipartFile file, String fileName) throws Exception
+    public void moveFileToConfiguration(MultipartFile file, String fileName, boolean isBrandingFile) throws IOException
     {
-        try (InputStream logoStream = file.getInputStream())
+        try (InputStream inputStream = file.getInputStream())
         {
 
             String originalFileName = getOriginalFileNameFromFilePath(fileName);
 
             String profileBasedFile = setProfileBasedResource(fileName);
 
-            File logoFile = new File(this.configServerRepo + "/" + profileBasedFile);
+            File destinationFile = new File(this.configServerRepo + "/" + profileBasedFile);
 
-            FileUtils.copyInputStreamToFile(logoStream, logoFile);
+            FileUtils.copyInputStreamToFile(inputStream, destinationFile);
 
             FileConfigurationService.logger.info("File is with name {} created on the config server", fileName);
 
-            sendNotification(originalFileName,
-                    FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
-
+            if (isBrandingFile)
+            {
+                sendNotification(originalFileName,
+                        FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+            }
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            throw new Exception("Can't update logo file");
+            FileConfigurationService.logger.error("File can't be updated");
+            throw e;
         }
     }
 
