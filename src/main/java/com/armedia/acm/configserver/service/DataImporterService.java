@@ -30,9 +30,9 @@ package com.armedia.acm.configserver.service;
 import static com.armedia.acm.configserver.service.ConfigUtils.extractFromFileName;
 import static com.armedia.acm.configserver.service.ConfigUtils.findProfile;
 
-import com.armedia.acm.configserver.model.AppConfig;
+import com.armedia.acm.configserver.model.ApplicationProperty;
 import com.armedia.acm.configserver.model.ArkcaseConfig;
-import com.armedia.acm.configserver.repository.AppConfigRepository;
+import com.armedia.acm.configserver.repository.ApplicationPropertyRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
@@ -58,18 +58,18 @@ public class DataImporterService
 {
 
     private static final Logger log = LoggerFactory.getLogger(DataImporterService.class);
-    private final AppConfigRepository appConfigRepository;
+    private final ApplicationPropertyRepository applicationPropertyRepository;
     private final ArkcaseConfig arkcaseConfig;
 
-    public DataImporterService(AppConfigRepository appConfigRepository, ArkcaseConfig arkcaseConfig)
+    public DataImporterService(ApplicationPropertyRepository applicationPropertyRepository, ArkcaseConfig arkcaseConfig)
     {
-        this.appConfigRepository = appConfigRepository;
+        this.applicationPropertyRepository = applicationPropertyRepository;
         this.arkcaseConfig = arkcaseConfig;
     }
 
     public void importData()
     {
-        if (Boolean.TRUE.equals(this.appConfigRepository.existsAnyRecord()))
+        if (Boolean.TRUE.equals(this.applicationPropertyRepository.existsAnyRecord()))
             return;
 
         var mapper = new ObjectMapper(new YAMLFactory());
@@ -110,8 +110,8 @@ public class DataImporterService
                 var yamlProperties = mapper.readValue(reader, Map.class);
                 if (yamlProperties != null && !yamlProperties.isEmpty())
                 {
-                    var appConfigs = mapYamlToEntities(resource, yamlProperties);
-                    this.appConfigRepository.saveAll(appConfigs);
+                    var applicationProperties = mapYamlToEntities(resource, yamlProperties);
+                    this.applicationPropertyRepository.saveAll(applicationProperties);
                 }
             }
             catch (Exception e)
@@ -125,9 +125,9 @@ public class DataImporterService
         }
     }
 
-    private List<AppConfig> mapYamlToEntities(Resource resource, Map<String, Object> yamlProperties)
+    private List<ApplicationProperty> mapYamlToEntities(Resource resource, Map<String, Object> yamlProperties)
     {
-        var appConfigs = new ArrayList<AppConfig>();
+        var applicationProperties = new ArrayList<ApplicationProperty>();
         var fileName = resource.getFilename();
 
         if(fileName == null || fileName.isBlank())
@@ -146,11 +146,11 @@ public class DataImporterService
 
         for (var entry : flattenedProperties.entrySet())
         {
-            var appConfig = new AppConfig(applicationName, profile, label,  entry.getKey(), entry.getValue());
-            appConfigs.add(appConfig);
+            var applicationProperty = new ApplicationProperty(applicationName, profile, label, entry.getKey(), entry.getValue());
+            applicationProperties.add(applicationProperty);
         }
 
-        return appConfigs;
+        return applicationProperties;
     }
 
     private void flattenProperties(String prefix, Map<String, Object> source, Map<String, String> target)

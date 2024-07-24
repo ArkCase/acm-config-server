@@ -60,7 +60,7 @@ public class ModulesListAPIController
         try
         {
             var modules = configurationService.getModulesNames();
-            ModulesListAPIController.logger.info("Retrieve list of modules");
+            ModulesListAPIController.logger.info("Retrieved list of modules");
             return ResponseEntity.ok(modules);
         }
         catch (Exception e)

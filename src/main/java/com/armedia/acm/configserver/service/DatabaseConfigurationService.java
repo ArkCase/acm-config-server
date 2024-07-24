@@ -27,12 +27,13 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
+import static com.armedia.acm.configserver.service.ConfigUtils.extractFromFileName;
 import static com.armedia.acm.configserver.service.ConfigUtils.findProfile;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
-import com.armedia.acm.configserver.model.AppConfig;
+import com.armedia.acm.configserver.model.ApplicationProperty;
 import com.armedia.acm.configserver.model.ArkcaseConfig;
-import com.armedia.acm.configserver.repository.AppConfigRepository;
+import com.armedia.acm.configserver.repository.ApplicationPropertyRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,12 +50,12 @@ public class DatabaseConfigurationService implements ConfigurationService
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConfigurationService.class);
 
-    private final AppConfigRepository appConfigRepository;
+    private final ApplicationPropertyRepository applicationPropertyRepository;
     private final ArkcaseConfig arkcaseConfig;
 
-    public DatabaseConfigurationService(AppConfigRepository appConfigRepository, ArkcaseConfig arkcaseConfig)
+    public DatabaseConfigurationService(ApplicationPropertyRepository applicationPropertyRepository, ArkcaseConfig arkcaseConfig)
     {
-        this.appConfigRepository = appConfigRepository;
+        this.applicationPropertyRepository = applicationPropertyRepository;
         this.arkcaseConfig = arkcaseConfig;
     }
 
@@ -81,21 +82,22 @@ public class DatabaseConfigurationService implements ConfigurationService
                 var appNameWithoutProfile = matchedProfile.map(s -> applicationName.substring(0, applicationName.indexOf(s) - 1))
                         .orElse(applicationName);
 
-                var config = this.appConfigRepository.findByApplicationAndProfileAndKey(appNameWithoutProfile, profile, entry.getKey());
+                var config = this.applicationPropertyRepository.findByApplicationAndProfileAndKey(appNameWithoutProfile, profile,
+                        entry.getKey());
                 if (config == null)
                 {
-                    // label is missing
-                    config = new AppConfig();
+                    config = new ApplicationProperty();
                     config.setApplication(appNameWithoutProfile);
+                    config.setProfile(profile);
+                    config.setLabel(extractFromFileName(appNameWithoutProfile, this.arkcaseConfig.getLanguages()));
                     config.setKey(entry.getKey());
                     config.setValue(entry.getValue().toString());
-                    config.setProfile(profile);
                 }
                 else
                 {
                     config.setValue(entry.getValue().toString());
                 }
-                this.appConfigRepository.save(config);
+                this.applicationPropertyRepository.save(config);
             }
         }
         catch (Exception e)
@@ -115,7 +117,7 @@ public class DatabaseConfigurationService implements ConfigurationService
 
         try
         {
-            this.appConfigRepository.deleteByApplicationAndProfileAndKeyIn(appNameWithoutProfile, "runtime", properties);
+            this.applicationPropertyRepository.deleteByApplicationAndProfileAndKeyIn(appNameWithoutProfile, "runtime", properties);
         }
         catch (Exception e)
         {
@@ -134,7 +136,7 @@ public class DatabaseConfigurationService implements ConfigurationService
 
         try
         {
-            this.appConfigRepository.deleteByApplicationAndProfile(appNameWithoutProfile, "runtime");
+            this.applicationPropertyRepository.deleteByApplicationAndProfile(appNameWithoutProfile, "runtime");
         }
         catch (Exception e)
         {
@@ -154,7 +156,7 @@ public class DatabaseConfigurationService implements ConfigurationService
     {
         try
         {
-            this.appConfigRepository.deleteAllByProfile("runtime");
+            this.applicationPropertyRepository.deleteAllByProfile("runtime");
         }
         catch (Exception e)
         {
@@ -166,6 +168,6 @@ public class DatabaseConfigurationService implements ConfigurationService
     @Override
     public List<String> getModulesNames()
     {
-        return this.appConfigRepository.findAllUniqueLabels();
+        return this.applicationPropertyRepository.findAllUniqueLabels();
     }
 }

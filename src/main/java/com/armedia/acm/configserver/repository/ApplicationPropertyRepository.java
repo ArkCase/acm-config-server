@@ -27,7 +27,7 @@ package com.armedia.acm.configserver.repository;
  * #L%
  */
 
-import com.armedia.acm.configserver.model.AppConfig;
+import com.armedia.acm.configserver.model.ApplicationProperty;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,17 +38,18 @@ import java.util.List;
 
 @Repository
 @Profile("run-with-db")
-public interface AppConfigRepository extends JpaRepository<AppConfig, Long> {
-    AppConfig findByApplicationAndProfileAndKey(String application, String profile, String key);
+public interface ApplicationPropertyRepository extends JpaRepository<ApplicationProperty, Long>
+{
+    ApplicationProperty findByApplicationAndProfileAndKey(String application, String profile, String key);
 
     void deleteAllByProfile(String profile);
     void deleteByApplicationAndProfileAndKeyIn(String application, String profile, List<String> keys);
     void deleteByApplicationAndProfile(String appNameWithoutProfile, String runtime);
 
-    @Query("SELECT DISTINCT a.label FROM AppConfig a")
+    @Query("SELECT DISTINCT ap.label FROM ApplicationProperty ap")
     List<String> findAllUniqueLabels();
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN TRUE ELSE FALSE END FROM AppConfig c")
+    @Query("SELECT CASE WHEN COUNT(ap) > 0 THEN TRUE ELSE FALSE END FROM ApplicationProperty ap")
     Boolean existsAnyRecord();
 
 }

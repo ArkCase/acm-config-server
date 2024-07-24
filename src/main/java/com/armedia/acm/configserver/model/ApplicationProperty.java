@@ -41,7 +41,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "properties")
 @NoArgsConstructor
-public class AppConfig
+public class ApplicationProperty
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,7 +62,7 @@ public class AppConfig
     @Column(name = "value")
     private String value;
 
-    public AppConfig(String application, String profile, String label, String key, String value)
+    public ApplicationProperty(String application, String profile, String label, String key, String value)
     {
         this.application = application;
         this.profile = profile;
