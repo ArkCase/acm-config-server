@@ -1,7 +1,5 @@
 package com.armedia.acm.configserver.jms;
 
-import java.time.Duration;
-
 /*-
  * #%L
  * acm-config-server
@@ -36,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
+
+import java.time.Duration;
 
 @Configuration
 public class ActiveMqFactory

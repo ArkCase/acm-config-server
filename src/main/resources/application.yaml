@@ -1,10 +1,37 @@
 server.port: 9999
 spring:
   profiles.active: native
-  cloud.config.server:
-    native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules
+  profiles:
+    include: jdbc
   jms:
     pub-sub-domain: true
+  datasource:
+    # Database connection should be added here
+    url: jdbc:postgresql://localhost:5432/config
+    username: #user
+    password: #pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  cloud:
+    config:
+      server:
+        native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules
+        jdbc: # we do not need custom SQL unless our table structure is custom
+          enabled: true
+          order: 1
+          sql: SELECT KEY, VALUE from PROPERTIES where APPLICATION=? and PROFILE=?
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
 #spring.cloud.config.server.git.clone-on-start: true
 #spring.security.user.name: root
@@ -13,12 +40,18 @@ spring:
 properties.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo
 branding.files.folder.path: ${user.home}/.arkcase/acm/acm-config-server-repo/branding
 logging:
+  level:
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type: ERROR
+    org.hibernate.type.descriptor: ERROR
+    org.hibernate.type.descriptor.sql: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+    com.armedia.acm.configserver: debug
+    org.springframework.cloud.config: ERROR
   file.max-history: 10
   file.max-size: 10MB
   file: logs/acmConfigServer.log
-  level:
-    com.armedia.acm.configserver: debug
-    org.springframework.cloud.config: debug
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss,SSS} [%thread] %-5level %logger.%M - %msg%n"
 jms.message.buffer.window: 1
@@ -37,4 +70,29 @@ acm.activemq:
   rules-destination: rules.changed
   permissions-destination: permissions.changed
   timeout: 10 #seconds
-arkcase.languages: "-de,-en,-en-in,-es,-fr,-hi,-ja,-pt,-ru,-zh-cn,-zh-tw"
+arkcase:
+  languages:
+    - "-de"
+    - "-en"
+    - "-en-in"
+    - "-es"
+    - "-fr"
+    - "-hi"
+    - "-ja"
+    - "-pt"
+    - "-ru"
+    - "-zh-cn"
+    - "-zh-tw"
+    - "-ar"
+  folders: # This list should be updated - list of folders to be imported to DB
+    - "${user.home}/.arkcase/acm/acm-config-server-repo"
+    - "${user.home}/.arkcase/acm/acm-config-server-repo/labels"
+    - "${user.home}/.arkcase/acm/acm-config-server-repo/ldap"
+    - "${user.home}/.arkcase/acm/acm-config-server-repo/lookups"
+  #    - "/home/vladimir/IdeaProjects/acm-config/acm/acm-config-server-repo/rules"
+  profiles:
+    - "foia"
+    - "privacy"
+    - "custom"
+    - "runtime"
+

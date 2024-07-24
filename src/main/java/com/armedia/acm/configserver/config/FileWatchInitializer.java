@@ -1,4 +1,4 @@
-package com.armedia.acm.configserver;
+package com.armedia.acm.configserver.config;
 
 /*-
  * #%L
@@ -27,27 +27,27 @@ package com.armedia.acm.configserver;
  * #L%
  */
 
-import com.armedia.acm.configserver.model.ArkcaseConfig;
+import com.armedia.acm.configserver.service.FileWatchService;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.config.server.EnableConfigServer;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jms.annotation.EnableJms;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-@EnableConfigServer
-@SpringBootApplication
-@EnableJms
-@EnableAsync
-@EnableJpaRepositories
-@EnableConfigurationProperties(ArkcaseConfig.class)
-public class AcmConfigServerApplication
+@Component
+@Profile("run-with-file")
+public class FileWatchInitializer implements ApplicationRunner
 {
+    private final FileWatchService fileWatchService;
 
-    public static void main(String[] args)
+    public FileWatchInitializer(FileWatchService fileWatchService)
     {
-        SpringApplication.run(AcmConfigServerApplication.class, args);
+        this.fileWatchService = fileWatchService;
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception
+    {
+        this.fileWatchService.monitor();
     }
 }

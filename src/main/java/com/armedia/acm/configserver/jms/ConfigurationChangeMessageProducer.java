@@ -1,11 +1,5 @@
 package com.armedia.acm.configserver.jms;
 
-import java.time.LocalDateTime;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.jms.Session;
-
 /*-
  * #%L
  * acm-config-server
@@ -40,6 +34,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
+
+import javax.jms.Session;
+
+import java.time.LocalDateTime;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class ConfigurationChangeMessageProducer

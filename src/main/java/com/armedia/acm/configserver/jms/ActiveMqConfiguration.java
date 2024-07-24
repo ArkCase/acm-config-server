@@ -1,8 +1,5 @@
 package com.armedia.acm.configserver.jms;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
 /*-
  * #%L
  * acm-config-server
@@ -30,7 +27,9 @@ import org.springframework.stereotype.Component;
  * #L%
  */
 
-import com.google.common.base.MoreObjects;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "acm.activemq")
@@ -147,11 +146,11 @@ public class ActiveMqConfiguration
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper(this)
-                .add("brokerUrl", this.brokerUrl)
-                .add("user", this.user)
-                .add("defaultDestination", this.defaultDestination)
-                .add("timeout", this.timeout)
+        return new ToStringCreator(this)
+                .append("brokerUrl", this.brokerUrl)
+                .append("user", this.user)
+                .append("defaultDestination", this.defaultDestination)
+                .append("timeout", this.timeout)
                 .toString();
     }
 }

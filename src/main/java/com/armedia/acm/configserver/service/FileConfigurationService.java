@@ -27,24 +27,24 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.jms.DeliveryMode;
-
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.jms.DeliveryMode;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 @Service
-@Qualifier(value = "fileConfigurationService")
+@Profile("run-with-file")
 public class FileConfigurationService
 {
 
@@ -71,11 +71,11 @@ public class FileConfigurationService
 
             String profileBasedFile = setProfileBasedResource(fileName);
 
-            File destinationFile = new File(this.configServerRepo + "/" + profileBasedFile);
+            File destinationFile = new File(this.configServerRepo, profileBasedFile);
 
             FileUtils.copyInputStreamToFile(inputStream, destinationFile);
 
-            FileConfigurationService.logger.info("File is with name {} created on the config server", fileName);
+            FileConfigurationService.logger.info("File with name {} created on the config server", fileName);
 
             if (isBrandingFile)
             {

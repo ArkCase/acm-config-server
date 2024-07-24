@@ -1,23 +1,5 @@
 package com.armedia.acm.configserver.api;
 
-import java.nio.file.NoSuchFileException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 /*-
  * #%L
  * acm-config-server
@@ -48,21 +30,32 @@ import org.springframework.web.bind.annotation.RestController;
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.service.ConfigurationService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.nio.file.NoSuchFileException;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/config")
 public class ConfigurationAPIController
 {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationAPIController.class);
 
-    private final List<String> langs;
-
     private final ConfigurationService configServerService;
 
-    public ConfigurationAPIController(@Qualifier(value = "fileSystemConfigurationService") ConfigurationService configServerService,
-            @Value("${arkcase.languages}") String arkcaseLanguages)
+    public ConfigurationAPIController(ConfigurationService configServerService)
     {
         this.configServerService = configServerService;
-        this.langs = Arrays.asList(arkcaseLanguages.split(","));
     }
 
     @PostMapping("/{applicationName}")
@@ -71,18 +64,6 @@ public class ConfigurationAPIController
         ConfigurationAPIController.logger.info("Update properties {}", properties.keySet());
         try
         {
-            if (this.langs.stream().anyMatch(applicationName::contains))
-            {
-                applicationName = "labels/" + applicationName;
-            }
-            else if (applicationName.equals("ldap"))
-            {
-                applicationName = "ldap/" + applicationName;
-            }
-            else if (applicationName.equals("lookups"))
-            {
-                applicationName = "lookups/" + applicationName;
-            }
             this.configServerService.updateProperties(properties, applicationName);
             ConfigurationAPIController.logger.debug("Properties successfully updated");
             return ResponseEntity.ok().build();
@@ -135,14 +116,9 @@ public class ConfigurationAPIController
     public ResponseEntity<?> resetFilePropertiesToDefault(@PathVariable String applicationName)
     {
         ConfigurationAPIController.logger.info("Resetting properties for: {}", applicationName);
-        if (this.langs.parallelStream().anyMatch(applicationName::contains))
-        {
-            applicationName = "labels/" + applicationName;
-        }
         try
         {
             this.configServerService.resetFilePropertiesToDefault(applicationName);
-
             return ResponseEntity.ok().build();
         }
         catch (NoSuchFileException e)

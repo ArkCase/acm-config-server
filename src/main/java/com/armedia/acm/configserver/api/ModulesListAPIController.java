@@ -1,10 +1,5 @@
 package com.armedia.acm.configserver.api;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /*-
  * #%L
  * acm-config-server
@@ -32,13 +27,18 @@ import java.util.List;
  * #L%
  */
 
+import com.armedia.acm.configserver.service.ConfigurationService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/config")
@@ -46,60 +46,28 @@ public class ModulesListAPIController
 {
     private static final Logger logger = LoggerFactory.getLogger(ModulesListAPIController.class);
 
-    private final List<String> langs;
+    private final ConfigurationService configurationService;
 
-    private final String labelsFolderPath;
-
-    public ModulesListAPIController(@Value("${properties.folder.path}") String propertiesFolderPath,
-            @Value("${arkcase.languages}") String arkcaseLanguages)
+    public ModulesListAPIController(ConfigurationService configurationService)
     {
-        this.labelsFolderPath = propertiesFolderPath + "/labels";
-        this.langs = Arrays.asList(arkcaseLanguages.split(","));
+        this.configurationService = configurationService;
     }
 
     @GetMapping(value = "/modules", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<String> getModules()
+    public ResponseEntity<List<String>> getModules()
     {
-        return getModulesNames();
-    }
-
-    /**
-     * Return list of modules configuration
-     *
-     * @return list of modules configuration
-     */
-    public List<String> getModulesNames()
-    {
-        File modulesDir = new File(this.labelsFolderPath);
-
-        File[] files = modulesDir.listFiles(file -> {
-            if (file.isFile() && !file.getName().toLowerCase().contains("-runtime"))
-            {
-                return true;
-            }
-            return false;
-        });
-
-        List<String> modules = new ArrayList<>();
-
-        for (File labelResource : files)
+        ModulesListAPIController.logger.info("Retrieve list of modules");
+        try
         {
-            for (String lang : this.langs)
-            {
-                String fileName = labelResource.getName();
-                if (fileName.contains(lang))
-                {
-                    int sepPos = fileName.indexOf(lang);
-                    String moduleName = fileName.substring(0, sepPos);
-                    if (!modules.stream().anyMatch(module -> module.equals(moduleName)))
-                    {
-                        modules.add(moduleName);
-                    }
-                }
-            }
+            var modules = configurationService.getModulesNames();
+            ModulesListAPIController.logger.info("Retrieve list of modules");
+            return ResponseEntity.ok(modules);
         }
-
-        ModulesListAPIController.logger.info("Returns modules names. [{}]", modules.toArray());
-        return modules;
+        catch (Exception e)
+        {
+            ModulesListAPIController.logger.debug("Failed to retrieve modules, reason {}", e.getMessage());
+            ModulesListAPIController.logger.trace("Cause: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

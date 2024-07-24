@@ -1,25 +1,5 @@
 package com.armedia.acm.configserver.service;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-
 /*-
  * #%L
  * acm-config-server
@@ -48,32 +28,64 @@ import org.yaml.snakeyaml.Yaml;
  */
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
+import com.armedia.acm.configserver.model.ArkcaseConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
-@Qualifier(value = "fileSystemConfigurationService")
+@Profile("run-with-file")
 public class FileSystemConfigurationService implements ConfigurationService
 {
     private static final Logger logger = LoggerFactory.getLogger(FileSystemConfigurationService.class);
 
-    private final String propertiesFolderPath;
+    private final String labelsFolderPath;
 
-    private final String brandingFilesFolder;
+    private final ArkcaseConfig arkcaseConfig;
 
     private FileConfigurationService fileConfigurationService;
 
-    private static final String RUNTIME = "-runtime";
 
-    public FileSystemConfigurationService(@Value("${properties.folder.path}") String propertiesFolderPath,
-            @Value("${branding.files.folder.path}") String brandingFilesFolder, FileConfigurationService fileConfigurationService)
+    public FileSystemConfigurationService(ArkcaseConfig arkcaseConfig, FileConfigurationService fileConfigurationService)
     {
-        this.propertiesFolderPath = propertiesFolderPath;
-        this.brandingFilesFolder = brandingFilesFolder;
+        this.arkcaseConfig = arkcaseConfig;
+        this.labelsFolderPath = this.arkcaseConfig.getPropertiesFolderPath() + "/labels";
         this.fileConfigurationService = fileConfigurationService;
     }
 
     @Override
     public synchronized void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException
     {
+        if (this.arkcaseConfig.getLanguages().stream().anyMatch(applicationName::contains))
+        {
+            applicationName = "labels/" + applicationName;
+        }
+        else if (applicationName.equals("ldap"))
+        {
+            applicationName = "ldap/" + applicationName;
+        }
+        else if (applicationName.equals("lookups"))
+        {
+            applicationName = "lookups/" + applicationName;
+        }
+
+        // acm-config..appName-runtime.yaml
         String configurationFilePath = getRuntimeConfigurationFilePath(applicationName);
 
         FileSystemResource yamlResource = loadYamlSystemResource(configurationFilePath);
@@ -89,10 +101,7 @@ public class FileSystemConfigurationService implements ConfigurationService
                 configMap = new LinkedHashMap<>();
             }
 
-            for (Map.Entry<String, Object> entry : properties.entrySet())
-            {
-                configMap.put(entry.getKey(), entry.getValue());
-            }
+            configMap.putAll(properties);
 
             try (FileWriter fw = new FileWriter(yamlResource.getFile()))
             {
@@ -125,10 +134,7 @@ public class FileSystemConfigurationService implements ConfigurationService
                 configMap = new LinkedHashMap<>();
             }
 
-            for (String property : properties)
-            {
-                configMap.remove(property);
-            }
+            properties.forEach(configMap::remove);
 
             try (FileWriter fw = new FileWriter(yamlResource.getFile()))
             {
@@ -147,28 +153,34 @@ public class FileSystemConfigurationService implements ConfigurationService
      *
      * @param applicationName
      *            - ex. 'cases-en', without the file extension (.yaml)
+     *            - If cases-en was updated, cases-en-runtime is created including just the updated properties
+     *            - This method will remove just the updated (cases-en-runtime.yaml)
      * @throws ConfigurationException
      */
     @Override
     public void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException, NoSuchFileException
     {
-        String resetFilePath;
-        if (!applicationName.contains(FileSystemConfigurationService.RUNTIME))
+        if (this.arkcaseConfig.getLanguages().parallelStream().anyMatch(applicationName::contains))
         {
-            resetFilePath = String.format("%s/%s%s.yaml", this.propertiesFolderPath, applicationName,
-                    FileSystemConfigurationService.RUNTIME);
+            applicationName = "labels/" + applicationName;
+        }
+
+        if (!applicationName.contains(ConfigurationService.RUNTIME))
+        {
+            applicationName = String.format("%s/%s%s.yaml", this.arkcaseConfig.getPropertiesFolderPath(), applicationName,
+                    ConfigurationService.RUNTIME);
         }
         else
         {
-            resetFilePath = String.format("%s/%s.yaml", this.propertiesFolderPath, applicationName);
+            applicationName = String.format("%s/%s.yaml", this.arkcaseConfig.getPropertiesFolderPath(), applicationName);
         }
 
-        String[] fileNameHelper = resetFilePath.split("/");
+        String[] fileNameHelper = applicationName.split("/");
         String fileName = fileNameHelper[fileNameHelper.length - 1];
 
         FileSystemConfigurationService.logger.info("Deleting file [{}]", fileName);
 
-        File fileToBeDeleted = new File(resetFilePath);
+        File fileToBeDeleted = new File(applicationName);
         if (!fileToBeDeleted.exists())
         {
             FileSystemConfigurationService.logger.warn("File [{}] does not exists, nothing to delete.", fileName);
@@ -183,16 +195,16 @@ public class FileSystemConfigurationService implements ConfigurationService
     @Override
     public void resetConfigurationBrandingFilesToDefault() throws ConfigurationException
     {
-        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(this.brandingFilesFolder);
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(this.arkcaseConfig.getBrandingFilesFolder());
 
         for (File file : fileList)
         {
-            if (file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            if (file.getName().contains(ConfigurationService.RUNTIME))
             {
                 if (file.delete())
                 {
                     FileSystemConfigurationService.logger.info("Reset file [{}] to default version.", file.getName());
-                    String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
+                    String originalFileName = file.getName().replace(ConfigurationService.RUNTIME, "");
                     this.fileConfigurationService.sendNotification(originalFileName,
                             FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
 
@@ -209,10 +221,10 @@ public class FileSystemConfigurationService implements ConfigurationService
     @Override
     public void resetPropertiesToDefault() throws ConfigurationException
     {
-        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(this.propertiesFolderPath);
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(this.arkcaseConfig.getPropertiesFolderPath());
         for (File file : fileList)
         {
-            if (file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            if (file.getName().contains(ConfigurationService.RUNTIME))
             {
                 FileSystemConfigurationService.logger.info("Deleting file [{}]", file.getName());
                 if (!file.delete())
@@ -221,6 +233,36 @@ public class FileSystemConfigurationService implements ConfigurationService
                 }
             }
         }
+    }
+
+    @Override
+    public List<String> getModulesNames()
+    {
+        File modulesDir = new File(this.labelsFolderPath);
+
+        File[] files = modulesDir.listFiles(file -> file.isFile() && !file.getName().toLowerCase().contains("-runtime"));
+
+        List<String> modules = new ArrayList<>();
+
+        for (File labelResource : files)
+        {
+            for (String lang : this.arkcaseConfig.getLanguages())
+            {
+                String fileName = labelResource.getName();
+                if (fileName.contains(lang))
+                {
+                    int sepPos = fileName.indexOf(lang);
+                    String moduleName = fileName.substring(0, sepPos);
+                    if (modules.stream().noneMatch(module -> module.equals(moduleName)))
+                    {
+                        modules.add(moduleName);
+                    }
+                }
+            }
+        }
+
+        FileSystemConfigurationService.logger.info("Returns modules names. [{}]", modules.toArray());
+        return modules;
     }
 
     private List<File> listAllRuntimeFilesInFolderAndSubfolders(String directoryName)
@@ -232,7 +274,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         File[] fList = directory.listFiles();
         for (File file : fList)
         {
-            if (file.isFile() && file.getName().contains(FileSystemConfigurationService.RUNTIME))
+            if (file.isFile() && file.getName().contains(ConfigurationService.RUNTIME))
             {
                 resultList.add(file);
             }
@@ -265,7 +307,8 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private String getRuntimeConfigurationFilePath(String applicationName)
     {
-        return String.format("%s/%s%s.yaml", this.propertiesFolderPath, applicationName, FileSystemConfigurationService.RUNTIME);
+        return String.format("%s/%s%s.yaml", this.arkcaseConfig.getPropertiesFolderPath(), applicationName,
+                ConfigurationService.RUNTIME);
     }
 
     private DumperOptions buildDumperOptions()

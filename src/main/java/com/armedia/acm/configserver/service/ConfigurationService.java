@@ -1,9 +1,5 @@
 package com.armedia.acm.configserver.service;
 
-import java.nio.file.NoSuchFileException;
-import java.util.List;
-import java.util.Map;
-
 /*-
  * #%L
  * acm-config-server
@@ -33,25 +29,62 @@ import java.util.Map;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 
+import java.nio.file.NoSuchFileException;
+import java.util.List;
+import java.util.Map;
+
 public interface ConfigurationService
 {
+    String RUNTIME = "-runtime";
+
     /**
-     * Update properties in yaml file with name - applicationName,
-     * updated properties will be written in the runtime file.
+     * Update properties in database or yaml file
+     * updated properties will be written in the runtime file or database with 'runtime' profile
      *
      * @param properties
      *            - properties for update
      * @param applicationName
      *            - name of the file whose properties will be updated
+     *            format: case-en, case-en-foia, arkcase, arkcase-foia
      * @throws ConfigurationException
      */
     void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException;
 
+    /**
+     * Remove properties from '-runtime' file or 'runtime' profile (New or modified properties)
+     *
+     * @param properties
+     *            - properties for deletion
+     * @param applicationName
+     *            - name of the file whose properties will be deleted
+     *            format: case-en, case-en-foia, arkcase, arkcase-foia
+     * @throws ConfigurationException
+     */
     void removeProperties(List<String> properties, String applicationName) throws ConfigurationException;
 
+    /**
+     * Reset to default - delete all runtime properties from all '-runtime' files or 'runtime' profile
+     * 
+     * @throws ConfigurationException
+     */
     void resetPropertiesToDefault() throws ConfigurationException;
 
+    /**
+     * Reset all updated properties from file '-runtime' or profile 'runtime'
+     *
+     * @param applicationName
+     *            - name of the file whose properties will be deleted
+     *            * format: case-en, case-en-foia, arkcase, arkcase-foia
+     * @throws ConfigurationException
+     */
     void resetFilePropertiesToDefault(String applicationName) throws NoSuchFileException, ConfigurationException;
 
     void resetConfigurationBrandingFilesToDefault() throws ConfigurationException;
+
+    /**
+     * Return list of modules configuration
+     *
+     * @return list of modules configuration
+     */
+    List<String> getModulesNames();
 }
