@@ -86,7 +86,7 @@ public class DataImporterService
                     try (var reader = new BufferedReader(
                             new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)))
                     {
-                        readToYaml(resource, reader, mapper);
+                        readFromYaml(resource, reader, mapper);
                     }
                     catch (IOException e)
                     {
@@ -101,7 +101,7 @@ public class DataImporterService
         }
     }
 
-    private void readToYaml(Resource resource, BufferedReader reader, ObjectMapper mapper) throws IOException
+    private void readFromYaml(Resource resource, BufferedReader reader, ObjectMapper mapper) throws IOException
     {
         if (reader.ready())
         {
@@ -110,7 +110,7 @@ public class DataImporterService
                 var yamlProperties = mapper.readValue(reader, Map.class);
                 if (yamlProperties != null && !yamlProperties.isEmpty())
                 {
-                    var applicationProperties = mapYamlToEntities(resource, yamlProperties);
+                    var applicationProperties = yamlToApplicationProperties(resource, yamlProperties);
                     this.applicationPropertyRepository.saveAll(applicationProperties);
                 }
             }
@@ -125,7 +125,7 @@ public class DataImporterService
         }
     }
 
-    private List<ApplicationProperty> mapYamlToEntities(Resource resource, Map<String, Object> yamlProperties)
+    private List<ApplicationProperty> yamlToApplicationProperties(Resource resource, Map<String, Object> yamlProperties)
     {
         var applicationProperties = new ArrayList<ApplicationProperty>();
         var fileName = resource.getFilename();

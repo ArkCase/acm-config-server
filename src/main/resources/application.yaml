@@ -94,5 +94,6 @@ arkcase:
     - "foia"
     - "privacy"
     - "custom"
+    - "server"
     - "runtime"
 
