@@ -11,9 +11,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +36,21 @@ public abstract class DataService
         this.mapper = new ObjectMapper(new YAMLFactory());
     }
 
-    public void readFromYaml(String fileName, BufferedReader reader) throws IOException
+    protected void readResource(Resource resource)
+    {
+        log.debug("Import runtime properties from file: {}", resource.getFilename());
+        try (var reader = new BufferedReader(
+                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)))
+        {
+            readFromYaml(resource.getFilename(), reader);
+        }
+        catch (IOException e)
+        {
+            log.debug("Unable to read resource: {}, reason:{}", resource.getFilename(), e.getMessage(), e);
+        }
+    }
+
+    protected void readFromYaml(String fileName, BufferedReader reader) throws IOException
     {
         if (reader.ready())
         {
@@ -57,7 +74,7 @@ public abstract class DataService
         }
     }
 
-    public List<ApplicationProperty> yamlToApplicationProperties(String fileName, Map<String, Object> yamlProperties)
+    protected List<ApplicationProperty> yamlToApplicationProperties(String fileName, Map<String, Object> yamlProperties)
     {
         var applicationProperties = new ArrayList<ApplicationProperty>();
 
@@ -84,7 +101,7 @@ public abstract class DataService
         return applicationProperties;
     }
 
-    public void flattenProperties(String prefix, Map<String, Object> source, Map<String, String> target)
+    protected void flattenProperties(String prefix, Map<String, Object> source, Map<String, String> target)
     {
         try
         {

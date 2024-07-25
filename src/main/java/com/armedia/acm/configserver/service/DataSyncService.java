@@ -32,13 +32,14 @@ import com.armedia.acm.configserver.model.ArkcaseConfig;
 import com.armedia.acm.configserver.repository.ApplicationPropertyRepository;
 
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -62,16 +63,10 @@ public class DataSyncService extends DataService
                 var resources = resolver.getResources("file:" + folder + "/*-runtime.yaml");
                 for (var resource : resources)
                 {
-                    log.debug("Import runtime properties from file: {}", resource.getFilename());
-                    try (var reader = new BufferedReader(
-                            new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)))
-                    {
-                        readFromYaml(resource.getFilename(), reader);
-                    }
-                    catch (IOException e)
-                    {
-                        log.debug("Unable to read resource: {}, reason:{}", resource.getFilename(), e.getMessage(), e);
-                    }
+                    super.readResource(resource);
+
+                    // Delete the file after processing
+                    this.deleteResource(resource);
                 }
             }
             catch (IOException e)
@@ -116,6 +111,19 @@ public class DataSyncService extends DataService
         else
         {
             log.warn("YAML file is empty: {}", fileName);
+        }
+    }
+
+    private void deleteResource(Resource resource)
+    {
+        try
+        {
+            Path path = resource.getFile().toPath();
+            Files.delete(path);
+        }
+        catch (IOException e)
+        {
+            log.warn("Failed to delete file: {}, reason: {}", resource.getFilename(), e.getMessage());
         }
     }
 }

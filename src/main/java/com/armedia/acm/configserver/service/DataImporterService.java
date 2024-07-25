@@ -34,10 +34,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 @Service
 @Profile("run-with-db")
@@ -63,16 +60,7 @@ public class DataImporterService extends DataService
                 var resources = resolver.getResources("file:" + folder + "/*.yaml");
                 for (var resource : resources)
                 {
-                    log.debug("Import properties from file: {}", resource.getFilename());
-                    try (var reader = new BufferedReader(
-                            new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)))
-                    {
-                        readFromYaml(resource.getFilename(), reader);
-                    }
-                    catch (IOException e)
-                    {
-                        log.debug("Unable to read resource: {}, reason:{}", resource.getFilename(), e.getMessage(), e);
-                    }
+                    super.readResource(resource);
                 }
             }
             catch (IOException e)
