@@ -27,6 +27,7 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
+import com.armedia.acm.configserver.model.ApplicationProperty;
 import com.armedia.acm.configserver.model.ArkcaseConfig;
 import com.armedia.acm.configserver.repository.ApplicationPropertyRepository;
 
@@ -38,32 +39,30 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Profile("run-with-db")
-public class DataImporterService extends DataService
+public class DataSyncService extends DataService
 {
-
-    protected DataImporterService(ApplicationPropertyRepository applicationPropertyRepository, ArkcaseConfig arkcaseConfig)
+    protected DataSyncService(ApplicationPropertyRepository applicationPropertyRepository, ArkcaseConfig arkcaseConfig)
     {
         super(applicationPropertyRepository, arkcaseConfig);
     }
 
-    public void importData()
+    public void syncRuntimeFiles()
     {
-        if (Boolean.TRUE.equals(this.applicationPropertyRepository.existsAnyRecord()))
-            return;
-
         var resolver = new PathMatchingResourcePatternResolver();
 
-        for (var folder : this.arkcaseConfig.getFolders())
+        for (var folder : arkcaseConfig.getFolders())
         {
             try
             {
-                var resources = resolver.getResources("file:" + folder + "/*.yaml");
+                var resources = resolver.getResources("file:" + folder + "/*-runtime.yaml");
                 for (var resource : resources)
                 {
-                    log.debug("Import properties from file: {}", resource.getFilename());
+                    log.debug("Import runtime properties from file: {}", resource.getFilename());
                     try (var reader = new BufferedReader(
                             new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)))
                     {
@@ -79,6 +78,44 @@ public class DataImporterService extends DataService
             {
                 log.error("Unable to resolve resources in folder: {}, reason: {}", folder, e.getMessage(), e);
             }
+        }
+    }
+
+    @Override
+    public void readFromYaml(String fileName, BufferedReader reader) throws IOException
+    {
+        if (reader.ready())
+        {
+            try
+            {
+                var yamlProperties = super.mapper.readValue(reader, Map.class);
+                if (yamlProperties != null && !yamlProperties.isEmpty())
+                {
+                    List<ApplicationProperty> applicationProperties = yamlToApplicationProperties(fileName, yamlProperties);
+
+                    applicationProperties.forEach(ap -> {
+                        var existingAp = super.applicationPropertyRepository.findByApplicationAndProfileAndLabelAndKey(ap.getApplication(),
+                                ap.getProfile(), ap.getLabel(), ap.getKey());
+                        if (existingAp.isEmpty())
+                        {
+                            super.applicationPropertyRepository.save(ap);
+                        }
+                        else
+                        {
+                            existingAp.get().setValue(ap.getValue());
+                            super.applicationPropertyRepository.save(existingAp.get());
+                        }
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                log.debug("Unable to read YAML file: {}, reason:{}", fileName, e.getMessage(), e);
+            }
+        }
+        else
+        {
+            log.warn("YAML file is empty: {}", fileName);
         }
     }
 }

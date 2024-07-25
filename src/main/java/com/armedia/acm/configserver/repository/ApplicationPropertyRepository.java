@@ -35,12 +35,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Profile("run-with-db")
 public interface ApplicationPropertyRepository extends JpaRepository<ApplicationProperty, Long>
 {
     ApplicationProperty findByApplicationAndProfileAndKey(String application, String profile, String key);
+
+    Optional<ApplicationProperty> findByApplicationAndProfileAndLabelAndKey(String application, String profile, String label, String key);
 
     void deleteAllByProfile(String profile);
     void deleteByApplicationAndProfileAndKeyIn(String application, String profile, List<String> keys);

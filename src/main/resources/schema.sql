@@ -6,5 +6,13 @@ CREATE TABLE IF NOT EXISTS properties (
                                           label TEXT,
                                           key TEXT,
                                           value TEXT,
-                                          CONSTRAINT unique_app_profile_key UNIQUE (application, profile, key)
+                                          CONSTRAINT
+                                          unique_app_profile_key
+                                          UNIQUE
+(
+                                          application,
+                                          profile,
+                                          label,
+                                          key
+)
     );

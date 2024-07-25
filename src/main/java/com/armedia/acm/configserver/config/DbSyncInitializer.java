@@ -27,7 +27,7 @@ package com.armedia.acm.configserver.config;
  * #L%
  */
 
-import com.armedia.acm.configserver.service.DataImporterService;
+import com.armedia.acm.configserver.service.DataSyncService;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -38,16 +38,16 @@ import org.springframework.stereotype.Component;
 @Profile("run-with-db")
 public class DbSyncInitializer implements ApplicationRunner
 {
-    private final DataImporterService dataImporterService;
+    private final DataSyncService dataSyncService;
 
-    public DbSyncInitializer(DataImporterService dataImporterService)
+    public DbSyncInitializer(DataSyncService dataSyncService)
     {
-        this.dataImporterService = dataImporterService;
+        this.dataSyncService = dataSyncService;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
-        this.dataImporterService.importData();
+        this.dataSyncService.syncRuntimeFiles();
     }
 }
