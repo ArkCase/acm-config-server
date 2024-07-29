@@ -2,7 +2,7 @@ server.port: 9999
 spring:
   profiles.active: native
   profiles:
-    include: jdbc
+    include: jdbc, native
   jms:
     pub-sub-domain: true
   datasource:
@@ -19,12 +19,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   cloud:
     config:
       server:
-        native.searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules
         jdbc:
-          enabled: false
+          order: 0
+          sql: "SELECT key, value from properties where application = ? and profile = ? and label = ?"
+        native:
+          searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules
+          order: 1
   sql:
     init:
       mode: always

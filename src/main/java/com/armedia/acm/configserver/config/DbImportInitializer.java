@@ -48,6 +48,6 @@ public class DbImportInitializer implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
-        this.dataImporterService.importData();
+        this.dataImporterService.importRuntimeFiles();
     }
 }

@@ -69,7 +69,7 @@ public class DataImporterService
         this.mapper = new ObjectMapper(new YAMLFactory());
     }
 
-    public void importData()
+    public void importRuntimeFiles()
     {
         var resolver = new PathMatchingResourcePatternResolver();
 
@@ -77,7 +77,7 @@ public class DataImporterService
         {
             try
             {
-                var resources = resolver.getResources("file:" + folder + "/*.yaml");
+                var resources = resolver.getResources("file:" + folder + "/*-runtime.yaml");
                 for (var resource : resources)
                 {
                     readResource(resource);
@@ -116,15 +116,7 @@ public class DataImporterService
                 if (yamlProperties != null && !yamlProperties.isEmpty())
                 {
                     var applicationProperties = yamlToApplicationProperties(fileName, yamlProperties);
-                    if (fileName.contains("-runtime"))
-                    {
-                        saveRuntimeProperties(applicationProperties);
-                    }
-                    else
-                    {
-                        this.applicationPropertyRepository.saveAll(applicationProperties);
-
-                    }
+                    saveRuntimeProperties(applicationProperties);
                 }
             }
             catch (Exception e)
