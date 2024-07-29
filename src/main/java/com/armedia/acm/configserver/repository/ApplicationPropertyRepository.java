@@ -43,6 +43,7 @@ public interface ApplicationPropertyRepository extends JpaRepository<Application
 {
     ApplicationProperty findByApplicationAndProfileAndKey(String application, String profile, String key);
 
+    List<ApplicationProperty> findByApplicationAndProfileIn(String application, List<String> profiles);
     Optional<ApplicationProperty> findByApplicationAndProfileAndLabelAndKey(String application, String profile, String label, String key);
 
     void deleteAllByProfile(String profile);
@@ -54,5 +55,4 @@ public interface ApplicationPropertyRepository extends JpaRepository<Application
 
     @Query("SELECT CASE WHEN COUNT(ap) > 0 THEN TRUE ELSE FALSE END FROM ApplicationProperty ap")
     Boolean existsAnyRecord();
-
 }
