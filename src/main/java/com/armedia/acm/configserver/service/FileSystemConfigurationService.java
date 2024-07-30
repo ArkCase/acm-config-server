@@ -85,7 +85,6 @@ public class FileSystemConfigurationService implements ConfigurationService
             applicationName = "lookups/" + applicationName;
         }
 
-        // acm-config..appName-runtime.yaml
         String configurationFilePath = getRuntimeConfigurationFilePath(applicationName);
 
         FileSystemResource yamlResource = loadYamlSystemResource(configurationFilePath);
@@ -165,10 +164,10 @@ public class FileSystemConfigurationService implements ConfigurationService
             applicationName = "labels/" + applicationName;
         }
 
-        if (!applicationName.contains(ConfigurationService.RUNTIME))
+        if (!applicationName.contains(ConfigurationService._RUNTIME))
         {
             applicationName = String.format("%s/%s%s.yaml", this.arkcaseConfig.getPropertiesFolderPath(), applicationName,
-                    ConfigurationService.RUNTIME);
+                    ConfigurationService._RUNTIME);
         }
         else
         {
@@ -199,12 +198,12 @@ public class FileSystemConfigurationService implements ConfigurationService
 
         for (File file : fileList)
         {
-            if (file.getName().contains(ConfigurationService.RUNTIME))
+            if (file.getName().contains(ConfigurationService._RUNTIME))
             {
                 if (file.delete())
                 {
                     FileSystemConfigurationService.logger.info("Reset file [{}] to default version.", file.getName());
-                    String originalFileName = file.getName().replace(ConfigurationService.RUNTIME, "");
+                    String originalFileName = file.getName().replace(ConfigurationService._RUNTIME, "");
                     this.fileConfigurationService.sendNotification(originalFileName,
                             FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
 
@@ -224,7 +223,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(this.arkcaseConfig.getPropertiesFolderPath());
         for (File file : fileList)
         {
-            if (file.getName().contains(ConfigurationService.RUNTIME))
+            if (file.getName().contains(ConfigurationService._RUNTIME))
             {
                 FileSystemConfigurationService.logger.info("Deleting file [{}]", file.getName());
                 if (!file.delete())
@@ -240,7 +239,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     {
         File modulesDir = new File(this.labelsFolderPath);
 
-        File[] files = modulesDir.listFiles(file -> file.isFile() && !file.getName().toLowerCase().contains("-runtime"));
+        File[] files = modulesDir.listFiles(file -> file.isFile() && !file.getName().toLowerCase().contains(_RUNTIME));
 
         List<String> modules = new ArrayList<>();
 
@@ -274,7 +273,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         File[] fList = directory.listFiles();
         for (File file : fList)
         {
-            if (file.isFile() && file.getName().contains(ConfigurationService.RUNTIME))
+            if (file.isFile() && file.getName().contains(ConfigurationService._RUNTIME))
             {
                 resultList.add(file);
             }
@@ -308,7 +307,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     private String getRuntimeConfigurationFilePath(String applicationName)
     {
         return String.format("%s/%s%s.yaml", this.arkcaseConfig.getPropertiesFolderPath(), applicationName,
-                ConfigurationService.RUNTIME);
+                ConfigurationService._RUNTIME);
     }
 
     private DumperOptions buildDumperOptions()

@@ -35,7 +35,8 @@ import java.util.Map;
 
 public interface ConfigurationService
 {
-    String RUNTIME = "-runtime";
+    String _RUNTIME = "-runtime";
+    String RUNTIME = "runtime";
 
     /**
      * Update properties in database or yaml file

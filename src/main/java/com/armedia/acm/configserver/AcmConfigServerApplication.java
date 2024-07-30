@@ -36,11 +36,13 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableConfigServer
 @SpringBootApplication
 @EnableJms
 @EnableAsync
+@EnableTransactionManagement
 @EnableJpaRepositories
 @EnableConfigurationProperties(ArkcaseConfig.class)
 public class AcmConfigServerApplication

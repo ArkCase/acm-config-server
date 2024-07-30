@@ -27,8 +27,7 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import static com.armedia.acm.configserver.service.ConfigUtils.extractFromFileName;
-import static com.armedia.acm.configserver.service.ConfigUtils.findProfile;
+import static com.armedia.acm.configserver.service.ConfigUtils.extractLabelFromFileName;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.model.ApplicationProperty;
@@ -39,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -69,27 +69,24 @@ public class DatabaseConfigurationService implements ConfigurationService
      * @throws ConfigurationException
      */
     @Override
+    @Transactional
     public synchronized void updateProperties(Map<String, Object> properties, String applicationName) throws ConfigurationException
     {
         try
         {
             for (var entry : properties.entrySet())
             {
-                var matchedProfile = findProfile(applicationName, this.arkcaseConfig.getProfiles());
+                var appNameWithoutProfile = !applicationName.contains(RUNTIME) ? applicationName
+                        : applicationName.substring(0, applicationName.indexOf(RUNTIME));
 
-                var profile = matchedProfile.orElse("default");
-
-                var appNameWithoutProfile = matchedProfile.map(s -> applicationName.substring(0, applicationName.indexOf(s) - 1))
-                        .orElse(applicationName);
-
-                var config = this.applicationPropertyRepository.findByApplicationAndProfileAndKey(appNameWithoutProfile, profile,
+                var config = this.applicationPropertyRepository.findByApplicationAndProfileAndKey(appNameWithoutProfile, RUNTIME,
                         entry.getKey());
                 if (config == null)
                 {
                     config = new ApplicationProperty();
                     config.setApplication(appNameWithoutProfile);
-                    config.setProfile(profile);
-                    config.setLabel(extractFromFileName(appNameWithoutProfile, this.arkcaseConfig.getLanguages()));
+                    config.setProfile(RUNTIME);
+                    config.setLabel(extractLabelFromFileName(appNameWithoutProfile, this.arkcaseConfig.getLanguages()));
                     config.setKey(entry.getKey());
                     config.setValue(entry.getValue().toString());
                 }
@@ -108,16 +105,14 @@ public class DatabaseConfigurationService implements ConfigurationService
     }
 
     @Override
+    @Transactional
     public synchronized void removeProperties(List<String> properties, String applicationName) throws ConfigurationException
     {
-        var matchedProfile = findProfile(applicationName, this.arkcaseConfig.getProfiles());
-
-        var appNameWithoutProfile = matchedProfile.map(s -> applicationName.substring(0, applicationName.indexOf(s) - 1))
-                .orElse(applicationName);
-
+        var appNameWithoutProfile = !applicationName.contains(RUNTIME) ? applicationName
+                : applicationName.substring(0, applicationName.indexOf(RUNTIME));
         try
         {
-            this.applicationPropertyRepository.deleteByApplicationAndProfileAndKeyIn(appNameWithoutProfile, "runtime", properties);
+            this.applicationPropertyRepository.deleteAllByApplicationAndProfileAndKeyIn(appNameWithoutProfile, RUNTIME, properties);
         }
         catch (Exception e)
         {
@@ -127,16 +122,15 @@ public class DatabaseConfigurationService implements ConfigurationService
     }
 
     @Override
+    @Transactional
     public void resetFilePropertiesToDefault(String applicationName) throws ConfigurationException
     {
-        var matchedProfile = findProfile(applicationName, this.arkcaseConfig.getProfiles());
-
-        var appNameWithoutProfile = matchedProfile.map(s -> applicationName.substring(0, applicationName.indexOf(s) - 1))
-                .orElse(applicationName);
+        var appNameWithoutProfile = !applicationName.contains(RUNTIME) ? applicationName
+                : applicationName.substring(0, applicationName.indexOf(RUNTIME));
 
         try
         {
-            this.applicationPropertyRepository.deleteByApplicationAndProfile(appNameWithoutProfile, "runtime");
+            this.applicationPropertyRepository.deleteByApplicationAndProfile(appNameWithoutProfile, RUNTIME);
         }
         catch (Exception e)
         {
@@ -152,11 +146,12 @@ public class DatabaseConfigurationService implements ConfigurationService
     }
 
     @Override
+    @Transactional
     public void resetPropertiesToDefault() throws ConfigurationException
     {
         try
         {
-            this.applicationPropertyRepository.deleteAllByProfile("runtime");
+            this.applicationPropertyRepository.deleteAllByProfile(RUNTIME);
         }
         catch (Exception e)
         {

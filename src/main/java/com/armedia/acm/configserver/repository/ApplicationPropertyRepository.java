@@ -47,7 +47,8 @@ public interface ApplicationPropertyRepository extends JpaRepository<Application
     Optional<ApplicationProperty> findByApplicationAndProfileAndLabelAndKey(String application, String profile, String label, String key);
 
     void deleteAllByProfile(String profile);
-    void deleteByApplicationAndProfileAndKeyIn(String application, String profile, List<String> keys);
+
+    void deleteAllByApplicationAndProfileAndKeyIn(String application, String profile, List<String> keys);
     void deleteByApplicationAndProfile(String appNameWithoutProfile, String runtime);
 
     @Query("SELECT DISTINCT ap.label FROM ApplicationProperty ap")

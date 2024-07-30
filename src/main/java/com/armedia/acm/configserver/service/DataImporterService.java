@@ -27,8 +27,8 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
-import static com.armedia.acm.configserver.service.ConfigUtils.extractFromFileName;
-import static com.armedia.acm.configserver.service.ConfigUtils.findProfile;
+import static com.armedia.acm.configserver.service.ConfigUtils.extractLabelFromFileName;
+import static com.armedia.acm.configserver.service.ConfigurationService.RUNTIME;
 
 import com.armedia.acm.configserver.model.ApplicationProperty;
 import com.armedia.acm.configserver.model.ArkcaseConfig;
@@ -130,24 +130,6 @@ public class DataImporterService
         }
     }
 
-    private void saveRuntimeProperties(List<ApplicationProperty> applicationProperties)
-    {
-        applicationProperties.forEach(ap -> {
-            var existingAp = this.applicationPropertyRepository.findByApplicationAndProfileAndLabelAndKey(
-                    ap.getApplication(),
-                    ap.getProfile(), ap.getLabel(), ap.getKey());
-            if (existingAp.isEmpty())
-            {
-                this.applicationPropertyRepository.save(ap);
-            }
-            else
-            {
-                existingAp.get().setValue(ap.getValue());
-                this.applicationPropertyRepository.save(existingAp.get());
-            }
-        });
-    }
-
     private List<ApplicationProperty> yamlToApplicationProperties(String fileName, Map<String, Object> yamlProperties)
     {
         var applicationProperties = new ArrayList<ApplicationProperty>();
@@ -155,13 +137,11 @@ public class DataImporterService
         if (fileName == null || fileName.isBlank())
             return List.of();
 
-        var label = extractFromFileName(fileName, this.arkcaseConfig.getLanguages());
+        var label = extractLabelFromFileName(fileName, this.arkcaseConfig.getLanguages());
 
-        var matchedProfile = findProfile(fileName, arkcaseConfig.getProfiles());
-        var profile = matchedProfile.orElse("default");
+        var profile = RUNTIME;
 
-        var applicationName = matchedProfile.map(s -> fileName.substring(0, fileName.indexOf(s) - 1))
-                .orElseGet(() -> fileName.substring(0, fileName.lastIndexOf('.')));
+        var applicationName = fileName.substring(0, fileName.indexOf(profile) - 1);
 
         var flattenedProperties = new HashMap<String, String>();
         flattenProperties("", yamlProperties, flattenedProperties);
@@ -195,6 +175,24 @@ public class DataImporterService
         {
             DataImporterService.logger.error("Unable to flatten prefix:{}, source:{}, reason: {}", prefix, source, e.getMessage(), e);
         }
+    }
+
+    private void saveRuntimeProperties(List<ApplicationProperty> applicationProperties)
+    {
+        applicationProperties.forEach(ap -> {
+            var existingAp = this.applicationPropertyRepository.findByApplicationAndProfileAndLabelAndKey(
+                    ap.getApplication(),
+                    ap.getProfile(), ap.getLabel(), ap.getKey());
+            if (existingAp.isEmpty())
+            {
+                this.applicationPropertyRepository.save(ap);
+            }
+            else
+            {
+                existingAp.get().setValue(ap.getValue());
+                this.applicationPropertyRepository.save(existingAp.get());
+            }
+        });
     }
 
     private void deleteResource(Resource resource)

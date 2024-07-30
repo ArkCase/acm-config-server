@@ -7,9 +7,9 @@ spring:
     pub-sub-domain: true
   datasource:
     # Database connection should be added here
-    url: jdbc:postgresql://${DB_HOST}:5432/config
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/config
+    username: ${DB_USERNAME:vladimir}
+    password: ${DB_PASSWORD:newpassword}
     driver-class-name: org.postgresql.Driver
 
   jpa:

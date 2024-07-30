@@ -27,6 +27,8 @@ package com.armedia.acm.configserver.service;
  * #L%
  */
 
+import static com.armedia.acm.configserver.service.ConfigurationService._RUNTIME;
+
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -102,7 +104,7 @@ public class FileConfigurationService
 
     private String setProfileBasedResource(String fileName)
     {
-        return new StringBuilder(fileName).insert(fileName.indexOf("."), "-" + "runtime").toString();
+        return new StringBuilder(fileName).insert(fileName.indexOf("."), _RUNTIME).toString();
     }
 
     public void sendNotification(String message, String destination)

@@ -27,7 +27,7 @@ package com.armedia.acm.configserver.repository;
  * #L%
  */
 
-import com.armedia.acm.configserver.model.ApplicationProperty;
+import static com.armedia.acm.configserver.service.ConfigurationService.RUNTIME;
 
 import org.springframework.cloud.config.environment.Environment;
 import org.springframework.cloud.config.environment.PropertySource;
@@ -52,19 +52,21 @@ public class CustomEnvironmentRepository implements EnvironmentRepository {
 
     @Override
     public Environment findOne(String application, String profile, String label) {
-        List<String> profiles = List.of(profile.split(","));
+        var profiles = List.of(RUNTIME);
 
-        List<ApplicationProperty> properties = applicationPropertyRepository.findByApplicationAndProfileIn(application, profiles);
+        var properties = applicationPropertyRepository.findByApplicationAndProfileIn(application, profiles);
 
-        Environment environment = new Environment(application, profiles.toArray(new String[0]), label, null, null);
+        var environment = new Environment(application, profiles.toArray(new String[0]), null, null, null);
 
-        Map<String, Map<String, String>> propertySourceMap = new HashMap<>();
-        for (ApplicationProperty property : properties) {
-            String sourceName = String.format("%s-%s", application, property.getProfile());
+        var propertySourceMap = new HashMap<String, Map<String, String>>();
+        for (var property : properties)
+        {
+            var sourceName = String.format("%s-%s.yaml", application, property.getProfile());
             propertySourceMap.computeIfAbsent(sourceName, k -> new HashMap<>()).put(property.getKey(), property.getValue());
         }
 
-        for (Map.Entry<String, Map<String, String>> entry : propertySourceMap.entrySet()) {
+        for (var entry : propertySourceMap.entrySet())
+        {
             environment.add(new PropertySource(entry.getKey(), entry.getValue()));
         }
 
