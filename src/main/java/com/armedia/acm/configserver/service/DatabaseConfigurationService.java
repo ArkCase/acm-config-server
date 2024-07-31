@@ -32,10 +32,12 @@ import static com.armedia.acm.configserver.service.ConfigUtils.extractLabelFromF
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.model.ApplicationProperty;
 import com.armedia.acm.configserver.model.ArkcaseConfig;
+import com.armedia.acm.configserver.model.DatabaseChangeEvent;
 import com.armedia.acm.configserver.repository.ApplicationPropertyRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +54,14 @@ public class DatabaseConfigurationService implements ConfigurationService
 
     private final ApplicationPropertyRepository applicationPropertyRepository;
     private final ArkcaseConfig arkcaseConfig;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public DatabaseConfigurationService(ApplicationPropertyRepository applicationPropertyRepository, ArkcaseConfig arkcaseConfig)
+    public DatabaseConfigurationService(ApplicationPropertyRepository applicationPropertyRepository, ArkcaseConfig arkcaseConfig,
+            ApplicationEventPublisher eventPublisher)
     {
         this.applicationPropertyRepository = applicationPropertyRepository;
         this.arkcaseConfig = arkcaseConfig;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -74,11 +79,12 @@ public class DatabaseConfigurationService implements ConfigurationService
     {
         try
         {
+            var appNameWithoutProfile = !applicationName.contains(RUNTIME) ? applicationName
+                    : applicationName.substring(0, applicationName.indexOf(RUNTIME));
+            var label = extractLabelFromFileName(appNameWithoutProfile, arkcaseConfig.getLanguages());
+
             for (var entry : properties.entrySet())
             {
-                var appNameWithoutProfile = !applicationName.contains(RUNTIME) ? applicationName
-                        : applicationName.substring(0, applicationName.indexOf(RUNTIME));
-
                 var config = this.applicationPropertyRepository.findByApplicationAndProfileAndKey(appNameWithoutProfile, RUNTIME,
                         entry.getKey());
                 if (config == null)
@@ -96,6 +102,9 @@ public class DatabaseConfigurationService implements ConfigurationService
                 }
                 this.applicationPropertyRepository.save(config);
             }
+
+            eventPublisher.publishEvent(new DatabaseChangeEvent(this, label,
+                    String.format("Updated properties: %s for application: %s", properties, appNameWithoutProfile)));
         }
         catch (Exception e)
         {
@@ -110,9 +119,14 @@ public class DatabaseConfigurationService implements ConfigurationService
     {
         var appNameWithoutProfile = !applicationName.contains(RUNTIME) ? applicationName
                 : applicationName.substring(0, applicationName.indexOf(RUNTIME));
+        var label = extractLabelFromFileName(appNameWithoutProfile, arkcaseConfig.getLanguages());
+
         try
         {
             this.applicationPropertyRepository.deleteAllByApplicationAndProfileAndKeyIn(appNameWithoutProfile, RUNTIME, properties);
+
+            eventPublisher.publishEvent(new DatabaseChangeEvent(this, label,
+                    String.format("Deleted properties: %s from application: %s", properties, appNameWithoutProfile)));
         }
         catch (Exception e)
         {
@@ -127,10 +141,13 @@ public class DatabaseConfigurationService implements ConfigurationService
     {
         var appNameWithoutProfile = !applicationName.contains(RUNTIME) ? applicationName
                 : applicationName.substring(0, applicationName.indexOf(RUNTIME));
+        var label = extractLabelFromFileName(appNameWithoutProfile, arkcaseConfig.getLanguages());
 
         try
         {
-            this.applicationPropertyRepository.deleteByApplicationAndProfile(appNameWithoutProfile, RUNTIME);
+            this.applicationPropertyRepository.deleteAllByApplicationAndProfile(appNameWithoutProfile, RUNTIME);
+            eventPublisher.publishEvent(new DatabaseChangeEvent(this, label,
+                    String.format("Reset properties for application: %s", appNameWithoutProfile)));
         }
         catch (Exception e)
         {
@@ -151,7 +168,13 @@ public class DatabaseConfigurationService implements ConfigurationService
     {
         try
         {
-            this.applicationPropertyRepository.deleteAllByProfile(RUNTIME);
+            this.applicationPropertyRepository.findAllUniqueApplicationsWithRuntimeProfile()
+                    .forEach(application -> {
+                        this.applicationPropertyRepository.deleteAllByApplicationAndProfile(application, RUNTIME);
+                        var label = extractLabelFromFileName(application, arkcaseConfig.getLanguages());
+                        eventPublisher.publishEvent(new DatabaseChangeEvent(this, label,
+                                String.format("Reset properties for application: %s", application)));
+                    });
         }
         catch (Exception e)
         {

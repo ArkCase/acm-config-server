@@ -8,8 +8,8 @@ spring:
   datasource:
     # Database connection should be added here
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/config
-    username: ${DB_USERNAME:vladimir}
-    password: ${DB_PASSWORD:newpassword}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -86,16 +86,10 @@ arkcase:
     - "-zh-cn"
     - "-zh-tw"
     - "-ar"
-  folders: # This list should be updated - list of folders to be imported to DB
+  folders: # list of folders monitored for runtime changes
     - "${user.home}/.arkcase/acm/acm-config-server-repo"
     - "${user.home}/.arkcase/acm/acm-config-server-repo/labels"
     - "${user.home}/.arkcase/acm/acm-config-server-repo/ldap"
     - "${user.home}/.arkcase/acm/acm-config-server-repo/lookups"
-  #    - "/home/vladimir/IdeaProjects/acm-config/acm/acm-config-server-repo/rules"
-  profiles:
-    - "foia"
-    - "privacy"
-    - "custom"
-    - "server"
-    - "runtime"
+  # - "/home/vladimir/IdeaProjects/acm-config/acm/acm-config-server-repo/rules"
 

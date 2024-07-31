@@ -42,18 +42,16 @@ import java.util.Optional;
 public interface ApplicationPropertyRepository extends JpaRepository<ApplicationProperty, Long>
 {
     ApplicationProperty findByApplicationAndProfileAndKey(String application, String profile, String key);
-
     List<ApplicationProperty> findByApplicationAndProfileIn(String application, List<String> profiles);
     Optional<ApplicationProperty> findByApplicationAndProfileAndLabelAndKey(String application, String profile, String label, String key);
 
-    void deleteAllByProfile(String profile);
-
     void deleteAllByApplicationAndProfileAndKeyIn(String application, String profile, List<String> keys);
-    void deleteByApplicationAndProfile(String appNameWithoutProfile, String runtime);
+
+    void deleteAllByApplicationAndProfile(String appNameWithoutProfile, String runtime);
 
     @Query("SELECT DISTINCT ap.label FROM ApplicationProperty ap")
     List<String> findAllUniqueLabels();
 
-    @Query("SELECT CASE WHEN COUNT(ap) > 0 THEN TRUE ELSE FALSE END FROM ApplicationProperty ap")
-    Boolean existsAnyRecord();
+    @Query("SELECT DISTINCT ap.application FROM ApplicationProperty ap WHERE ap.profile = 'runtime'")
+    List<String> findAllUniqueApplicationsWithRuntimeProfile();
 }

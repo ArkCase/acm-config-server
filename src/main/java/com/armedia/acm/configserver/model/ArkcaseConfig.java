@@ -44,7 +44,6 @@ public class ArkcaseConfig
 {
     private List<String> folders;
     private List<String> languages;
-    private List<String> profiles;
 
     @Value("${properties.folder.path}")
     private String propertiesFolderPath;
