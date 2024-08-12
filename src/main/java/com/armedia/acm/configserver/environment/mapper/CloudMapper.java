@@ -285,28 +285,19 @@ public class CloudMapper
         this.api = new CoreV1Api(this.client);
         this.properties = Objects.requireNonNullElse(properties, CloudMapperProperties.DEFAULT);
 
-        if (!this.properties.enabled)
-        {
-            this.log.info("The CloudMapper is disabled");
-            this.resolver = CloudMapper.NULL_RESOLVER;
-            this.informerFactory = null;
-            this.namespace = null;
-            return;
-        }
-
-        this.namespace = this.properties.namespace;
-        this.log.info("The CloudMapper is enabled (namespace = {})", this.namespace);
-
         final StringSubstitutor substitutor;
-        if (this.properties.disableInterpolator)
-        {
-            this.log.info("CloudMapper's Interpolator is disabled, using a strict lookup");
-            substitutor = new StringSubstitutor(CloudMapper.NULL_LOOKUP);
-        }
-        else
+
+        if (this.properties.enableInterpolator)
         {
             this.log.info("CloudMapper's Interpolator is ensabled");
             substitutor = StringSubstitutor.createInterpolator();
+            this.resolver = substitutor::replace;
+        }
+        else
+        {
+            this.log.info("CloudMapper's Interpolator is disabled, using a strict lookup");
+            substitutor = new StringSubstitutor(CloudMapper.NULL_LOOKUP);
+            this.resolver = CloudMapper.NULL_RESOLVER;
         }
 
         // Set our custom delimiters to avoid conflicting with Spring's OOTB stuff
@@ -314,6 +305,20 @@ public class CloudMapper
                 .setVariablePrefix("@{") //
                 .setVariableSuffix("}") //
         ;
+
+        // If the cloud lookup is not enabled, this is as far as we go
+        if (!this.properties.enableCloud)
+        {
+            this.log.info("The CloudMapper is disabled");
+            this.informerFactory = null;
+            this.namespace = null;
+            return;
+        }
+
+        // Cloud lookup is enabled. As a result, we add all the stuff
+        // needed to support it.
+        this.namespace = this.properties.namespace;
+        this.log.info("The CloudMapper is enabled (namespace = {})", this.namespace);
 
         final String missing = (properties.missingAsEmpty ? StringUtils.EMPTY : null);
         this.log.info("CloudMapper missing-as-empty: {}", properties.missingAsEmpty);
@@ -354,14 +359,12 @@ public class CloudMapper
                     Objects.isNull(result));
             return (result != null ? result : missing);
         });
-
-        this.resolver = substitutor::replace;
     }
 
     @PostConstruct
     protected void postConstruct() throws ApiException
     {
-        if (!this.properties.enabled)
+        if (!this.properties.enableCloud)
         {
             return;
         }
@@ -400,7 +403,7 @@ public class CloudMapper
     @PreDestroy
     protected void preDestroy()
     {
-        if (!this.properties.enabled)
+        if (!this.properties.enableCloud)
         {
             return;
         }

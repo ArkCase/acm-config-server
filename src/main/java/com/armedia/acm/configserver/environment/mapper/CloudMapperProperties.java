@@ -52,7 +52,9 @@ public class CloudMapperProperties
 
     private static final Path SERVICEACCOUNT_NAMESPACE_PATH = Paths.get(Config.SERVICEACCOUNT_NAMESPACE_PATH);
 
-    protected static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
+    protected static final Boolean DEFAULT_ENABLE_INTERPOLATOR = Boolean.TRUE;
+    protected static final Boolean DEFAULT_ENABLE_CLOUD = Boolean.FALSE;
+    protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
     protected static final String DEFAULT_NAMESPACE;
     static
     {
@@ -61,36 +63,45 @@ public class CloudMapperProperties
         try (Reader r = Files.newBufferedReader(CloudMapperProperties.SERVICEACCOUNT_NAMESPACE_PATH, StandardCharsets.UTF_8))
         {
             namespace = IOUtils.toString(r);
+            CloudMapperProperties.LOG.debug("Read the default namespace [{}] from [{}]", namespace,
+                    CloudMapperProperties.SERVICEACCOUNT_NAMESPACE_PATH);
         }
         catch (IOException e)
         {
-            CloudMapperProperties.LOG.warn("Failed to read the pod's namespace from the file at [%s], it must be configured explicitly",
-                    CloudMapperProperties.SERVICEACCOUNT_NAMESPACE_PATH,
-                    e);
+            CloudMapperProperties.LOG.warn("Failed to read the pod's namespace from the file at [{}], it must be configured explicitly",
+                    CloudMapperProperties.SERVICEACCOUNT_NAMESPACE_PATH, e.getMessage());
         }
+
+        if (StringUtils.isNotBlank(namespace))
+        {
+            CloudMapperProperties.LOG.debug("The default namespace for the CloudMapper will be {}", namespace);
+        }
+
         DEFAULT_NAMESPACE = namespace;
     }
 
-    protected static final Boolean DEFAULT_DISABLE_INTERPOLATOR = Boolean.FALSE;
-    protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
+    public static CloudMapperProperties DEFAULT = new CloudMapperProperties( //
+            CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, //
+            CloudMapperProperties.DEFAULT_ENABLE_CLOUD, //
+            CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, //
+            CloudMapperProperties.DEFAULT_NAMESPACE //
+    );
 
-    public static CloudMapperProperties DEFAULT = new CloudMapperProperties(null, CloudMapperProperties.DEFAULT_ENABLED,
-            CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
-
-    public final String namespace;
-    public final boolean enabled;
-    public final boolean disableInterpolator;
+    public final boolean enableInterpolator;
+    public final boolean enableCloud;
     public final boolean missingAsEmpty;
+    public final String namespace;
 
     public CloudMapperProperties(
-            @Value("${cloud-mapper.namespace:#{null}}") String namespace,
-            @Value("${cloud-mapper.enabled:#{null}}") Boolean enabled,
-            @Value("${cloud-mapper.disableInterpolator:#{null}}") Boolean disableInterpolator,
-            @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty)
+            @Value("${cloud-mapper.enableInterpolator:#{null}}") Boolean enableInterpolator,
+            @Value("${cloud-mapper.enabledCloud:#{null}}") Boolean enableCloud,
+            @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty,
+            @Value("${cloud-mapper.namespace:#{null}}") String namespace)
     {
-        this.namespace = Objects.requireNonNullElse(namespace, CloudMapperProperties.DEFAULT_NAMESPACE);
-        this.enabled = StringUtils.isNotBlank(this.namespace) && Objects.requireNonNullElse(enabled, CloudMapperProperties.DEFAULT_ENABLED);
-        this.disableInterpolator = Objects.requireNonNullElse(disableInterpolator, CloudMapperProperties.DEFAULT_DISABLE_INTERPOLATOR);
+        this.namespace = Objects.toString(namespace, CloudMapperProperties.DEFAULT_NAMESPACE);
+        this.enableInterpolator = Objects.requireNonNullElse(enableInterpolator, CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR);
+        this.enableCloud = StringUtils.isNotBlank(this.namespace)
+                && Objects.requireNonNullElse(enableCloud, CloudMapperProperties.DEFAULT_ENABLE_CLOUD);
         this.missingAsEmpty = Objects.requireNonNullElse(missingAsEmpty, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
     }
 }
