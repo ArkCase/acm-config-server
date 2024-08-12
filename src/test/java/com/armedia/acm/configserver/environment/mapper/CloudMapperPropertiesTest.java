@@ -43,7 +43,7 @@ public class CloudMapperPropertiesTest
         Boolean missingAsEmpty = null;
 
         props = CloudMapperProperties.DEFAULT;
-        Assertions.assertNull(props.namespace);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_NAMESPACE, props.namespace);
         Assertions.assertFalse(props.cloud);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
@@ -53,7 +53,7 @@ public class CloudMapperPropertiesTest
         enableInterpolator = null;
         missingAsEmpty = null;
         props = new CloudMapperProperties(enableInterpolator, enableCloud, missingAsEmpty, namespace);
-        Assertions.assertNull(props.namespace);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_NAMESPACE, props.namespace);
         Assertions.assertFalse(props.cloud);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
