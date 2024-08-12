@@ -81,27 +81,18 @@ public class CloudMapperProperties
         DEFAULT_NAMESPACE = namespace;
     }
 
-    public static CloudMapperProperties DEFAULT = new CloudMapperProperties( //
-            CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, //
-            CloudMapperProperties.DEFAULT_ENABLE_CLOUD, //
-            CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, //
-            CloudMapperProperties.DEFAULT_NAMESPACE //
-    );
+    public static CloudMapperProperties DEFAULT = new CloudMapperProperties(
+            CloudMapperProperties.DEFAULT_ENABLED,
+            CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR,
+            CloudMapperProperties.DEFAULT_ENABLE_CLOUD,
+            CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY,
+            CloudMapperProperties.DEFAULT_NAMESPACE);
 
     public final boolean enabled;
     public final boolean interpolator;
     public final boolean cloud;
     public final boolean missingAsEmpty;
     public final String namespace;
-
-    public CloudMapperProperties(
-            @Value("${cloud-mapper.interpolator:#{null}}") Boolean enableInterpolator,
-            @Value("${cloud-mapper.cloud:#{null}}") Boolean enableCloud,
-            @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty,
-            @Value("${cloud-mapper.namespace:#{null}}") String namespace)
-    {
-        this(CloudMapperProperties.DEFAULT_ENABLED, enableInterpolator, enableCloud, missingAsEmpty, namespace);
-    }
 
     public CloudMapperProperties(
             @Value("${cloud-mapper.enabled:#{null}}") Boolean enabled,
