@@ -289,13 +289,13 @@ public class CloudMapper
 
         if (this.properties.interpolator)
         {
-            this.log.info("CloudMapper's Interpolator is ensabled");
+            this.log.info("CloudMapper's interpolator is enabled");
             substitutor = StringSubstitutor.createInterpolator();
             this.resolver = substitutor::replace;
         }
         else
         {
-            this.log.info("CloudMapper's Interpolator is disabled, using a strict lookup");
+            this.log.info("CloudMapper's interpolator is disabled, using a strict lookup");
             substitutor = new StringSubstitutor(CloudMapper.NULL_LOOKUP);
             this.resolver = CloudMapper.NULL_RESOLVER;
         }
@@ -309,7 +309,7 @@ public class CloudMapper
         // If the cloud lookup is not enabled, this is as far as we go
         if (!this.properties.cloud)
         {
-            this.log.info("The CloudMapper is disabled");
+            this.log.info("The CloudMapper's cloud support is disabled");
             this.informerFactory = null;
             this.namespace = null;
             return;
@@ -318,7 +318,7 @@ public class CloudMapper
         // Cloud lookup is enabled. As a result, we add all the stuff
         // needed to support it.
         this.namespace = this.properties.namespace;
-        this.log.info("The CloudMapper is enabled (namespace = {})", this.namespace);
+        this.log.info("The CloudMapper's cloud support is enabled (namespace = {})", this.namespace);
 
         final String missing = (properties.missingAsEmpty ? StringUtils.EMPTY : null);
         this.log.info("CloudMapper missing-as-empty: {}", properties.missingAsEmpty);
