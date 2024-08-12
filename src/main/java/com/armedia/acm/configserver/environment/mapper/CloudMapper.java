@@ -287,7 +287,7 @@ public class CloudMapper
 
         final StringSubstitutor substitutor;
 
-        if (this.properties.enableInterpolator)
+        if (this.properties.interpolator)
         {
             this.log.info("CloudMapper's Interpolator is ensabled");
             substitutor = StringSubstitutor.createInterpolator();
@@ -307,7 +307,7 @@ public class CloudMapper
         ;
 
         // If the cloud lookup is not enabled, this is as far as we go
-        if (!this.properties.enableCloud)
+        if (!this.properties.cloud)
         {
             this.log.info("The CloudMapper is disabled");
             this.informerFactory = null;
@@ -364,7 +364,7 @@ public class CloudMapper
     @PostConstruct
     protected void postConstruct() throws ApiException
     {
-        if (!this.properties.enableCloud)
+        if (!this.properties.cloud)
         {
             return;
         }
@@ -403,7 +403,7 @@ public class CloudMapper
     @PreDestroy
     protected void preDestroy()
     {
-        if (!this.properties.enableCloud)
+        if (!this.properties.cloud)
         {
             return;
         }

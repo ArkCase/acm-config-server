@@ -44,8 +44,8 @@ public class CloudMapperPropertiesTest
 
         props = CloudMapperProperties.DEFAULT;
         Assertions.assertNull(props.namespace);
-        Assertions.assertFalse(props.enableCloud);
-        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.enableInterpolator);
+        Assertions.assertFalse(props.cloud);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
 
         namespace = null;
@@ -54,8 +54,8 @@ public class CloudMapperPropertiesTest
         missingAsEmpty = null;
         props = new CloudMapperProperties(enableInterpolator, enableCloud, missingAsEmpty, namespace);
         Assertions.assertNull(props.namespace);
-        Assertions.assertFalse(props.enableCloud);
-        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.enableInterpolator);
+        Assertions.assertFalse(props.cloud);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
 
         namespace = UUID.randomUUID().toString();
@@ -64,8 +64,8 @@ public class CloudMapperPropertiesTest
         missingAsEmpty = null;
         props = new CloudMapperProperties(enableInterpolator, enableCloud, missingAsEmpty, namespace);
         Assertions.assertEquals(namespace, props.namespace);
-        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_CLOUD, props.enableCloud);
-        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.enableInterpolator);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_CLOUD, props.cloud);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
 
         namespace = UUID.randomUUID().toString();
@@ -74,8 +74,8 @@ public class CloudMapperPropertiesTest
         missingAsEmpty = null;
         props = new CloudMapperProperties(enableInterpolator, enableCloud, missingAsEmpty, namespace);
         Assertions.assertEquals(namespace, props.namespace);
-        Assertions.assertTrue(props.enableCloud);
-        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.enableInterpolator);
+        Assertions.assertTrue(props.cloud);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
 
         namespace = UUID.randomUUID().toString();
@@ -84,8 +84,8 @@ public class CloudMapperPropertiesTest
         missingAsEmpty = null;
         props = new CloudMapperProperties(enableInterpolator, enableCloud, missingAsEmpty, namespace);
         Assertions.assertEquals(namespace, props.namespace);
-        Assertions.assertFalse(props.enableCloud);
-        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.enableInterpolator);
+        Assertions.assertFalse(props.cloud);
+        Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
         Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
 
         namespace = UUID.randomUUID().toString();
@@ -96,8 +96,8 @@ public class CloudMapperPropertiesTest
         {
             props = new CloudMapperProperties(di, enableCloud, missingAsEmpty, namespace);
             Assertions.assertEquals(namespace, props.namespace);
-            Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_CLOUD, props.enableCloud);
-            Assertions.assertEquals(di, props.enableInterpolator);
+            Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_CLOUD, props.cloud);
+            Assertions.assertEquals(di, props.interpolator);
             Assertions.assertEquals(CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY, props.missingAsEmpty);
         }
 
@@ -109,8 +109,8 @@ public class CloudMapperPropertiesTest
         {
             props = new CloudMapperProperties(enableInterpolator, enableCloud, me, namespace);
             Assertions.assertEquals(namespace, props.namespace);
-            Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_CLOUD, props.enableCloud);
-            Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.enableInterpolator);
+            Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_CLOUD, props.cloud);
+            Assertions.assertEquals(CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR, props.interpolator);
             Assertions.assertEquals(me, props.missingAsEmpty);
         }
     }
