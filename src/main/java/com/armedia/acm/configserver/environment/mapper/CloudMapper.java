@@ -173,11 +173,54 @@ public class CloudMapper
     private static final StringLookup NULL_LOOKUP = (v) -> null;
     private static final UnaryOperator<String> NULL_RESOLVER = (v) -> null;
 
+    private static enum Folding
+    {
+        UPPER(StringUtils::upperCase),
+        LOWER(StringUtils::lowerCase),
+        NONE();
+
+        public UnaryOperator<String> fold;
+
+        private Folding()
+        {
+            this(null);
+        }
+
+        private Folding(UnaryOperator<String> fold)
+        {
+            this.fold = Objects.requireNonNullElse(fold, UnaryOperator.identity());
+        }
+    }
+
+    private static class LookupInfo
+    {
+        private final String key;
+        private final Folding folding;
+
+        private LookupInfo(String raw)
+        {
+            String key = raw;
+            Folding folding = Folding.NONE;
+            if (raw.endsWith("^^"))
+            {
+                folding = Folding.UPPER;
+                key = StringUtils.removeEnd(raw, "^^");
+            }
+            else if (raw.endsWith(",,"))
+            {
+                folding = Folding.LOWER;
+                key = StringUtils.removeEnd(raw, ",,");
+            }
+            this.folding = folding;
+            this.key = key;
+        }
+    }
+
     private static final StringLookup LOOKUP_SYS = StringLookupFactory.INSTANCE.systemPropertyStringLookup();
     private static final StringLookup LOOKUP_ENV = StringLookupFactory.INSTANCE.environmentVariableStringLookup();
     private static final StringLookup LOOKUP_ALL = StringLookupFactory.INSTANCE.interpolatorStringLookup();
 
-    private static final String lookup(String key)
+    private static final String rawLookup(String key)
     {
         String r = null;
 
@@ -199,12 +242,19 @@ public class CloudMapper
         return null;
     }
 
-    private static final String lookupExtas(String key)
+    private static final String lookup(String key)
+    {
+        LookupInfo lookup = new LookupInfo(key);
+        String result = CloudMapper.rawLookup(lookup.key);
+        return lookup.folding.fold.apply(result);
+    }
+
+    private static final String rawLookupExtras(String key)
     {
         String r = null;
 
         // Try the simple lookup first
-        r = CloudMapper.lookup(key);
+        r = CloudMapper.rawLookup(key);
         if (r != null)
         {
             return r;
@@ -219,6 +269,13 @@ public class CloudMapper
 
         // No hits
         return null;
+    }
+
+    private static final String lookupExtras(String key)
+    {
+        LookupInfo lookup = new LookupInfo(key);
+        String result = CloudMapper.rawLookupExtras(lookup.key);
+        return lookup.folding.fold.apply(result);
     }
 
     // TODO: Should we do this differently? i.e. allow client configurability?
@@ -341,7 +398,7 @@ public class CloudMapper
             // Our interpolator will first try system properties, then try environment variables...
             // then try the default interpolator, and finally give up ...
             this.log.info("CloudMapper's interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
-            StringLookup lookup = (this.properties.interpolatorExtras ? CloudMapper::lookup : CloudMapper::lookupExtas);
+            StringLookup lookup = (this.properties.interpolatorExtras ? CloudMapper::lookup : CloudMapper::lookupExtras);
             substitutor = new StringSubstitutor(lookup);
             this.resolver = substitutor::replace;
         }
