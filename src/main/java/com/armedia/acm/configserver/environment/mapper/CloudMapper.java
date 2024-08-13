@@ -44,6 +44,7 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
+import org.apache.commons.text.lookup.StringLookupFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,6 +173,54 @@ public class CloudMapper
     private static final StringLookup NULL_LOOKUP = (v) -> null;
     private static final UnaryOperator<String> NULL_RESOLVER = (v) -> null;
 
+    private static final StringLookup LOOKUP_SYS = StringLookupFactory.INSTANCE.systemPropertyStringLookup();
+    private static final StringLookup LOOKUP_ENV = StringLookupFactory.INSTANCE.environmentVariableStringLookup();
+    private static final StringLookup LOOKUP_ALL = StringLookupFactory.INSTANCE.interpolatorStringLookup();
+
+    private static final String lookup(String key)
+    {
+        String r = null;
+
+        // System property?
+        r = CloudMapper.LOOKUP_SYS.lookup(key);
+        if (r != null)
+        {
+            return r;
+        }
+
+        // Environment variable?
+        r = CloudMapper.LOOKUP_ENV.lookup(key);
+        if (r != null)
+        {
+            return r;
+        }
+
+        // No hits
+        return null;
+    }
+
+    private static final String lookupExtas(String key)
+    {
+        String r = null;
+
+        // Try the simple lookup first
+        r = CloudMapper.lookup(key);
+        if (r != null)
+        {
+            return r;
+        }
+
+        // Use the extra lookups
+        r = CloudMapper.LOOKUP_ALL.lookup(key);
+        if (r != null)
+        {
+            return r;
+        }
+
+        // No hits
+        return null;
+    }
+
     // TODO: Should we do this differently? i.e. allow client configurability?
     private final ApiClient client;
     private final CoreV1Api api;
@@ -289,8 +338,11 @@ public class CloudMapper
 
         if (this.properties.interpolator)
         {
-            this.log.info("CloudMapper's interpolator is enabled");
-            substitutor = StringSubstitutor.createInterpolator();
+            // Our interpolator will first try system properties, then try environment variables...
+            // then try the default interpolator, and finally give up ...
+            this.log.info("CloudMapper's interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
+            StringLookup lookup = (this.properties.interpolatorExtras ? CloudMapper::lookup : CloudMapper::lookupExtas);
+            substitutor = new StringSubstitutor(lookup);
             this.resolver = substitutor::replace;
         }
         else
@@ -299,12 +351,6 @@ public class CloudMapper
             substitutor = new StringSubstitutor(CloudMapper.NULL_LOOKUP);
             this.resolver = CloudMapper.NULL_RESOLVER;
         }
-
-        // Set our custom delimiters to avoid conflicting with Spring's OOTB stuff
-        substitutor //
-                .setVariablePrefix("@{") //
-                .setVariableSuffix("}") //
-        ;
 
         // If the cloud lookup is not enabled, this is as far as we go
         if (!this.properties.cloud)

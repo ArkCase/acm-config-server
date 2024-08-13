@@ -54,6 +54,7 @@ public class CloudMapperProperties
 
     protected static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
     protected static final Boolean DEFAULT_ENABLE_INTERPOLATOR = Boolean.TRUE;
+    protected static final Boolean DEFAULT_ENABLE_INTERPOLATOR_EXTRAS = Boolean.FALSE;
     protected static final Boolean DEFAULT_ENABLE_CLOUD = Boolean.FALSE;
     protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
     protected static final String DEFAULT_NAMESPACE;
@@ -84,12 +85,14 @@ public class CloudMapperProperties
     public static CloudMapperProperties DEFAULT = new CloudMapperProperties(
             CloudMapperProperties.DEFAULT_ENABLED,
             CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR,
+            CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS,
             CloudMapperProperties.DEFAULT_ENABLE_CLOUD,
             CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY,
             CloudMapperProperties.DEFAULT_NAMESPACE);
 
     public final boolean enabled;
     public final boolean interpolator;
+    public final boolean interpolatorExtras;
     public final boolean cloud;
     public final boolean missingAsEmpty;
     public final String namespace;
@@ -97,6 +100,7 @@ public class CloudMapperProperties
     public CloudMapperProperties(
             @Value("${cloud-mapper.enabled:#{null}}") Boolean enabled,
             @Value("${cloud-mapper.interpolator:#{null}}") Boolean interpolator,
+            @Value("${cloud-mapper.interpolatorExtras:#{null}}") Boolean interpolatorExtras,
             @Value("${cloud-mapper.cloud:#{null}}") Boolean cloud,
             @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty,
             @Value("${cloud-mapper.namespace:#{null}}") String namespace)
@@ -106,6 +110,8 @@ public class CloudMapperProperties
         this.namespace = Objects.toString(namespace, CloudMapperProperties.DEFAULT_NAMESPACE);
         this.interpolator = this.enabled
                 && Objects.requireNonNullElse(interpolator, CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR);
+        this.interpolatorExtras = this.enabled
+                && Objects.requireNonNullElse(interpolatorExtras, CloudMapperProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS);
         this.cloud = this.enabled && StringUtils.isNotBlank(this.namespace)
                 && Objects.requireNonNullElse(cloud, CloudMapperProperties.DEFAULT_ENABLE_CLOUD);
         this.missingAsEmpty = this.enabled && Objects.requireNonNullElse(missingAsEmpty, CloudMapperProperties.DEFAULT_MISSING_AS_EMPTY);
