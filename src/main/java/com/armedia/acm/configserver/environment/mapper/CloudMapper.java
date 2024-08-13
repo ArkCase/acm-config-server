@@ -409,6 +409,12 @@ public class CloudMapper
             this.resolver = CloudMapper.NULL_RESOLVER;
         }
 
+        // Re-add this ... apparently the simplified syntax causes conflicts with
+        // the OOTB Spring stuff...
+        substitutor
+                .setVariablePrefix("@{")
+                .setVariableSuffix("}");
+
         // If the cloud lookup is not enabled, this is as far as we go
         if (!this.properties.cloud)
         {
