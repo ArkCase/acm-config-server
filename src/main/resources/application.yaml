@@ -2,7 +2,7 @@ server.port: 9999
 spring:
   profiles.active: native
   profiles:
-    include: jdbc, native
+    include: awss3, jdbc, native
   jms:
     pub-sub-domain: true
   datasource:
@@ -29,10 +29,29 @@ spring:
         native:
           searchLocations: file:${user.home}/.arkcase/acm/acm-config-server-repo,file:${user.home}/.arkcase/acm/acm-config-server-repo/labels,file:${user.home}/.arkcase/acm/acm-config-server-repo/ldap,file:${user.home}/.arkcase/acm/acm-config-server-repo/lookups,file:${user.home}/.arkcase/acm/acm-config-server-repo/rules
           order: 1
-  sql:
+        awss3:
+          endpoint: http://127.0.0.1:9000
+          order: 2
+          bucket: arkcase
+          region: us-east-1
+        bootstrap: true
+        fail-on-composite-error: false
+        default-application-name:
+    aws:
+      s3:
+        endpoint: http://127.0.0.1:9000  # MinIO endpoint
+        bucket: arkcase
+      region:
+        static: us-east-1  # Required region
+      credentials:
+        access-key: minioadmin
+        secret-key: minioadmin
+
+sql:
     init:
       mode: always
       schema-locations: classpath:schema.sql
+
 
 #spring.cloud.config.server.git.uri: file:///c:/dev/arkcase-config
 #spring.cloud.config.server.git.clone-on-start: true
@@ -50,7 +69,9 @@ logging:
     org.hibernate.type.descriptor.sql: ERROR
     org.hibernate.type.descriptor.sql.BasicBinder: ERROR
     com.armedia.acm.configserver: debug
-    org.springframework.cloud.config: ERROR
+    org.springframework.cloud.config: debug
+    org.springframework.cloud.aws: DEBUG
+
   file.max-history: 10
   file.max-size: 10MB
   file: logs/acmConfigServer.log
@@ -91,5 +112,3 @@ arkcase:
     - "${user.home}/.arkcase/acm/acm-config-server-repo/labels"
     - "${user.home}/.arkcase/acm/acm-config-server-repo/ldap"
     - "${user.home}/.arkcase/acm/acm-config-server-repo/lookups"
-  # - "/home/vladimir/IdeaProjects/acm-config/acm/acm-config-server-repo/rules"
-

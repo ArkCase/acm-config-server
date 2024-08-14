@@ -32,6 +32,7 @@ import com.armedia.acm.configserver.model.ArkcaseConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -50,23 +51,21 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Profile("run-with-file")
+@Profile("!run-with-db")
+@ConditionalOnMissingBean(DatabaseConfigurationService.class)
 public class FileSystemConfigurationService implements ConfigurationService
 {
     private static final Logger logger = LoggerFactory.getLogger(FileSystemConfigurationService.class);
 
     private final String labelsFolderPath;
-
     private final ArkcaseConfig arkcaseConfig;
+    private final NotificationService notificationService;
 
-    private FileConfigurationService fileConfigurationService;
-
-
-    public FileSystemConfigurationService(ArkcaseConfig arkcaseConfig, FileConfigurationService fileConfigurationService)
+    public FileSystemConfigurationService(ArkcaseConfig arkcaseConfig, NotificationService notificationService)
     {
         this.arkcaseConfig = arkcaseConfig;
         this.labelsFolderPath = this.arkcaseConfig.getPropertiesFolderPath() + "/labels";
-        this.fileConfigurationService = fileConfigurationService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -204,9 +203,8 @@ public class FileSystemConfigurationService implements ConfigurationService
                 {
                     FileSystemConfigurationService.logger.info("Reset file [{}] to default version.", file.getName());
                     String originalFileName = file.getName().replace(ConfigurationService._RUNTIME, "");
-                    this.fileConfigurationService.sendNotification(originalFileName,
-                            FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
-
+                    this.notificationService.sendNotification(originalFileName,
+                            NotificationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
                 }
                 else
                 {
@@ -214,7 +212,6 @@ public class FileSystemConfigurationService implements ConfigurationService
                 }
             }
         }
-
     }
 
     @Override

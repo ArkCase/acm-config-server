@@ -27,15 +27,18 @@ package com.armedia.acm.configserver.config;
  * #L%
  */
 
+import com.armedia.acm.configserver.service.DatabaseConfigurationService;
 import com.armedia.acm.configserver.service.FileWatchService;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("run-with-file")
+@Profile("!run-with-db")
+@ConditionalOnMissingBean(DatabaseConfigurationService.class)
 public class FileWatchInitializer implements ApplicationRunner
 {
     private final FileWatchService fileWatchService;

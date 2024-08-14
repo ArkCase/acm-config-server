@@ -32,6 +32,7 @@ import com.armedia.acm.configserver.jms.ConfigurationChangeMessageProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Service
-@Profile("run-with-file")
+@Profile("!run-with-db")
+@ConditionalOnMissingBean(DatabaseConfigurationService.class)
 public class FileWatchService
 {
     private final Logger logger = LoggerFactory.getLogger(getClass());

@@ -1,4 +1,4 @@
-package com.armedia.acm.configserver.model;
+package com.armedia.acm.configserver.service;
 
 /*-
  * #%L
@@ -27,18 +27,11 @@ package com.armedia.acm.configserver.model;
  * #L%
  */
 
-import org.springframework.context.ApplicationEvent;
+import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Getter;
+import java.io.IOException;
 
-@Getter
-public class DatabaseChangeEvent extends ApplicationEvent {
-    private final String changeType;
-    private final String details;
-
-    public DatabaseChangeEvent(Object source, String changeType, String details) {
-        super(source);
-        this.changeType = changeType;
-        this.details = details;
-    }
+public interface ResourceStorageService
+{
+    void moveFileToConfiguration(MultipartFile file, String fileName, boolean isBrandingFile) throws IOException;
 }

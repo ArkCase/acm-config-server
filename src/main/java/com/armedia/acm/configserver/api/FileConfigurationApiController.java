@@ -27,11 +27,10 @@ package com.armedia.acm.configserver.api;
  * #L%
  */
 
-import com.armedia.acm.configserver.service.FileConfigurationService;
+import com.armedia.acm.configserver.service.ResourceStorageService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,18 +40,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@Profile("run-with-file")
 @RestController
 @RequestMapping("/file")
 public class FileConfigurationApiController
 {
-    private final FileConfigurationService fileConfigurationService;
+    private final ResourceStorageService resourceStorageService;
 
     private static final Logger logger = LoggerFactory.getLogger(FileConfigurationApiController.class);
 
-    public FileConfigurationApiController(FileConfigurationService fileConfigurationService)
+    public FileConfigurationApiController(ResourceStorageService resourceStorageService)
     {
-        this.fileConfigurationService = fileConfigurationService;
+        this.resourceStorageService = resourceStorageService;
     }
 
     @PostMapping()
@@ -63,7 +61,7 @@ public class FileConfigurationApiController
     {
 
         FileConfigurationApiController.logger.info("File is received on config server! [{}], isBrandingFile: [{}]", fileName, isBrandingFile);
-        this.fileConfigurationService.moveFileToConfiguration(file, fileName, isBrandingFile);
+        this.resourceStorageService.moveFileToConfiguration(file, fileName, isBrandingFile);
         FileConfigurationApiController.logger.info("file is moved to config server!");
 
         return ResponseEntity.ok().build();

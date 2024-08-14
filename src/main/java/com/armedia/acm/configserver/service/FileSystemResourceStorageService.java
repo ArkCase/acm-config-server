@@ -29,41 +29,36 @@ package com.armedia.acm.configserver.service;
 
 import static com.armedia.acm.configserver.service.ConfigurationService._RUNTIME;
 
-import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.jms.DeliveryMode;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 @Service
-@Profile("run-with-file")
-public class FileConfigurationService
+@Profile("!run-with-db")
+@ConditionalOnMissingBean(MinioResourceStorageService.class)
+public class FileSystemResourceStorageService implements ResourceStorageService
 {
 
     private final String configServerRepo;
+    private final NotificationService notificationService;
+    private static final Logger logger = LoggerFactory.getLogger(FileSystemResourceStorageService.class);
 
-    private final JmsTemplate acmJmsTemplate;
-
-    public static final String VIRTUAL_TOPIC_CONFIG_FILE_UPDATED = "VirtualTopic.ConfigFileUpdated";
-
-    private static final Logger logger = LoggerFactory.getLogger(FileConfigurationService.class);
-
-    public FileConfigurationService(@Value("${properties.folder.path}") String configRepo, JmsTemplate acmJmsTemplate)
+    public FileSystemResourceStorageService(@Value("${properties.folder.path}") String configRepo, NotificationService notificationService)
     {
         this.configServerRepo = configRepo;
-        this.acmJmsTemplate = acmJmsTemplate;
+        this.notificationService = notificationService;
     }
 
+    @Override
     public void moveFileToConfiguration(MultipartFile file, String fileName, boolean isBrandingFile) throws IOException
     {
         try (InputStream inputStream = file.getInputStream())
@@ -77,17 +72,17 @@ public class FileConfigurationService
 
             FileUtils.copyInputStreamToFile(inputStream, destinationFile);
 
-            FileConfigurationService.logger.info("File with name {} created on the config server", fileName);
+            FileSystemResourceStorageService.logger.info("File with name {} created on the config server", fileName);
 
             if (isBrandingFile)
             {
-                sendNotification(originalFileName,
-                        FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+                this.notificationService.sendNotification(originalFileName,
+                        NotificationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
             }
         }
         catch (IOException e)
         {
-            FileConfigurationService.logger.error("File can't be updated");
+            FileSystemResourceStorageService.logger.error("File can't be updated");
             throw e;
         }
     }
@@ -97,7 +92,7 @@ public class FileConfigurationService
         String[] splitedFilePath = filePath.split("/");
         String originalFileName = splitedFilePath[splitedFilePath.length - 1];
 
-        FileConfigurationService.logger.debug("Original file name from path {} is {}", filePath, originalFileName);
+        FileSystemResourceStorageService.logger.debug("Original file name from path {} is {}", filePath, originalFileName);
 
         return originalFileName;
     }
@@ -106,16 +101,4 @@ public class FileConfigurationService
     {
         return new StringBuilder(fileName).insert(fileName.indexOf("."), _RUNTIME).toString();
     }
-
-    public void sendNotification(String message, String destination)
-    {
-        ActiveMQTopic topic = new ActiveMQTopic(destination);
-
-        this.acmJmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
-        this.acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
-
-        FileConfigurationService.logger.debug("File with name {} is updated and success message is sent for updating", message);
-
-    }
-
 }
