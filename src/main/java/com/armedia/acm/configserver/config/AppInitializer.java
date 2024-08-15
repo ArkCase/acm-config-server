@@ -1,9 +1,3 @@
-package com.armedia.acm.configserver.config;
-
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
-
 /*-
  * #%L
  * acm-config-server
@@ -30,6 +24,11 @@ import org.springframework.stereotype.Component;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.config;
+
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 
 import com.armedia.acm.configserver.service.FileWatchService;
 

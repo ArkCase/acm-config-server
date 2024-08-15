@@ -1,10 +1,8 @@
-package com.armedia.acm.configserver;
-
 /*-
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 ArkCase LLC
+ * Copyright (C) 2019 - 2024 ArkCase LLC
  * %%
  * This file is part of the ArkCase software.
  *
@@ -26,6 +24,7 @@ package com.armedia.acm.configserver;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,15 +1,8 @@
-package com.armedia.acm.configserver.api;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /*-
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 ArkCase LLC
+ * Copyright (C) 2019 - 2024 ArkCase LLC
  * %%
  * This file is part of the ArkCase software.
  *
@@ -31,6 +24,12 @@ import java.util.List;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.api;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,11 +1,3 @@
-package com.armedia.acm.configserver.jms;
-
-import java.time.LocalDateTime;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.jms.Session;
-
 /*-
  * #%L
  * acm-config-server
@@ -32,6 +24,13 @@ import javax.jms.Session;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.jms;
+
+import java.time.LocalDateTime;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.jms.Session;
 
 import org.apache.activemq.command.ActiveMQTopic;
 import org.slf4j.Logger;

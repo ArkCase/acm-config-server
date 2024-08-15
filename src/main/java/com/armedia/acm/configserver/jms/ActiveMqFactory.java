@@ -1,7 +1,3 @@
-package com.armedia.acm.configserver.jms;
-
-import java.time.Duration;
-
 /*-
  * #%L
  * acm-config-server
@@ -28,6 +24,9 @@ import java.time.Duration;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.jms;
+
+import java.time.Duration;
 
 import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.activemq.command.ActiveMQTopic;

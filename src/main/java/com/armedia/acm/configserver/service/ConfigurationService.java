@@ -1,14 +1,8 @@
-package com.armedia.acm.configserver.service;
-
-import java.nio.file.NoSuchFileException;
-import java.util.List;
-import java.util.Map;
-
 /*-
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 ArkCase LLC
+ * Copyright (C) 2019 - 2024 ArkCase LLC
  * %%
  * This file is part of the ArkCase software.
  *
@@ -30,6 +24,11 @@ import java.util.Map;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.service;
+
+import java.nio.file.NoSuchFileException;
+import java.util.List;
+import java.util.Map;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 
