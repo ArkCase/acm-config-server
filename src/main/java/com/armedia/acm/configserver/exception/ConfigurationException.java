@@ -1,5 +1,3 @@
-package com.armedia.acm.configserver.exception;
-
 /*-
  * #%L
  * acm-config-server
@@ -26,6 +24,7 @@ package com.armedia.acm.configserver.exception;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.exception;
 
 public class ConfigurationException extends Exception
 {

@@ -1,20 +1,8 @@
-package com.armedia.acm.configserver.api;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 /*-
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 - 2020 ArkCase LLC
+ * Copyright (C) 2019 - 2024 ArkCase LLC
  * %%
  * This file is part of the ArkCase software.
  *
@@ -36,8 +24,21 @@ import org.springframework.web.multipart.MultipartFile;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.api;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.armedia.acm.configserver.service.FileConfigurationService;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/file")
@@ -50,13 +51,15 @@ public class FileConfigurationApiController
     private static final Logger logger = LoggerFactory.getLogger(FileConfigurationApiController.class);
 
     @PostMapping()
-    public ResponseEntity<?> moveFileToConfiguration(@RequestParam("file") MultipartFile file,
-            @RequestParam("fileName") String fileName) throws Exception
+    public ResponseEntity<?> moveFileToConfiguration(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("fileName") String fileName,
+            @RequestParam(defaultValue = "true", required = false) boolean isBrandingFile) throws IOException
     {
 
-        FileConfigurationApiController.logger.info("branding file is received on config server! [{}]", fileName);
+        FileConfigurationApiController.logger.info("File is received on config server! [{}], isBrandingFile: [{}]", fileName, isBrandingFile);
 
-        this.fileConfigurationService.moveFileToConfiguration(file, fileName);
+        this.fileConfigurationService.moveFileToConfiguration(file, fileName, isBrandingFile);
 
         FileConfigurationApiController.logger.info("file is moved to config server!");
 

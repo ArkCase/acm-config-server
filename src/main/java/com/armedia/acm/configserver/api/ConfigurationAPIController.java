@@ -1,28 +1,8 @@
-package com.armedia.acm.configserver.api;
-
-import java.nio.file.NoSuchFileException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 /*-
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 ArkCase LLC
+ * Copyright (C) 2019 - 2024 ArkCase LLC
  * %%
  * This file is part of the ArkCase software.
  *
@@ -44,6 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+package com.armedia.acm.configserver.api;
+
+import java.nio.file.NoSuchFileException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.armedia.acm.configserver.exception.ConfigurationException;
 import com.armedia.acm.configserver.service.ConfigurationService;
