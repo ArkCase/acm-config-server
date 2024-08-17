@@ -24,7 +24,7 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.environment;
+package com.armedia.acm.configserver.environmentinterpolator;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -41,17 +41,15 @@ import org.springframework.cloud.config.server.environment.SearchPathLocator;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import com.armedia.acm.configserver.environment.mapper.EnvironmentInterpolator;
-
 class NativeEnvironmentInterpolatorRepository implements EnvironmentRepository, SearchPathLocator, Ordered
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final EnvironmentInterpolator cloudMapper;
+    private final NativeEnvironmentInterpolator cloudMapper;
 
     private final NativeEnvironmentRepository delegate;
 
-    NativeEnvironmentInterpolatorRepository(EnvironmentInterpolator cloudMapper, ConfigurableEnvironment environment, NativeEnvironmentProperties properties)
+    NativeEnvironmentInterpolatorRepository(NativeEnvironmentInterpolator cloudMapper, ConfigurableEnvironment environment, NativeEnvironmentProperties properties)
     {
         this.cloudMapper = cloudMapper;
         this.delegate = new NativeEnvironmentRepository(environment, properties)

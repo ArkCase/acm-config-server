@@ -24,7 +24,7 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.environment;
+package com.armedia.acm.configserver.environmentinterpolator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +37,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import com.armedia.acm.configserver.environment.mapper.EnvironmentInterpolator;
-
 @Configuration
 @Profile("native-interpolator")
 public class NativeEnvironmentInterpolatorRepositoryConfiguration
@@ -46,7 +44,7 @@ public class NativeEnvironmentInterpolatorRepositoryConfiguration
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private EnvironmentInterpolator cloudMapper;
+    private NativeEnvironmentInterpolator cloudMapper;
 
     @Bean
     @Lazy

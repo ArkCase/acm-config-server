@@ -24,7 +24,7 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.environment;
+package com.armedia.acm.configserver.environmentinterpolator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,18 +33,16 @@ import org.springframework.cloud.config.server.environment.EnvironmentRepository
 import org.springframework.cloud.config.server.environment.NativeEnvironmentProperties;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import com.armedia.acm.configserver.environment.mapper.EnvironmentInterpolator;
-
 class NativeEnvironmentInterpolatorRepositoryFactory
         implements EnvironmentRepositoryFactory<NativeEnvironmentInterpolatorRepository, NativeEnvironmentProperties>
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final EnvironmentInterpolator cloudMapper;
+    private final NativeEnvironmentInterpolator cloudMapper;
     private final ConfigurableEnvironment environment;
     private final ConfigServerProperties properties;
 
-    NativeEnvironmentInterpolatorRepositoryFactory(EnvironmentInterpolator cloudMapper, ConfigurableEnvironment environment,
+    NativeEnvironmentInterpolatorRepositoryFactory(NativeEnvironmentInterpolator cloudMapper, ConfigurableEnvironment environment,
             ConfigServerProperties properties)
     {
         this.cloudMapper = cloudMapper;

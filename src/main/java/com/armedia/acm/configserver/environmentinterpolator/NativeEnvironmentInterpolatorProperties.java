@@ -24,7 +24,7 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.environment.mapper;
+package com.armedia.acm.configserver.environmentinterpolator;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,37 +33,37 @@ import org.springframework.stereotype.Component;
 
 @Lazy
 @Component
-public class EnvironmentInterpolatorProperties
+public class NativeEnvironmentInterpolatorProperties
 {
     protected static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
     protected static final Boolean DEFAULT_ENABLE_INTERPOLATOR = Boolean.TRUE;
     protected static final Boolean DEFAULT_ENABLE_INTERPOLATOR_EXTRAS = Boolean.FALSE;
     protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
 
-    public static EnvironmentInterpolatorProperties DEFAULT = new EnvironmentInterpolatorProperties(
-            EnvironmentInterpolatorProperties.DEFAULT_ENABLED,
-            EnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR,
-            EnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS,
-            EnvironmentInterpolatorProperties.DEFAULT_MISSING_AS_EMPTY);
+    public static NativeEnvironmentInterpolatorProperties DEFAULT = new NativeEnvironmentInterpolatorProperties(
+            NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLED,
+            NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR,
+            NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS,
+            NativeEnvironmentInterpolatorProperties.DEFAULT_MISSING_AS_EMPTY);
 
     public final boolean enabled;
     public final boolean interpolator;
     public final boolean interpolatorExtras;
     public final boolean missingAsEmpty;
 
-    public EnvironmentInterpolatorProperties(
+    public NativeEnvironmentInterpolatorProperties(
             @Value("${cloud-mapper.enabled:#{null}}") Boolean enabled,
             @Value("${cloud-mapper.interpolator:#{null}}") Boolean interpolator,
             @Value("${cloud-mapper.interpolatorExtras:#{null}}") Boolean interpolatorExtras,
             @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty)
     {
         // This can serve as the master flag to disable the whole thing in one go, if needed
-        this.enabled = ObjectUtils.defaultIfNull(enabled, EnvironmentInterpolatorProperties.DEFAULT_ENABLED);
+        this.enabled = ObjectUtils.defaultIfNull(enabled, NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLED);
         this.interpolator = this.enabled
-                && ObjectUtils.defaultIfNull(interpolator, EnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR);
+                && ObjectUtils.defaultIfNull(interpolator, NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR);
         this.interpolatorExtras = this.enabled
-                && ObjectUtils.defaultIfNull(interpolatorExtras, EnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS);
+                && ObjectUtils.defaultIfNull(interpolatorExtras, NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS);
         this.missingAsEmpty = this.enabled
-                && ObjectUtils.defaultIfNull(missingAsEmpty, EnvironmentInterpolatorProperties.DEFAULT_MISSING_AS_EMPTY);
+                && ObjectUtils.defaultIfNull(missingAsEmpty, NativeEnvironmentInterpolatorProperties.DEFAULT_MISSING_AS_EMPTY);
     }
 }

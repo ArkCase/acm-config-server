@@ -24,7 +24,7 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.environment.mapper;
+package com.armedia.acm.configserver.environmentinterpolator;
 
 import java.io.IOException;
 import java.util.function.UnaryOperator;
@@ -43,7 +43,7 @@ import org.yaml.snakeyaml.Yaml;
 
 @Lazy
 @Component
-public class EnvironmentInterpolator
+public class NativeEnvironmentInterpolator
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -102,14 +102,14 @@ public class EnvironmentInterpolator
         String r = null;
 
         // System property?
-        r = EnvironmentInterpolator.LOOKUP_SYS.lookup(key);
+        r = NativeEnvironmentInterpolator.LOOKUP_SYS.lookup(key);
         if (r != null)
         {
             return r;
         }
 
         // Environment variable?
-        r = EnvironmentInterpolator.LOOKUP_ENV.lookup(key);
+        r = NativeEnvironmentInterpolator.LOOKUP_ENV.lookup(key);
         if (r != null)
         {
             return r;
@@ -122,7 +122,7 @@ public class EnvironmentInterpolator
     private static final String lookup(String key)
     {
         LookupInfo lookup = new LookupInfo(key);
-        String result = EnvironmentInterpolator.rawLookup(lookup.key);
+        String result = NativeEnvironmentInterpolator.rawLookup(lookup.key);
         return lookup.folding.fold.apply(result);
     }
 
@@ -131,14 +131,14 @@ public class EnvironmentInterpolator
         String r = null;
 
         // Try the simple lookup first
-        r = EnvironmentInterpolator.rawLookup(key);
+        r = NativeEnvironmentInterpolator.rawLookup(key);
         if (r != null)
         {
             return r;
         }
 
         // Use the extra lookups
-        r = EnvironmentInterpolator.LOOKUP_ALL.lookup(key);
+        r = NativeEnvironmentInterpolator.LOOKUP_ALL.lookup(key);
         if (r != null)
         {
             return r;
@@ -151,24 +151,24 @@ public class EnvironmentInterpolator
     private static final String lookupExtras(String key)
     {
         LookupInfo lookup = new LookupInfo(key);
-        String result = EnvironmentInterpolator.rawLookupExtras(lookup.key);
+        String result = NativeEnvironmentInterpolator.rawLookupExtras(lookup.key);
         return lookup.folding.fold.apply(result);
     }
 
-    private final EnvironmentInterpolatorProperties properties;
+    private final NativeEnvironmentInterpolatorProperties properties;
 
     private final UnaryOperator<String> resolver;
 
     @Autowired
-    public EnvironmentInterpolator(EnvironmentInterpolatorProperties properties) throws IOException
+    public NativeEnvironmentInterpolator(NativeEnvironmentInterpolatorProperties properties) throws IOException
     {
-        this.log.debug("Creating the EnvironmentInterpolator");
+        this.log.debug("Creating the NativeEnvironmentInterpolator");
         if (this.log.isTraceEnabled())
         {
-            this.log.trace("EnvironmentInterpolatorProperties:\n{}", new Yaml().dump(properties));
+            this.log.trace("NativeEnvironmentInterpolatorProperties:\n{}", new Yaml().dump(properties));
         }
 
-        this.properties = ObjectUtils.defaultIfNull(properties, EnvironmentInterpolatorProperties.DEFAULT);
+        this.properties = ObjectUtils.defaultIfNull(properties, NativeEnvironmentInterpolatorProperties.DEFAULT);
 
         final StringSubstitutor substitutor;
 
@@ -176,16 +176,16 @@ public class EnvironmentInterpolator
         {
             // Our interpolator will first try system properties, then try environment variables...
             // then try the default interpolator, and finally give up ...
-            this.log.info("EnvironmentInterpolator's interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
-            StringLookup lookup = (this.properties.interpolatorExtras ? EnvironmentInterpolator::lookup : EnvironmentInterpolator::lookupExtras);
+            this.log.info("NativeEnvironmentInterpolator's interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
+            StringLookup lookup = (this.properties.interpolatorExtras ? NativeEnvironmentInterpolator::lookup : NativeEnvironmentInterpolator::lookupExtras);
             substitutor = new StringSubstitutor(lookup);
             this.resolver = substitutor::replace;
         }
         else
         {
-            this.log.info("EnvironmentInterpolator's interpolator is disabled, using a strict lookup");
-            substitutor = new StringSubstitutor(EnvironmentInterpolator.NULL_LOOKUP);
-            this.resolver = EnvironmentInterpolator.NULL_RESOLVER;
+            this.log.info("NativeEnvironmentInterpolator's interpolator is disabled, using a strict lookup");
+            substitutor = new StringSubstitutor(NativeEnvironmentInterpolator.NULL_LOOKUP);
+            this.resolver = NativeEnvironmentInterpolator.NULL_RESOLVER;
         }
 
         // Re-add this ... apparently the simplified syntax causes conflicts with
