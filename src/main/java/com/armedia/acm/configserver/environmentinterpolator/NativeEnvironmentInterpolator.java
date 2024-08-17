@@ -96,7 +96,7 @@ public class NativeEnvironmentInterpolator
     private static final StringLookup LOOKUP_ENV = StringLookupFactory.INSTANCE.environmentVariableStringLookup();
     private static final StringLookup LOOKUP_ALL = StringLookupFactory.INSTANCE.interpolatorStringLookup();
 
-    private static final String rawLookup(String key)
+    private static final String baseLookup(String key)
     {
         String r = null;
 
@@ -121,16 +121,16 @@ public class NativeEnvironmentInterpolator
     private static final String lookup(String key)
     {
         LookupInfo lookup = new LookupInfo(key);
-        String result = NativeEnvironmentInterpolator.rawLookup(lookup.key);
+        String result = NativeEnvironmentInterpolator.baseLookup(lookup.key);
         return lookup.folding.fold.apply(result);
     }
 
-    private static final String rawLookupExtras(String key)
+    private static final String baseLookupExtras(String key)
     {
         String r = null;
 
         // Try the simple lookup first
-        r = NativeEnvironmentInterpolator.rawLookup(key);
+        r = NativeEnvironmentInterpolator.baseLookup(key);
         if (r != null)
         {
             return r;
@@ -150,7 +150,7 @@ public class NativeEnvironmentInterpolator
     private static final String lookupExtras(String key)
     {
         LookupInfo lookup = new LookupInfo(key);
-        String result = NativeEnvironmentInterpolator.rawLookupExtras(lookup.key);
+        String result = NativeEnvironmentInterpolator.baseLookupExtras(lookup.key);
         return lookup.folding.fold.apply(result);
     }
 
@@ -171,14 +171,14 @@ public class NativeEnvironmentInterpolator
 
         if (!this.properties.interpolator)
         {
-            this.log.info("Native Environment Interpolator is disabled, using a strict lookup");
+            this.log.info("Native Environment Interpolator is disabled, values will not be interpolated");
             this.resolver = NativeEnvironmentInterpolator.IDENTITY;
             return;
         }
 
         // Our interpolator will first try system properties, then try environment variables...
         // then try the default interpolator, and finally give up ...
-        this.log.info("Native Environment Interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
+        this.log.info("Native Environment Interpolator is enabled (with{} extras)", (this.properties.interpolatorExtras ? "" : "out"));
         StringLookup lookup = (this.properties.interpolatorExtras ? NativeEnvironmentInterpolator::lookup
                 : NativeEnvironmentInterpolator::lookupExtras);
 
