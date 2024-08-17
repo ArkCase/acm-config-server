@@ -169,25 +169,24 @@ public class NativeEnvironmentInterpolator
 
         this.properties = ObjectUtils.defaultIfNull(properties, NativeEnvironmentInterpolatorProperties.DEFAULT);
 
-        if (this.properties.interpolator)
-        {
-            // Our interpolator will first try system properties, then try environment variables...
-            // then try the default interpolator, and finally give up ...
-            this.log.info("Native Environment Interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
-            StringLookup lookup = (this.properties.interpolatorExtras ? NativeEnvironmentInterpolator::lookup
-                    : NativeEnvironmentInterpolator::lookupExtras);
-
-            final StringSubstitutor substitutor = new StringSubstitutor(lookup)
-                    .setVariablePrefix("@{")
-                    .setVariableSuffix("}");
-
-            this.resolver = substitutor::replace;
-        }
-        else
+        if (!this.properties.interpolator)
         {
             this.log.info("Native Environment Interpolator is disabled, using a strict lookup");
             this.resolver = NativeEnvironmentInterpolator.IDENTITY;
+            return;
         }
+
+        // Our interpolator will first try system properties, then try environment variables...
+        // then try the default interpolator, and finally give up ...
+        this.log.info("Native Environment Interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
+        StringLookup lookup = (this.properties.interpolatorExtras ? NativeEnvironmentInterpolator::lookup
+                : NativeEnvironmentInterpolator::lookupExtras);
+
+        final StringSubstitutor substitutor = new StringSubstitutor(lookup)
+                .setVariablePrefix("@{")
+                .setVariableSuffix("}");
+
+        this.resolver = substitutor::replace;
     }
 
     public String map(final String key, final String value)
