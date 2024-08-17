@@ -47,8 +47,7 @@ public class NativeEnvironmentInterpolator
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private static final StringLookup NULL_LOOKUP = (v) -> null;
-    private static final UnaryOperator<String> NULL_RESOLVER = (v) -> null;
+    private static final UnaryOperator<String> IDENTITY = UnaryOperator.identity();
 
     private static enum Folding
     {
@@ -162,7 +161,7 @@ public class NativeEnvironmentInterpolator
     @Autowired
     public NativeEnvironmentInterpolator(NativeEnvironmentInterpolatorProperties properties) throws IOException
     {
-        this.log.debug("Creating the NativeEnvironmentInterpolator");
+        this.log.debug("Creating the Native Environment Interpolator");
         if (this.log.isTraceEnabled())
         {
             this.log.trace("NativeEnvironmentInterpolatorProperties:\n{}", new Yaml().dump(properties));
@@ -170,29 +169,25 @@ public class NativeEnvironmentInterpolator
 
         this.properties = ObjectUtils.defaultIfNull(properties, NativeEnvironmentInterpolatorProperties.DEFAULT);
 
-        final StringSubstitutor substitutor;
-
         if (this.properties.interpolator)
         {
             // Our interpolator will first try system properties, then try environment variables...
             // then try the default interpolator, and finally give up ...
-            this.log.info("NativeEnvironmentInterpolator's interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
-            StringLookup lookup = (this.properties.interpolatorExtras ? NativeEnvironmentInterpolator::lookup : NativeEnvironmentInterpolator::lookupExtras);
-            substitutor = new StringSubstitutor(lookup);
+            this.log.info("Native Environment Interpolator is enabled (extras = {})", this.properties.interpolatorExtras);
+            StringLookup lookup = (this.properties.interpolatorExtras ? NativeEnvironmentInterpolator::lookup
+                    : NativeEnvironmentInterpolator::lookupExtras);
+
+            final StringSubstitutor substitutor = new StringSubstitutor(lookup)
+                    .setVariablePrefix("@{")
+                    .setVariableSuffix("}");
+
             this.resolver = substitutor::replace;
         }
         else
         {
-            this.log.info("NativeEnvironmentInterpolator's interpolator is disabled, using a strict lookup");
-            substitutor = new StringSubstitutor(NativeEnvironmentInterpolator.NULL_LOOKUP);
-            this.resolver = NativeEnvironmentInterpolator.NULL_RESOLVER;
+            this.log.info("Native Environment Interpolator is disabled, using a strict lookup");
+            this.resolver = NativeEnvironmentInterpolator.IDENTITY;
         }
-
-        // Re-add this ... apparently the simplified syntax causes conflicts with
-        // the OOTB Spring stuff...
-        substitutor
-                .setVariablePrefix("@{")
-                .setVariableSuffix("}");
     }
 
     public String map(final String key, final String value)
