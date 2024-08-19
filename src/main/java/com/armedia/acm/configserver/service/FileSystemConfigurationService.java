@@ -1,3 +1,5 @@
+package com.armedia.acm.configserver.service;
+
 /*-
  * #%L
  * acm-config-server
@@ -24,19 +26,8 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.service;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.armedia.acm.configserver.exception.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,7 +37,19 @@ import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import com.armedia.acm.configserver.exception.ConfigurationException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Qualifier(value = "fileSystemConfigurationService")
@@ -100,7 +103,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         }
         catch (IOException e)
         {
-            FileSystemConfigurationService.logger.warn("Failed to read configuration from path [{}]", configurationFilePath);
+            logger.warn("Failed to read configuration from path [{}]", configurationFilePath);
             throw new ConfigurationException("Failed to read configuration.", e);
         }
     }
@@ -136,7 +139,7 @@ public class FileSystemConfigurationService implements ConfigurationService
         }
         catch (IOException e)
         {
-            FileSystemConfigurationService.logger.warn("Failed to read configuration from path [{}]", configurationFilePath);
+            logger.warn("Failed to read configuration from path [{}]", configurationFilePath);
             throw new ConfigurationException("Failed to read configuration.", e);
         }
     }
@@ -154,23 +157,22 @@ public class FileSystemConfigurationService implements ConfigurationService
         String resetFilePath;
         if (!applicationName.contains(FileSystemConfigurationService.RUNTIME))
         {
-            resetFilePath = String.format("%s/%s%s.yaml", this.propertiesFolderPath, applicationName,
-                    FileSystemConfigurationService.RUNTIME);
+            resetFilePath = String.format("%s/%s%s.yaml", propertiesFolderPath, applicationName, RUNTIME);
         }
         else
         {
-            resetFilePath = String.format("%s/%s.yaml", this.propertiesFolderPath, applicationName);
+            resetFilePath = String.format("%s/%s.yaml", propertiesFolderPath, applicationName);
         }
 
         String[] fileNameHelper = resetFilePath.split("/");
         String fileName = fileNameHelper[fileNameHelper.length - 1];
 
-        FileSystemConfigurationService.logger.info("Deleting file [{}]", fileName);
+        logger.info("Deleting file [{}]", fileName);
 
         File fileToBeDeleted = new File(resetFilePath);
         if (!fileToBeDeleted.exists())
         {
-            FileSystemConfigurationService.logger.warn("File [{}] does not exists, nothing to delete.", fileName);
+            logger.warn("File [{}] does not exists, nothing to delete.", fileName);
             throw new NoSuchFileException(String.format("File %s does not exists, nothing to delete.", fileName));
         }
         else if (!fileToBeDeleted.delete())
@@ -182,7 +184,7 @@ public class FileSystemConfigurationService implements ConfigurationService
     @Override
     public void resetConfigurationBrandingFilesToDefault() throws ConfigurationException
     {
-        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(this.brandingFilesFolder);
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(brandingFilesFolder);
 
         for (File file : fileList)
         {
@@ -190,10 +192,9 @@ public class FileSystemConfigurationService implements ConfigurationService
             {
                 if (file.delete())
                 {
-                    FileSystemConfigurationService.logger.info("Reset file [{}] to default version.", file.getName());
+                    logger.info("Reset file [{}] to default version.", file.getName());
                     String originalFileName = file.getName().replace(FileSystemConfigurationService.RUNTIME, "");
-                    this.fileConfigurationService.sendNotification(originalFileName,
-                            FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+                    fileConfigurationService.sendNotification(originalFileName, FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
 
                 }
                 else
@@ -208,12 +209,12 @@ public class FileSystemConfigurationService implements ConfigurationService
     @Override
     public void resetPropertiesToDefault() throws ConfigurationException
     {
-        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(this.propertiesFolderPath);
+        List<File> fileList = listAllRuntimeFilesInFolderAndSubfolders(propertiesFolderPath);
         for (File file : fileList)
         {
             if (file.getName().contains(FileSystemConfigurationService.RUNTIME))
             {
-                FileSystemConfigurationService.logger.info("Deleting file [{}]", file.getName());
+                logger.info("Deleting file [{}]", file.getName());
                 if (!file.delete())
                 {
                     throw new ConfigurationException(String.format("File %s could not be deleted", file.getName()));
@@ -255,7 +256,7 @@ public class FileSystemConfigurationService implements ConfigurationService
             }
             catch (IOException e)
             {
-                FileSystemConfigurationService.logger.warn("Failed to create file to path [{}]", yamlResource.getPath());
+                logger.warn("Failed to create file to path [{}]", yamlResource.getPath());
                 throw new ConfigurationException(e);
             }
         }
@@ -264,7 +265,7 @@ public class FileSystemConfigurationService implements ConfigurationService
 
     private String getRuntimeConfigurationFilePath(String applicationName)
     {
-        return String.format("%s/%s%s.yaml", this.propertiesFolderPath, applicationName, FileSystemConfigurationService.RUNTIME);
+        return String.format("%s/%s%s.yaml", propertiesFolderPath, applicationName, RUNTIME);
     }
 
     private DumperOptions buildDumperOptions()

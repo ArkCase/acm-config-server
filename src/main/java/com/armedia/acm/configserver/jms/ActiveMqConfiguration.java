@@ -1,3 +1,5 @@
+package com.armedia.acm.configserver.jms;
+
 /*-
  * #%L
  * acm-config-server
@@ -24,9 +26,8 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.jms;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import com.google.common.base.MoreObjects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -54,7 +55,7 @@ public class ActiveMqConfiguration
 
     public String getBrokerUrl()
     {
-        return this.brokerUrl;
+        return brokerUrl;
     }
 
     public void setBrokerUrl(String brokerUrl)
@@ -64,7 +65,7 @@ public class ActiveMqConfiguration
 
     public String getUser()
     {
-        return this.user;
+        return user;
     }
 
     public void setUser(String user)
@@ -74,7 +75,7 @@ public class ActiveMqConfiguration
 
     public String getPassword()
     {
-        return this.password;
+        return password;
     }
 
     public void setPassword(String password)
@@ -84,7 +85,7 @@ public class ActiveMqConfiguration
 
     public String getKeystore()
     {
-        return this.keystore;
+        return keystore;
     }
 
     public void setKeystore(String keystore)
@@ -94,7 +95,7 @@ public class ActiveMqConfiguration
 
     public String getKeystorePassword()
     {
-        return this.keystorePassword;
+        return keystorePassword;
     }
 
     public void setKeystorePassword(String keystorePassword)
@@ -104,7 +105,7 @@ public class ActiveMqConfiguration
 
     public String getTruststore()
     {
-        return this.truststore;
+        return truststore;
     }
 
     public void setTruststore(String truststore)
@@ -114,7 +115,7 @@ public class ActiveMqConfiguration
 
     public String getTruststorePassword()
     {
-        return this.truststorePassword;
+        return truststorePassword;
     }
 
     public void setTruststorePassword(String truststorePassword)
@@ -124,7 +125,7 @@ public class ActiveMqConfiguration
 
     public String getDefaultDestination()
     {
-        return this.defaultDestination;
+        return defaultDestination;
     }
 
     public void setDefaultDestination(String defaultDestination)
@@ -134,7 +135,7 @@ public class ActiveMqConfiguration
 
     public int getTimeout()
     {
-        return this.timeout;
+        return timeout;
     }
 
     public void setTimeout(int timeout)
@@ -145,11 +146,11 @@ public class ActiveMqConfiguration
     @Override
     public String toString()
     {
-        return new ToStringBuilder(this)
-                .append("brokerUrl", this.brokerUrl)
-                .append("user", this.user)
-                .append("defaultDestination", this.defaultDestination)
-                .append("timeout", this.timeout)
+        return MoreObjects.toStringHelper(this)
+                .add("brokerUrl", brokerUrl)
+                .add("user", user)
+                .add("defaultDestination", defaultDestination)
+                .add("timeout", timeout)
                 .toString();
     }
 }

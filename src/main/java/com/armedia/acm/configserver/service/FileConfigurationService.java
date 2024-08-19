@@ -1,37 +1,33 @@
+package com.armedia.acm.configserver.service;
+
 /*-
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 - 2024 ArkCase LLC
+ * Copyright (C) 2019 - 2020 ArkCase LLC
  * %%
- * This file is part of the ArkCase software.
- *
- * If the software was purchased under a paid ArkCase license, the terms of
- * the paid license agreement will prevail.  Otherwise, the software is
+ * This file is part of the ArkCase software. 
+ * 
+ * If the software was purchased under a paid ArkCase license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
  * provided under the following open source license terms:
- *
+ * 
  * ArkCase is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ *  
  * ArkCase is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.jms.DeliveryMode;
-
+import com.armedia.acm.configserver.api.ConfigurationAPIController;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -42,10 +38,14 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.jms.DeliveryMode;
+import javax.jms.TextMessage;
+import java.io.File;
+import java.io.InputStream;
+
 @Service
 @Qualifier(value = "fileConfigurationService")
-public class FileConfigurationService
-{
+public class FileConfigurationService {
 
     private final String configServerRepo;
 
@@ -55,37 +55,34 @@ public class FileConfigurationService
 
     private static final Logger logger = LoggerFactory.getLogger(FileConfigurationService.class);
 
+
     public FileConfigurationService(@Value("${properties.folder.path}") String configRepo, JmsTemplate acmJmsTemplate)
     {
         this.configServerRepo = configRepo;
         this.acmJmsTemplate = acmJmsTemplate;
     }
 
-    public void moveFileToConfiguration(MultipartFile file, String fileName, boolean isBrandingFile) throws IOException
-    {
-        try (InputStream inputStream = file.getInputStream())
+    public void moveFileToConfiguration(MultipartFile file, String fileName) throws Exception {
+        try (InputStream logoStream = file.getInputStream())
         {
 
             String originalFileName = getOriginalFileNameFromFilePath(fileName);
 
             String profileBasedFile = setProfileBasedResource(fileName);
 
-            File destinationFile = new File(this.configServerRepo + "/" + profileBasedFile);
+            File logoFile = new File(configServerRepo + "/" + profileBasedFile);
 
-            FileUtils.copyInputStreamToFile(inputStream, destinationFile);
+            FileUtils.copyInputStreamToFile(logoStream, logoFile);
 
-            FileConfigurationService.logger.info("File is with name {} created on the config server", fileName);
+            logger.info("File is with name {} created on the config server", fileName);
 
-            if (isBrandingFile)
-            {
-                sendNotification(originalFileName,
-                        FileConfigurationService.VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
-            }
+            sendNotification(originalFileName,
+                    VIRTUAL_TOPIC_CONFIG_FILE_UPDATED);
+
         }
-        catch (IOException e)
+        catch (Exception e)
         {
-            FileConfigurationService.logger.error("File can't be updated");
-            throw e;
+            throw new Exception("Can't update logo file");
         }
     }
 
@@ -94,7 +91,7 @@ public class FileConfigurationService
         String[] splitedFilePath = filePath.split("/");
         String originalFileName = splitedFilePath[splitedFilePath.length - 1];
 
-        FileConfigurationService.logger.debug("Original file name from path {} is {}", filePath, originalFileName);
+        logger.debug("Original file name from path {} is {}", filePath, originalFileName);
 
         return originalFileName;
     }
@@ -108,10 +105,10 @@ public class FileConfigurationService
     {
         ActiveMQTopic topic = new ActiveMQTopic(destination);
 
-        this.acmJmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
-        this.acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
+        acmJmsTemplate.setDeliveryMode(DeliveryMode.PERSISTENT);
+        acmJmsTemplate.send(topic, inJmsSession -> inJmsSession.createTextMessage(message));
 
-        FileConfigurationService.logger.debug("File with name {} is updated and success message is sent for updating", message);
+        logger.debug("File with name {} is updated and success message is sent for updating", message);
 
     }
 

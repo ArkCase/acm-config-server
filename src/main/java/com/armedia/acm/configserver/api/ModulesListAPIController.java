@@ -1,8 +1,10 @@
+package com.armedia.acm.configserver.api;
+
 /*-
  * #%L
  * acm-config-server
  * %%
- * Copyright (C) 2019 - 2024 ArkCase LLC
+ * Copyright (C) 2019 ArkCase LLC
  * %%
  * This file is part of the ArkCase software.
  *
@@ -24,12 +26,6 @@
  * along with ArkCase. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package com.armedia.acm.configserver.api;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +34,11 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/config")
@@ -65,11 +66,11 @@ public class ModulesListAPIController
     /**
      * Return list of modules configuration
      *
-     * @return list of modules configuration
+     * @return
      */
     public List<String> getModulesNames()
     {
-        File modulesDir = new File(this.labelsFolderPath);
+        File modulesDir = new File(labelsFolderPath);
 
         File[] files = modulesDir.listFiles(file -> {
             if (file.isFile() && !file.getName().toLowerCase().contains("-runtime"))
@@ -83,7 +84,7 @@ public class ModulesListAPIController
 
         for (File labelResource : files)
         {
-            for (String lang : this.langs)
+            for (String lang : langs)
             {
                 String fileName = labelResource.getName();
                 if (fileName.contains(lang))
@@ -98,7 +99,7 @@ public class ModulesListAPIController
             }
         }
 
-        ModulesListAPIController.logger.info("Returns modules names. [{}]", modules.toArray());
+        logger.info("Returns modules names. [{}]", modules.toArray());
         return modules;
     }
 }
