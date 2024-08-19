@@ -38,14 +38,14 @@ class NativeEnvironmentInterpolatorRepositoryFactory
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final NativeEnvironmentInterpolator cloudMapper;
+    private final NativeEnvironmentInterpolator interpolator;
     private final ConfigurableEnvironment environment;
     private final ConfigServerProperties properties;
 
-    NativeEnvironmentInterpolatorRepositoryFactory(NativeEnvironmentInterpolator cloudMapper, ConfigurableEnvironment environment,
+    NativeEnvironmentInterpolatorRepositoryFactory(NativeEnvironmentInterpolator interpolator, ConfigurableEnvironment environment,
             ConfigServerProperties properties)
     {
-        this.cloudMapper = cloudMapper;
+        this.interpolator = interpolator;
         this.environment = environment;
         this.properties = properties;
     }
@@ -54,6 +54,6 @@ class NativeEnvironmentInterpolatorRepositoryFactory
     public NativeEnvironmentInterpolatorRepository build(NativeEnvironmentProperties environmentProperties)
     {
         this.log.info("Building a NativeEnvironmentInterpolatorRepository for {}", this.properties.getDefaultLabel());
-        return new NativeEnvironmentInterpolatorRepository(this.cloudMapper, this.environment, environmentProperties);
+        return new NativeEnvironmentInterpolatorRepository(this.interpolator, this.environment, environmentProperties);
     }
 }

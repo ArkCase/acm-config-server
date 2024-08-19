@@ -45,13 +45,14 @@ class NativeEnvironmentInterpolatorRepository implements EnvironmentRepository, 
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final NativeEnvironmentInterpolator cloudMapper;
+    private final NativeEnvironmentInterpolator interpolator;
 
     private final NativeEnvironmentRepository delegate;
 
-    NativeEnvironmentInterpolatorRepository(NativeEnvironmentInterpolator cloudMapper, ConfigurableEnvironment environment, NativeEnvironmentProperties properties)
+    NativeEnvironmentInterpolatorRepository(NativeEnvironmentInterpolator interpolator, ConfigurableEnvironment environment,
+            NativeEnvironmentProperties properties)
     {
-        this.cloudMapper = cloudMapper;
+        this.interpolator = interpolator;
         this.delegate = new NativeEnvironmentRepository(environment, properties)
         {
             @Override
@@ -59,7 +60,7 @@ class NativeEnvironmentInterpolatorRepository implements EnvironmentRepository, 
             {
                 Environment env = super.findOne(config, profile, label);
                 NativeEnvironmentInterpolatorRepository.this.log.info(
-                        "Applying cloud mappings for the environment {} ({}), version {}, with profiles {}", env.getName(),
+                        "Applying interpolated mappings for the environment {} ({}), version {}, with profiles {}", env.getName(),
                         env.getLabel(), env.getVersion(), env.getProfiles());
 
                 // We call the superclass method first, so we can
@@ -78,7 +79,7 @@ class NativeEnvironmentInterpolatorRepository implements EnvironmentRepository, 
                         String value = entry.getValue().toString();
 
                         NativeEnvironmentInterpolatorRepository.this.log.trace("Mapping [{}]=[{}]", name, value);
-                        String newValue = NativeEnvironmentInterpolatorRepository.this.cloudMapper.map(name, value);
+                        String newValue = NativeEnvironmentInterpolatorRepository.this.interpolator.map(name, value);
 
                         // If we're supposed to remove it, then we do so
                         if (newValue == null)
@@ -101,7 +102,7 @@ class NativeEnvironmentInterpolatorRepository implements EnvironmentRepository, 
                 return result;
             }
         };
-        this.delegate.setDefaultLabel("native-cloud-environment");
+        this.delegate.setDefaultLabel("native-environment-interpolator");
     }
 
     @Override

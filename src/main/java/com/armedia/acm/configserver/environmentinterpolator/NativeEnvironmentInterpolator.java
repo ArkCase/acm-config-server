@@ -169,7 +169,7 @@ public class NativeEnvironmentInterpolator
 
         this.properties = ObjectUtils.defaultIfNull(properties, NativeEnvironmentInterpolatorProperties.DEFAULT);
 
-        if (!this.properties.interpolator)
+        if (!this.properties.enabled)
         {
             this.log.info("Native Environment Interpolator is disabled, values will not be interpolated");
             this.resolver = NativeEnvironmentInterpolator.IDENTITY;
@@ -178,8 +178,8 @@ public class NativeEnvironmentInterpolator
 
         // Our interpolator will first try system properties, then try environment variables...
         // then try the default interpolator, and finally give up ...
-        this.log.info("Native Environment Interpolator is enabled (with{} extras)", (this.properties.interpolatorExtras ? "" : "out"));
-        StringLookup lookup = (this.properties.interpolatorExtras ? NativeEnvironmentInterpolator::lookup
+        this.log.info("Native Environment Interpolator is enabled (with{} extras)", (this.properties.extras ? "" : "out"));
+        StringLookup lookup = (this.properties.extras ? NativeEnvironmentInterpolator::lookup
                 : NativeEnvironmentInterpolator::lookupExtras);
 
         final StringSubstitutor substitutor = new StringSubstitutor(lookup)

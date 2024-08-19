@@ -36,33 +36,27 @@ import org.springframework.stereotype.Component;
 public class NativeEnvironmentInterpolatorProperties
 {
     protected static final Boolean DEFAULT_ENABLED = Boolean.TRUE;
-    protected static final Boolean DEFAULT_ENABLE_INTERPOLATOR = Boolean.TRUE;
-    protected static final Boolean DEFAULT_ENABLE_INTERPOLATOR_EXTRAS = Boolean.FALSE;
+    protected static final Boolean DEFAULT_ENABLE_EXTRAS = Boolean.FALSE;
     protected static final Boolean DEFAULT_MISSING_AS_EMPTY = Boolean.FALSE;
 
     public static NativeEnvironmentInterpolatorProperties DEFAULT = new NativeEnvironmentInterpolatorProperties(
             NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLED,
-            NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR,
-            NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS,
+            NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_EXTRAS,
             NativeEnvironmentInterpolatorProperties.DEFAULT_MISSING_AS_EMPTY);
 
     public final boolean enabled;
-    public final boolean interpolator;
-    public final boolean interpolatorExtras;
+    public final boolean extras;
     public final boolean missingAsEmpty;
 
     public NativeEnvironmentInterpolatorProperties(
-            @Value("${cloud-mapper.enabled:#{null}}") Boolean enabled,
-            @Value("${cloud-mapper.interpolator:#{null}}") Boolean interpolator,
-            @Value("${cloud-mapper.interpolatorExtras:#{null}}") Boolean interpolatorExtras,
-            @Value("${cloud-mapper.missingAsEmpty:#{null}}") Boolean missingAsEmpty)
+            @Value("${interpolator.enabled:#{null}}") Boolean enabled,
+            @Value("${interpolator.extras:#{null}}") Boolean interpolatorExtras,
+            @Value("${interpolator.missingAsEmpty:#{null}}") Boolean missingAsEmpty)
     {
         // This can serve as the master flag to disable the whole thing in one go, if needed
         this.enabled = ObjectUtils.defaultIfNull(enabled, NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLED);
-        this.interpolator = this.enabled
-                && ObjectUtils.defaultIfNull(interpolator, NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR);
-        this.interpolatorExtras = this.enabled
-                && ObjectUtils.defaultIfNull(interpolatorExtras, NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_INTERPOLATOR_EXTRAS);
+        this.extras = this.enabled
+                && ObjectUtils.defaultIfNull(interpolatorExtras, NativeEnvironmentInterpolatorProperties.DEFAULT_ENABLE_EXTRAS);
         this.missingAsEmpty = this.enabled
                 && ObjectUtils.defaultIfNull(missingAsEmpty, NativeEnvironmentInterpolatorProperties.DEFAULT_MISSING_AS_EMPTY);
     }

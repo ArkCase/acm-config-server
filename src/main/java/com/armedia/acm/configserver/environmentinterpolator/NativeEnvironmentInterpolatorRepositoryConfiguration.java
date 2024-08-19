@@ -44,11 +44,11 @@ public class NativeEnvironmentInterpolatorRepositoryConfiguration
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private NativeEnvironmentInterpolator cloudMapper;
+    private NativeEnvironmentInterpolator interpolator;
 
     @Bean
     @Lazy
-    public NativeEnvironmentInterpolatorRepository nativeCloudEnvironmentRepository(NativeEnvironmentInterpolatorRepositoryFactory factory,
+    public NativeEnvironmentInterpolatorRepository nativeEnvironmentInterpolatorRepository(NativeEnvironmentInterpolatorRepositoryFactory factory,
             NativeEnvironmentProperties environmentProperties)
     {
         this.log.info("Creating a new NativeEnvironmentInterpolatorRepository");
@@ -57,10 +57,10 @@ public class NativeEnvironmentInterpolatorRepositoryConfiguration
 
     @Bean
     @Lazy
-    public NativeEnvironmentInterpolatorRepositoryFactory nativeCloudEnvironmentRepositoryFactory(
+    public NativeEnvironmentInterpolatorRepositoryFactory nativeEnvironmentInterpolatorRepositoryFactory(
             ConfigurableEnvironment environment, ConfigServerProperties properties)
     {
-        return new NativeEnvironmentInterpolatorRepositoryFactory(this.cloudMapper, environment, properties);
+        return new NativeEnvironmentInterpolatorRepositoryFactory(this.interpolator, environment, properties);
     }
 
 }
