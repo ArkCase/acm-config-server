@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.6.RELEASE</version>
+        <version>2.4.13</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -56,7 +56,7 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-cloud.version>Finchley.SR2</spring-cloud.version>
+        <spring-cloud.version>2020.0.0</spring-cloud.version>
         <log4j2.version>2.17.1</log4j2.version>
         <commons-text.version>1.12.0</commons-text.version>
 
@@ -105,6 +105,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.1.2-jre</version>
+        </dependency>
+
+        <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
             <version>3.2.10</version>
@@ -119,7 +125,7 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.24</version>
+            <version>1.33</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

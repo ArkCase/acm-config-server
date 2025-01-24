@@ -162,7 +162,7 @@ public class FileWatchService
 
             while (true)
             {
-                this.logger.debug("Waiting for file change on path [{}]", basePath);
+                this.logger.trace("Waiting for file change on path [{}]", basePath);
                 WatchKey key;
                 try
                 {
@@ -182,11 +182,17 @@ public class FileWatchService
                     continue;
                 }
 
-                this.logger.debug("Watch key event present...");
+                this.logger.trace("Watch key event present...");
                 for (WatchEvent<?> event : key.pollEvents())
                 {
                     Path filePath = (Path) event.context();
                     String watchedPath = key.watchable().toString();
+
+                    if (filePath.getFileName().toString().startsWith(".goutputstream")) {
+                        this.logger.trace("Ignoring temporary file: {}", filePath);
+                        continue;
+                    }
+
                     this.logger.info("Configuration file [{}] in folder [{}] has been updated!", filePath,
                             watchedPath);
                     String parentDirectoryName = Paths.get(watchedPath).getFileName().toString();
@@ -205,7 +211,7 @@ public class FileWatchService
                     }
                 }
                 key.reset();
-                this.logger.debug("Reset watch key...");
+                this.logger.trace("Reset watch key...");
             }
         }
         catch (IOException e)
